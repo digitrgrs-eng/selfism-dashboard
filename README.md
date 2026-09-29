@@ -59,3 +59,14 @@ Popravka cilja Linux x86_64, Python 3.12 i CUDA 12.8 iz ove baze. Proverava Qwen
 ## Izvor
 
 Osnova: https://github.com/10sorlabs/AI1-Model-Grabber , prateći fajlovi sa revizije `8a94a3d6c0b8ca0164aea15f8e37439156ce021c`. Postojeći autorski sadržaj i oznake zadržani su. Ovo nije zvanično 10sorLabs izdanje.
+
+## Privatni R2
+
+Dodaj ove environment promenljive u RunPod template i pod:
+
+- SELFISM_R2_ENDPOINT=https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com
+- SELFISM_R2_BUCKET=selfism-models
+- SELFISM_R2_ACCESS_KEY_ID: privatni Read only Access Key ID
+- SELFISM_R2_SECRET_ACCESS_KEY: privatni Read only Secret Access Key
+
+Kljuceve ne unositi u GitHub. Instalater najpre proverava privatni bucket, zatim RapidCache katalog, zatim originalne izvore. R2 objekti moraju imati metadata sha256 koju postavlja upload skripta; mora se poklopiti sa pouzdanim katalogom i velicinom. Fajlovi bez pouzdane SHA256 u katalogu ostaju na izvornim linkovima. Civitai token i dalje je potreban za originalne Selfora metapodatke. Potpisani linkovi traju 24 sata. Ovo je fallback pri izboru izvora; greska tokom zapocetog preuzimanja prikazuje se korisniku. Brzina nije garantovana i treba je izmeriti na pod-u.

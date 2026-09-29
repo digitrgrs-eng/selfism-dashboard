@@ -15,6 +15,7 @@ import httpx
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from launcher.private_r2 import r2_client, select_private
 
 class Selection(BaseModel):
     profile: Literal['simple','aio','extras','repair','model','node'] = 'simple'
@@ -64,6 +65,20 @@ async def resolve_rapidcache(host, files):
     if data is None:
         messages.insert(0, 'RapidCache catalog unavailable; using original sources.')
     return selected, messages
+
+async def resolve_sources(host, files):
+    if not files:
+        return files, []
+    try:
+        client,bucket,notice=await asyncio.to_thread(r2_client)
+        preferred,messages=await asyncio.to_thread(select_private,files,client,bucket)
+        if notice: messages.insert(0,notice)
+    except Exception:
+        preferred,messages={},['Private R2 unavailable; using fallback sources.']
+    remaining=[i for i in range(len(files)) if i not in preferred]
+    fallback,notes=await resolve_rapidcache(host,[files[i] for i in remaining])
+    preferred.update(zip(remaining,fallback))
+    return [preferred[i] for i in range(len(files))], messages+notes
 
 def register(host):
     root = Path(__file__).resolve().parents[1]
@@ -128,8 +143,8 @@ def register(host):
             try:
                 if workflow.get('files') or workflow.get('custom_nodes'):
                     workflow = copy.deepcopy(workflow)
-                    self.update(message='Checking RapidCache for identical models…')
-                    workflow['files'], source_messages = await resolve_rapidcache(host, workflow.get('files', []))
+                    self.update(message='Checking private R2 and RapidCache for identical models…')
+                    workflow['files'], source_messages = await resolve_sources(host, workflow.get('files', []))
                     logs.extend(source_messages)
                     self.check_cancelled()
                     await super()._install_workflow(workflow)
