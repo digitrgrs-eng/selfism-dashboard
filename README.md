@@ -6,7 +6,7 @@ Pripremljen iz korisnikovog 10sorLabs dashboard arhiva. Originalni Workflows, Cu
 
 ## Trenutni status
 
-Paket je lokalno pripremljen. Nije objavljen na GitHub-u, Docker image nije izgrađen i nije izvršen GPU test na RunPod-u. GitHub korisničko ime samo po sebi ne daje pristup nalogu. Pogledaj VALIDATION.md.
+Image je uspesno izgradjen i objavljen: https://github.com/digitrgrs-eng/selfism-dashboard/actions/runs/36507212645 . Adresa: `ghcr.io/digitrgrs-eng/selfism-dashboard:220ec7f57a262b96fd1db93118cdf8b85c56a3b4`. GPU test na RunPod-u jos nije izvrsen. Pogledaj VALIDATION.md.
 
 ## 1. GitHub
 
