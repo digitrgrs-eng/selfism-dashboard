@@ -2,7 +2,7 @@
 
 Lokalno na Windows-u:
 
-- `tests/test_selfism.py`: 8 testova prolazi.
+- `tests/test_selfism.py`: 17 testova prolazi.
 - Provereni novi API/UI, dozvoljeni profili, zaključavanje tokom drugih instalacija/generisanja, uvezani workflowi i trigger, ograničeni log i prekid/timeout instalacionog procesa.
 - JavaScript sintaksa originalnog i dodatog interfejsa proverena preko `node --check`.
 - Modeli i custom-node izvori su navedeni u `catalog/selfism.json`. Civitai SHA256 se pribavlja pre preuzimanja pomoću korisnikovog tokena.
@@ -15,3 +15,5 @@ Build i preostale provere:
 - Kompletna originalna test kolekcija: postoje neusaglašena očekivanja broja originalnih workflowa i testovi koji očekuju Linux/ComfyUI okruženje. Paket se ne predstavlja kao potpuno integraciono testiran.
 
 Pre stvarnog korišćenja: uspešan image build, novi probni GPU pod, log `Qwen35ChatHandler: True` i `GPU offload: True`, restart ComfyUI, zatim po jedno uspešno Simple i AIO generisanje. Proveriti i postojeći originalni workflow i RapidCache prijavu.
+
+RapidCache testovi: isto ime sa razlicitim SHA256 ne podudara se; razlicita velicina, HTTP, neubrzani izvor i pogresan auth ostaju na originalu. Ispravno podudaranje cuva lokalni folder, ukljucuje SHA256 proveru, ne loguje potpisani URL. Nedostupan API vraca originalne izvore. Prijavljeni RapidCache nalog na pravom pod-u jos nije testiran.

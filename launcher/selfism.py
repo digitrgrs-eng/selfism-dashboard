@@ -5,6 +5,8 @@ import copy
 import json
 import os
 import signal
+import re
+from urllib.parse import urlsplit
 from collections import deque
 from pathlib import Path
 from typing import Literal
@@ -18,6 +20,50 @@ class Selection(BaseModel):
     profile: Literal['simple','aio','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
+
+def prefer_rapidcache(files, remote_catalog):
+    """Use only exact, accelerated matches; keep local paths and verification."""
+    candidates = {}
+    for workflow in (remote_catalog or {}).get('workflows', []):
+        for item in workflow.get('files', []):
+            digest = str(item.get('sha256', '')).lower()
+            url = str(item.get('url', ''))
+            if (re.fullmatch(r'[0-9a-f]{64}', digest)
+                    and item.get('parallel') is True
+                    and urlsplit(url).scheme == 'https'
+                    and item.get('auth', 'none') in ('none', '', None)
+                    and type(item.get('size_bytes')) is int and item['size_bytes'] > 0):
+                candidates.setdefault(digest, []).append(item)
+    selected, messages = [], []
+    for original in files:
+        result = copy.deepcopy(original)
+        matches = candidates.get(str(original.get('sha256', '')).lower(), [])
+        match = next((item for item in matches if not original.get('size_bytes')
+                      or item['size_bytes'] == original['size_bytes']), None)
+        name = original.get('name') or Path(original['destination']).name
+        if match:
+            result.update(url=match['url'], auth='none', parallel=True,
+                          size_bytes=match['size_bytes'], verify=True)
+            messages.append(f'{name}: RapidCache (identical SHA256).')
+        else:
+            messages.append(f'{name}: original source (no verified accelerated match).')
+        selected.append(result)
+    return selected, messages
+
+async def resolve_rapidcache(host, files):
+    if not files:
+        return files, []
+    # Reuse the original RapidCache account; do not forward its token to downloads.
+    try:
+        data = await asyncio.to_thread(host.remote.fetch_catalog, fresh=True)
+        if data is not None:
+            host._validate_catalog(data)
+    except Exception:
+        data = None
+    selected, messages = prefer_rapidcache(files, data)
+    if data is None:
+        messages.insert(0, 'RapidCache catalog unavailable; using original sources.')
+    return selected, messages
 
 def register(host):
     root = Path(__file__).resolve().parents[1]
@@ -79,6 +125,11 @@ def register(host):
             os.environ['PIP_CONSTRAINT']=str(constraints)
             try:
                 if workflow.get('files') or workflow.get('custom_nodes'):
+                    workflow = copy.deepcopy(workflow)
+                    self.update(message='Checking RapidCache for identical models…')
+                    workflow['files'], source_messages = await resolve_rapidcache(host, workflow.get('files', []))
+                    logs.extend(source_messages)
+                    self.check_cancelled()
                     await super()._install_workflow(workflow)
                 if self.state.warnings:
                     raise RuntimeError('Some dependencies failed. See warnings and retry before running the workflow.')

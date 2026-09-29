@@ -41,7 +41,7 @@ Environment variables:
 - `CIVITAI_TOKEN` — lični Civitai API token za preuzimanje Selfora modela.
 - `HF_TOKEN` — tvoj Hugging Face read token, ako koristiš originalne workflowe sa modelima koji zahtevaju pristup. Prihvati njihove uslove na Hugging Face-u.
 
-Tokeni se unose u RunPod; ne ugrađuju se u Docker image. RapidCache koristi postojeću prijavu i postojeće uslove naloga. Novi Selfism modeli koriste navedene originalne izvore; nije potvrđeno da ih RapidCache ubrzava.
+Tokeni se unose u RunPod; ne ugrađuju se u Docker image. RapidCache koristi postojeću prijavu i postojeće uslove naloga. Pre instalacije prijavi se u RapidCache. Simple, AIO, dodatni i pojedinacni modeli proveravaju svez katalog tog naloga. Ubrzani HTTPS izvor koristi se samo kada SHA256 i poznata velicina odgovaraju originalu. Zadrzava se odredisni folder workflowa i provera integriteta. Bez podudaranja ili ako katalog nije dostupan koristi se originalni link. Proverava se katalog koji API izlozi nalogu, ne pretrazuje se ceo privatni RapidCache storage. Log prikazuje izbor izvora bez potpisanih URL-ova. Selfora i dalje zahteva Civitai metapodatke/token da bi se utvrdio originalni SHA256. Neuspeh vec zapocetog transfera prijavljuje se kao greska; ova izmena automatski bira fallback kada katalog nema odgovarajuci model ili nije dostupan.
 
 ## 3. Svaki novi pod
 

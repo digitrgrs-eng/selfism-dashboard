@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from launcher.selfism import prefer_rapidcache, resolve_rapidcache
 from fastapi.testclient import TestClient
 
 m=importlib.import_module('launcher.app')
@@ -101,3 +102,44 @@ def test_catalog_destinations_and_node_pins():
         assert f.get('sha256') or f.get('civitai_version') or 'github.com/starinspace/' in f['url']
     for n in data['nodes']:
         assert len(n['ref'])==40 and int(n['ref'],16)>0
+
+def test_rapidcache_preserves_workflow_path_and_enforces_hash():
+    original = {'name':'encoder','url':'https://huggingface.co/original',
+                'destination':'models/text_encoders/local.safetensors',
+                'sha256':'a'*64,'size_bytes':123,'auth':'huggingface'}
+    remote = dict(original, url='https://cache.example/file?signature=secret',
+                  destination='models/wrong/path',auth='none',parallel=True,verify=False)
+    result, logs = prefer_rapidcache([original], {'workflows':[{'files':[remote]}]})
+    assert result[0]['url'] == remote['url']
+    assert result[0]['destination'] == original['destination']
+    assert result[0]['verify'] is True and result[0]['auth']=='none'
+    assert result[0]['sha256'] == original['sha256']
+    assert original['url']=='https://huggingface.co/original'
+    assert 'RapidCache' in logs[0] and 'secret' not in str(logs)
+
+@pytest.mark.parametrize('change', [
+    {'sha256':'b'*64}, {'sha256':''}, {'size_bytes':124},
+    {'parallel':False}, {'parallel':'true'}, {'url':'http://cache.example/file'},
+    {'auth':'civitai'},
+])
+def test_rapidcache_mismatch_or_nonaccelerated_uses_original(change):
+    original={'name':'same-name','url':'https://original.example/model',
+              'destination':'models/vae/test','sha256':'a'*64,'size_bytes':123}
+    remote=dict(original,parallel=True,auth='none',url='https://cache.example/model')
+    remote.update(change)
+    result, logs=prefer_rapidcache([original],{'workflows':[{'files':[remote]}]})
+    assert result==[original]
+    assert 'original source' in logs[0]
+
+def test_rapidcache_outage_is_nonfatal_and_requests_fresh_links(monkeypatch):
+    calls=[]
+    def fetch(*,fresh):
+        calls.append(fresh)
+        raise RuntimeError('private signed URL must not be logged')
+    monkeypatch.setattr(m.remote,'fetch_catalog',fetch)
+    original=[{'url':'https://original.example/model','destination':'models/test'}]
+    result,logs=asyncio.run(resolve_rapidcache(m,original))
+    assert calls==[True] and result==original
+    assert 'unavailable' in logs[0] and 'private signed' not in str(logs)
+    asyncio.run(resolve_rapidcache(m,[]))
+    assert calls==[True]
