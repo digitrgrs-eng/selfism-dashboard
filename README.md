@@ -70,3 +70,17 @@ Dodaj ove environment promenljive u RunPod template i pod:
 - SELFISM_R2_SECRET_ACCESS_KEY: privatni Read only Secret Access Key
 
 Kljuceve ne unositi u GitHub. Instalater najpre proverava privatni bucket, zatim RapidCache katalog, zatim originalne izvore. R2 objekti moraju imati metadata sha256 koju postavlja upload skripta; mora se poklopiti sa pouzdanim katalogom i velicinom. Fajlovi bez pouzdane SHA256 u katalogu ostaju na izvornim linkovima. Civitai token i dalje je potreban za originalne Selfora metapodatke. Potpisani linkovi traju 24 sata. Ovo je fallback pri izboru izvora; greska tokom zapocetog preuzimanja prikazuje se korisniku. Brzina nije garantovana i treba je izmeriti na pod-u.
+
+
+## 10sorLabs Reference + Depth
+The Selfora / Selfism page includes a separate Reference + Depth installer. It uses Krea 2 Turbo FP8 regardless of the Selfora precision dropdown and installs the reference captioner, Depth control, Artfat Resolution and existing optional face/upscale dependencies. Source preference is the shared verified private R2 -> RapidCache -> original URL resolver. RapidCache requires an exact SHA256 match; availability is not assumed.
+
+Depth Anything weights are stored under `models/controlnet_aux` and linked into the annotator checkpoint directory after node installation, avoiding an untracked first-run download. The normal `--all` R2 upload includes these and all newly cataloged models. Millie remains a private, separately supplied LoRA; an existing `millie_000002750.safetensors` or `millie.safetensors` is enabled when the installed workflow is first saved. Existing saved workflows are preserved.
+
+After installing, use the RunPod Jupyter terminal to upload available catalog files:
+
+```bash
+PYTHONPATH=/opt/r2deps python3 /opt/10sorlabs/scripts/upload_models_r2.py --all
+```
+
+The tool prompts for bucket-scoped upload credentials without saving them, verifies local files, and skips already matching objects. Runtime download credentials remain read-only. No upload is triggered by installing a workflow.

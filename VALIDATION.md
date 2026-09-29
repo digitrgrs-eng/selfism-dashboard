@@ -17,3 +17,6 @@ Build i preostale provere:
 Pre stvarnog korišćenja: uspešan image build, novi probni GPU pod, log `Qwen35ChatHandler: True` i `GPU offload: True`, restart ComfyUI, zatim po jedno uspešno Simple i AIO generisanje. Proveriti i postojeći originalni workflow i RapidCache prijavu.
 
 RapidCache testovi: isto ime sa razlicitim SHA256 ne podudara se; razlicita velicina, HTTP, neubrzani izvor i pogresan auth ostaju na originalu. Ispravno podudaranje cuva lokalni folder, ukljucuje SHA256 proveru, ne loguje potpisani URL. Nedostupan API vraca originalne izvore. Prijavljeni RapidCache nalog na pravom pod-u jos nije testiran.
+
+
+Reference + Depth addition: 24 focused tests pass (Selfism and private R2), including Turbo selection, static loader model coverage, depth checkpoint link, UI/API exposure and R2 inventory. No live GPU generation, private R2 upload or deployment on an active pod was performed.

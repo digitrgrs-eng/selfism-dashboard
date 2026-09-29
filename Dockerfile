@@ -21,6 +21,7 @@ ENV LAUNCHER_AUTO_UPDATE=0 \
 # Do not use credentials possibly baked into the upstream image.
 COPY --link launcher/ /opt/10sorlabs/launcher/
 COPY --link --from=r2deps /r2deps/ /opt/r2deps/
+COPY --link scripts/upload_models_r2.py /opt/10sorlabs/scripts/upload_models_r2.py
 COPY --link catalog/ /opt/10sorlabs/catalog/
 COPY --link selfism_workflows/ /opt/10sorlabs/selfism_workflows/
 COPY --link --chmod=755 docker/entrypoint.sh /start.sh

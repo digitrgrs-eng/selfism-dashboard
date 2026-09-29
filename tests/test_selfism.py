@@ -159,3 +159,48 @@ def test_rapidcache_outage_is_nonfatal_and_requests_fresh_links(monkeypatch):
     assert 'unavailable' in logs[0] and 'private signed' not in str(logs)
     asyncio.run(resolve_rapidcache(m,[]))
     assert calls==[True]
+
+
+def test_reference_installer_uses_turbo_not_selfora_and_includes_depth_weights(monkeypatch):
+    import httpx
+    class Client:
+        def __init__(self,**kwargs): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self,*args): pass
+        async def get(self,url,**kwargs):
+            assert url.endswith('/queue')  # No Civitai token required for Turbo.
+            return httpx.Response(200,json={'queue_running':[],'queue_pending':[]},request=httpx.Request('GET',url))
+    captured={}
+    async def start(workflow): captured.update(workflow); return {'status':'running'}
+    monkeypatch.setattr(httpx,'AsyncClient',Client)
+    monkeypatch.setattr(m.selfism_controller,'start',start)
+    with TestClient(m.app) as c:
+        assert c.post('/api/selfism/install',json={'profile':'reference','precision':'bf16'}).status_code==200
+        w=c.get('/api/selfism/workflow/reference').json()
+        assert 'data-sf-action="reference"' in c.get('/').text
+    files={f['id']:f for f in captured['files']}
+    assert 'krea-turbo' in files and not {'bf16','int8','fp8'} & files.keys()
+    assert {'depth','depth-anything','nmkd','sam','face','bloom','famegrid','qwen-vae','llm','mmproj','encoder'} <= files.keys()
+    assert captured['selfism_repair'] is True
+    assert captured['model_links'][0]['source']==files['depth-anything']['destination']
+    assert any(n['name']=='ComfyUI-Artfat-Resolution' for n in captured['custom_nodes'])
+    # All static loader files, including optional enhancement models, have catalog coverage.
+    paths={Path(f['destination']).name for f in files.values()}
+    for n in w['nodes']:
+        if n['type'] in ('UNETLoader','VAELoader','CLIPLoader','UpscaleModelLoader','SAMLoader','UltralyticsDetectorProvider','Krea2ControlLoRALoader','DepthAnythingV2Preprocessor'):
+            assert n['widgets_values'][0].split('/')[-1] in paths
+        if n['type']=='Power Lora Loader (rgthree)':
+            for row in n['widgets_values']:
+                if isinstance(row,dict) and row.get('on'): assert row['lora'] in paths
+    assert next(n for n in w['nodes'] if n['type']=='UNETLoader')['widgets_values'][0]=='krea2_turbo_fp8_scaled.safetensors'
+
+
+def test_r2_inventory_includes_reference_models(tmp_path):
+    from scripts.upload_models_r2 import inventory
+    catalog=json.loads((Path(__file__).resolve().parents[1]/'catalog/selfism.json').read_text())
+    expected=set()
+    for key in catalog['reference_files']:
+        p=tmp_path/catalog['files'][key]['destination']; p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'test');expected.add(p)
+    found,missing=inventory(catalog,tmp_path)
+    assert {p for p,spec in found}==expected
+    assert len(found)==len(expected)

@@ -159,6 +159,60 @@
       "civitai_version": 3231887,
       "civitai_file": 3114599,
       "id": "bf16"
+    },
+    "krea-turbo": {
+      "name": "Krea 2 Turbo FP8",
+      "url": "https://huggingface.co/Comfy-Org/Krea-2/resolve/main/diffusion_models/krea2_turbo_fp8_scaled.safetensors",
+      "destination": "models/diffusion_models/krea2_turbo_fp8_scaled.safetensors",
+      "size_bytes": 13141730784,
+      "sha256": "eb4dd8c612cfd10f64f25b057e6e6bbcb5737c94a7372177e456dbf7579502f1",
+      "auth": "none",
+      "id": "krea-turbo"
+    },
+    "qwen-vae": {
+      "name": "Qwen Image VAE",
+      "url": "https://huggingface.co/QuantStack/Qwen-Image-Edit-GGUF/resolve/5cf642dd2b94af2a558ec06a9dde255c673e1fdf/VAE/Qwen_Image-VAE.safetensors",
+      "destination": "models/vae/qwen_image_vae.safetensors",
+      "size_bytes": 253806246,
+      "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+      "auth": "none",
+      "id": "qwen-vae"
+    },
+    "bloom": {
+      "name": "Krea 2 Bloomgirls Realism LoRA",
+      "url": "https://huggingface.co/gravedigga/loras/resolve/main/krea2-bloomgirls-realism-step00004000.safetensors",
+      "destination": "models/loras/krea2-bloomgirls-realism-step00004000.safetensors",
+      "size_bytes": 469315368,
+      "sha256": "7ff5ed79d0350c7360b1861829257cbd82b7ca0a75adb97c8716dd1327516c72",
+      "auth": "none",
+      "id": "bloom"
+    },
+    "famegrid": {
+      "name": "FameGrid Spicy LoRA",
+      "url": "https://huggingface.co/gravedigga/loras/resolve/main/famegrid_spicy.safetensors",
+      "destination": "models/loras/famegrid_spicy.safetensors",
+      "size_bytes": 1562410408,
+      "sha256": "7b4a37a9b9ec3885bf39242f2d4f691f186d959cbaaa30b0630e4631767b425e",
+      "auth": "none",
+      "id": "famegrid"
+    },
+    "nmkd": {
+      "name": "4x NMKD Superscale",
+      "url": "https://huggingface.co/gravedigga/loras/resolve/main/4xNMKDSuperscale_4xNMKDSuperscale.pt",
+      "destination": "models/upscale_models/4xNMKDSuperscale_4xNMKDSuperscale.pt",
+      "size_bytes": 66958607,
+      "sha256": "1d1b0078fe71446e0469d8d4df59e96baa80d83cda600d68237d655830821bcc",
+      "auth": "none",
+      "id": "nmkd"
+    },
+    "depth-anything": {
+      "id": "depth-anything",
+      "name": "Depth Anything V2 Large",
+      "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Large/resolve/cbbb86a30ce19b5684b7a05155dc7e6cbc7685b9/depth_anything_v2_vitl.pth",
+      "destination": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "size_bytes": 1341395338,
+      "sha256": "a7ea19fa0ed99244e67b624c72b8580b7e9553043245905be58796a608eb9345",
+      "auth": "none"
     }
   },
   "nodes": [
@@ -299,6 +353,12 @@
       "repo": "https://github.com/calcuis/gguf.git",
       "ref": "cb433968a4d42c59fc344d659ad94200b6c16689",
       "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Artfat-Resolution",
+      "repo": "https://github.com/artfat-creator/ComfyUI-Artfat-Resolution.git",
+      "ref": "ce95fe7099c146f825fbdc7d12de09bfe9ae32b5",
+      "install_requirements": true
     }
   ],
   "simple_files": [
@@ -328,5 +388,37 @@
     "artfat-comfyui-llm-prompter",
     "ComfyUI-Custom-Scripts",
     "gguf"
+  ],
+  "reference_files": [
+    "krea-turbo",
+    "encoder",
+    "qwen-vae",
+    "llm",
+    "mmproj",
+    "depth",
+    "depth-anything",
+    "bloom",
+    "famegrid",
+    "nmkd",
+    "face",
+    "sam"
+  ],
+  "reference_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-Custom-Scripts",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "comfyui-krea2-controlnet",
+    "comfyui_controlnet_aux",
+    "ComfyUI-Artfat-Resolution"
+  ],
+  "reference_links": [
+    {
+      "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
   ]
 }

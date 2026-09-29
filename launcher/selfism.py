@@ -18,7 +18,7 @@ from pydantic import BaseModel
 from launcher.private_r2 import r2_client, select_private
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -155,14 +155,20 @@ def register(host):
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
-                if profile in ('simple','aio'):
+                if profile in ('simple','aio','reference'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
-                        if n['type']=='UNETLoader': n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
+                        if n['type']=='UNETLoader' and profile != 'reference': n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
+                        if profile == 'reference' and n['type']=='Power Lora Loader (rgthree)':
+                            for row in n.get('widgets_values', []):
+                                if isinstance(row,dict) and row.get('lora')=='millie_000002750.safetensors':
+                                    for name in ('millie_000002750.safetensors','millie.safetensors'):
+                                        if (host.COMFYUI_DIR/'models/loras'/name).is_file():
+                                            row.update(lora=name,on=True); break
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
                     # Keep the user's previously edited workflow instead of overwriting it.
-                    dest=folder/f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json'
+                    dest=folder/('10sorlabs_MILLIE_REFERENCE_DEPTH_v1.json' if profile=='reference' else f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json')
                     if not dest.exists(): dest.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Upload your reference image. Add your private Millie LoRA separately and enable its row.')
@@ -202,6 +208,9 @@ def register(host):
             file_keys=[request.precision]+catalog['simple_files']
             nodes=[n for n in catalog['nodes'] if profile=='aio' or n['name'] in catalog['simple_nodes']]
             if profile=='aio': file_keys+=catalog['aio_files']
+        elif profile=='reference':
+            file_keys=catalog['reference_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reference_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -230,7 +239,8 @@ def register(host):
         logs.clear()
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':request.precision,'selfism_repair':profile in ('simple','aio','repair','node')}
+                  'precision':request.precision,'selfism_repair':profile in ('simple','aio','reference','repair','node'),
+                  'model_links':copy.deepcopy(catalog['reference_links']) if profile=='reference' else []}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -238,7 +248,7 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference'): raise HTTPException(404)
         return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=f'Selfism_{profile}_m1lli3.json')
 
     async def startup_repair():

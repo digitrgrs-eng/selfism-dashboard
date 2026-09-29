@@ -61,6 +61,14 @@ data=dict(version=1,files=files,nodes=nodes,
     aio_files=['edit-vae','face','sam'],
     extra_files=['edit','eyes','hair','depth','skin','span'],
     simple_nodes=[r.split('/')[1] for r in repos[:5]]+['gguf'])
+# Reference profile has separately verified metadata; retain it on regeneration.
+previous=json.loads((ROOT/'catalog/selfism.json').read_text(encoding='utf-8'))
+for key in ('reference_files','reference_nodes','reference_links'):
+    if key in previous: data[key]=previous[key]
+for key in previous.get('reference_files',[]):
+    if key not in data['files']: data['files'][key]=previous['files'][key]
+known={n['name'] for n in data['nodes']}
+data['nodes'] += [n for n in previous['nodes'] if n['name'] in previous.get('reference_nodes',[]) and n['name'] not in known]
 (ROOT/'catalog/selfism.json').write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
 print('Catalog written:',len(files),'models,',len(nodes),'pinned nodes')
 
