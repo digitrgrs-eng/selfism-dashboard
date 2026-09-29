@@ -1,0 +1,103 @@
+import asyncio
+import importlib
+import json
+import sys
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+
+m=importlib.import_module('launcher.app')
+
+@pytest.fixture(autouse=True)
+def clean(monkeypatch):
+    monkeypatch.setenv('SELFISM_AUTO_REPAIR','0')
+    for c,attr in [(m.controller,'task'),(m.custom_model_controller,'worker_task'),
+                   (m.custom_node_controller,'worker_task'),(m.comfy_service_controller,'task'),
+                   (m.selfism_controller,'task')]: monkeypatch.setattr(c,attr,None)
+
+def test_original_and_new_ui_available():
+    with TestClient(m.app) as c:
+        html=c.get('/').text
+        for name in ('selfism','workflows','custom-models','custom-nodes','account','docs'):
+            assert f'data-view="{name}"' in html
+        assert c.get('/api/selfism').status_code==200
+        assert c.get('/selfism.js').status_code==200
+        assert c.get('/selfism.css').status_code==200
+
+def test_packaged_workflows_and_trigger():
+    with TestClient(m.app) as c:
+        for profile in ('simple','aio'):
+            w=c.get('/api/selfism/workflow/'+profile).json()
+            llm=next(n for n in w['nodes'] if n['type']=='ArtfatLLMPrompter')
+            assert llm['widgets_values'][12].startswith('m1lli3,')
+            assert llm['widgets_values'][6] is True
+            assert llm['widgets_values'][0]=='RVN-Q4_K_M-multilingual-mtp.gguf'
+        assert c.get('/api/selfism/workflow/unknown').status_code==404
+
+def test_no_arbitrary_shell_or_profile():
+    with TestClient(m.app) as c:
+        assert c.post('/api/selfism/install',json={'profile':'rm -rf /'}).status_code==422
+        assert c.post('/api/selfism/install',json={'precision':'../../tmp'}).status_code==422
+
+def test_running_selfism_blocks_original_installers(monkeypatch):
+    class Running:
+        def done(self): return False
+    monkeypatch.setattr(m.selfism_controller,'task',Running())
+    c=TestClient(m.app)
+    for url,body in [('/api/install/krea-2-extended',None),
+                     ('/api/custom-nodes',{'url':'https://github.com/rgthree/rgthree-comfy'}),
+                     ('/api/custom-models',{'url':'https://huggingface.co/test/model','location':'vae'})]:
+        assert c.post(url,json=body).status_code==409
+
+def test_gpu_queue_blocks_mutation(monkeypatch):
+    import httpx
+    class Client:
+        def __init__(self,**kwargs): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self,*args): pass
+        async def get(self,url,**kwargs):
+            return httpx.Response(200,json={'queue_running':[1],'queue_pending':[]},request=httpx.Request('GET',url))
+    monkeypatch.setattr(httpx,'AsyncClient',Client)
+    with TestClient(m.app) as c:
+        r=c.post('/api/selfism/install',json={'profile':'repair'})
+        assert r.status_code==409
+        assert 'generation' in r.json()['detail']
+
+def test_repair_request_starts_fixed_job(monkeypatch):
+    import httpx
+    class Client:
+        def __init__(self,**kwargs): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self,*args): pass
+        async def get(self,url,**kwargs):
+            return httpx.Response(200,json={'queue_running':[],'queue_pending':[]},request=httpx.Request('GET',url))
+    captured={}
+    async def start(workflow): captured.update(workflow); return {'status':'running'}
+    monkeypatch.setattr(httpx,'AsyncClient',Client)
+    monkeypatch.setattr(m.selfism_controller,'start',start)
+    with TestClient(m.app) as c:
+        assert c.post('/api/selfism/install',json={'profile':'repair'}).status_code==200
+    assert captured['selfism_repair'] is True
+    assert captured['files']==[] and captured['custom_nodes']==[]
+
+def test_streaming_runner_timeout_and_cancel():
+    async def run():
+        ctrl=type(m.selfism_controller)()
+        rc,text=await ctrl._run_process(sys.executable,'-u','-c','print("probe output")',timeout=5)
+        assert rc==0 and 'probe output' in text
+        with pytest.raises(RuntimeError,match='timed out'):
+            await ctrl._run_process(sys.executable,'-c','import time; time.sleep(20)',timeout=.1)
+        ctrl.cancel_event.set()
+        with pytest.raises(m.InstallCancelled):
+            await ctrl._run_process(sys.executable,'-c','import time; time.sleep(20)',timeout=5)
+    asyncio.run(run())
+
+def test_catalog_destinations_and_node_pins():
+    data=json.loads((Path(__file__).resolve().parents[1]/'catalog/selfism.json').read_text())
+    for f in data['files'].values():
+        assert f['destination'].startswith('models/') and '..' not in f['destination']
+        assert f['url'].startswith('https://')
+        assert f.get('sha256') or f.get('civitai_version') or 'github.com/starinspace/' in f['url']
+    for n in data['nodes']:
+        assert len(n['ref'])==40 and int(n['ref'],16)>0

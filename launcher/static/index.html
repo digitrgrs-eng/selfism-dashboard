@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Install a complete 10sorLabs ComfyUI workflow with one click."
+    />
+    <title>10sorLabs Model Grabber</title>
+    <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/selfism.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="10sorLabs Model Grabber">
+        <img class="brand-mark" src="/logo.png" alt="" />
+        <span>10sorLabs</span>
+      </a>
+      <span class="product-name">Model Grabber</span>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" aria-label="Model Grabber sections">
+        <p class="sidebar-label">MENU</p>
+        <nav class="sidebar-nav">
+          <button class="sidebar-link" type="button" data-view-target="selfism">Selfora / Selfism</button>
+          <button class="sidebar-link is-active" type="button" data-view-target="workflows">
+            Workflows
+          </button>
+          <button class="sidebar-link" type="button" data-view-target="custom-models">
+            Custom models
+          </button>
+          <button class="sidebar-link" type="button" data-view-target="custom-nodes">
+            Custom nodes
+          </button>
+          <!-- Label only. The view id stays "account": VIEW_NAMES, data-view and every
+               account-* id in app.js key off it. -->
+          <button class="sidebar-link" type="button" data-view-target="account">
+            RapidCache
+          </button>
+          <!-- Label only, same as the RapidCache tab above. The view id is "docs" and
+               that is what VIEW_NAMES, data-view and the #docs hash key off, so this text
+               is free to change. It names the product because "Help" is generic: somebody
+               looking at a slow download needs to know this page is about RapidCache. -->
+          <button class="sidebar-link" type="button" data-view-target="docs">
+            RapidCache Docs
+          </button>
+        </nav>
+      </aside>
+
+      <main class="shell">
+        <section id="view-selfism" class="app-view" data-view="selfism" hidden>
+          <header class="page-heading"><h1>Selfora / Selfism</h1>
+            <p>Instaliraj modele i nodove, pripremi Qwen i otvori svoje Millie workflowe.</p></header>
+          <div class="sf-toolbar"><label for="sf-precision">Selfora v2.1 format</label>
+            <select id="sf-precision"><option value="fp8">FP8</option><option value="int8">INT8</option><option value="bf16">BF16 · više memorije</option></select>
+          </div>
+          <p class="sf-info">Paketi preuzimaju izabrani Selfora format i Qwen 27B + mmproj. Već provereni fajlovi se preskaču.
+            Završetak instalacije restartuje ComfyUI. Pokreni instalaciju kada nema generisanja u redu.</p>
+          <div class="sf-grid">
+            <article class="sf-card"><h2>Simple</h2><p>Selfora, encoder, VAE, Qwen, upscaler, osnovni nodovi i matched Power LoRA workflow.</p><button data-sf-action="simple">Download &amp; install Simple</button></article>
+            <article class="sf-card"><h2>AIO</h2><p>Osnovni modeli, dodatni AIO nodovi, face detector, SAM, edit VAE i matched AIO workflow. Opcione grane ostaju isključene.</p><button data-sf-action="aio">Download &amp; install AIO</button></article>
+            <article class="sf-card"><h2>AIO dodatni modeli</h2><p>Eyes, Hair, Depth Control LoRA, Identity Edit LoRA, Skin Detail i dodatni upscaler. Instaliraj AIO nodove prvo.</p><button data-sf-action="extras">Download dodatne modele</button></article>
+            <article class="sf-card"><h2>Qwen / CUDA popravka</h2><p>Proverava Qwen35 handler, instalira provereni CUDA llama.cpp paket po potrebi, podešava biblioteke i testira GPU offload.</p><button data-sf-action="repair">Instaliraj / popravi okruženje</button></article>
+          </div>
+          <p class="sf-info">Millie LoRA je tvoj privatni fajl: dodaj je kroz <a href="#custom-models">Custom models</a> u <strong>loras</strong>, pa uključi njen red u workflowu. Prefix je <strong>m1lli3</strong>.
+            Selfism linkovi koriste originalne izvore; RapidCache ubrzanje za njih nije garantovano. Postojeći RapidCache workflowi ostaju dostupni.</p>
+          <div class="sf-toolbar"><a href="/api/selfism/workflow/simple">Preuzmi Simple JSON</a><a href="/api/selfism/workflow/aio">Preuzmi AIO JSON</a></div>
+          <p id="sf-error" role="alert"></p>
+          <section class="sf-status"><h2 id="sf-status" aria-live="polite">Učitavanje…</h2><progress id="sf-progress" max="100" value="0"></progress><p id="sf-message" aria-live="polite"></p>
+            <button id="sf-cancel" class="secondary-button" disabled>Otkaži instalaciju</button>
+            <h3>Terminalski log</h3><pre id="sf-log" aria-label="Instalacioni log"></pre>
+          </section>
+          <details class="sf-details"><summary>Svi modeli · izvori i pojedinačno preuzimanje</summary><div id="sf-models"></div></details>
+          <details class="sf-details"><summary>Custom nodovi · repozitorijumi i instalacija</summary><div id="sf-nodes"></div></details>
+        </section>
+
+        <section id="view-workflows" class="app-view" data-view="workflows">
+          <header class="page-heading">
+            <h1>Select your workflow</h1>
+            <p>Choose a workflow to install its required models and custom nodes.</p>
+          </header>
+
+          <section class="workflow-section" aria-labelledby="workflow-heading">
+            <div class="section-heading">
+              <h2 id="workflow-heading">Workflows</h2>
+              <div class="section-heading-actions">
+                <span id="catalog-state" class="catalog-state">Loading...</span>
+                <span id="tier-badge" class="catalog-state" hidden></span>
+              </div>
+            </div>
+            <div id="workflow-grid" class="workflow-grid" aria-live="polite"></div>
+          </section>
+
+          <section id="job-panel" class="job-panel" aria-live="polite" hidden>
+            <div class="job-topline">
+              <div>
+                <p id="job-kicker" class="job-kicker">PREPARING</p>
+                <h2 id="job-title">Preparing workflow</h2>
+              </div>
+              <strong id="job-percent" class="job-percent">0%</strong>
+            </div>
+
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="Workflow installation progress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+
+            <div class="job-details">
+              <p id="job-message">Preparing workflow...</p>
+              <p id="job-metrics" class="job-metrics"></p>
+            </div>
+
+            <div id="job-warnings" class="job-warnings" hidden></div>
+            <p id="job-error" class="job-error" hidden></p>
+
+            <div id="debug-report" class="debug-report" hidden>
+              <div class="debug-report-actions">
+                <button id="debug-copy" class="button button-ghost" type="button">
+                  Copy
+                </button>
+                <button id="debug-download" class="button button-ghost" type="button">
+                  Download
+                </button>
+              </div>
+              <pre id="debug-report-text" class="debug-report-text"></pre>
+            </div>
+
+            <div class="job-actions">
+              <button id="cancel-button" class="button button-ghost" type="button">
+                Cancel
+              </button>
+              <button id="debug-button" class="button button-ghost" type="button" hidden>
+                Debug
+              </button>
+              <button id="restart-button" class="button button-ghost" type="button" hidden>
+                RESTART COMFYUI
+              </button>
+              <a id="comfy-button" class="button button-primary" href="#" hidden>
+                TO COMFYUI <span aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-custom-models" class="app-view" data-view="custom-models" hidden>
+          <header class="page-heading">
+            <h1>Custom models</h1>
+            <p>Add direct model links to any folder inside ComfyUI/models.</p>
+          </header>
+
+          <section class="model-section" aria-labelledby="queue-heading">
+            <div class="section-heading">
+              <h2 id="queue-heading">Download queue</h2>
+              <span id="custom-queue-state" class="catalog-state">0 queued</span>
+            </div>
+            <div id="model-draft-list" class="model-draft-list"></div>
+            <div id="model-queue-list" class="model-job-list" aria-live="polite"></div>
+          </section>
+
+          <section class="model-section downloaded-section" aria-labelledby="downloaded-heading">
+            <div class="section-heading">
+              <h2 id="downloaded-heading">Downloaded models</h2>
+              <span id="downloaded-model-state" class="catalog-state">0 models</span>
+            </div>
+            <div id="downloaded-model-list" class="model-job-list" aria-live="polite">
+              <p class="empty-state">Completed downloads will appear here.</p>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-custom-nodes" class="app-view" data-view="custom-nodes" hidden>
+          <header class="page-heading">
+            <h1>Custom nodes</h1>
+            <p>Add GitHub repositories directly to ComfyUI/custom_nodes.</p>
+          </header>
+
+          <section class="model-section" aria-labelledby="node-queue-heading">
+            <div class="section-heading">
+              <h2 id="node-queue-heading">Install queue</h2>
+              <span id="custom-node-queue-state" class="catalog-state">0 queued</span>
+            </div>
+            <div id="node-draft-list" class="model-draft-list"></div>
+            <div id="node-queue-list" class="model-job-list" aria-live="polite"></div>
+          </section>
+
+          <section class="model-section downloaded-section" aria-labelledby="installed-node-heading">
+            <div class="section-heading">
+              <h2 id="installed-node-heading">Installed nodes</h2>
+              <div class="section-heading-actions">
+                <span id="installed-node-state" class="catalog-state">0 nodes</span>
+                <button
+                  id="custom-node-restart-button"
+                  class="button button-ghost restart-comfy-button"
+                  type="button"
+                  hidden
+                >
+                  RESTART COMFYUI
+                </button>
+              </div>
+            </div>
+            <p id="custom-node-restart-error" class="draft-error" hidden></p>
+            <div id="installed-node-list" class="model-job-list" aria-live="polite">
+              <p class="empty-state">Completed custom nodes will appear here.</p>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-account" class="app-view" data-view="account" hidden>
+          <header class="page-heading">
+            <h1>RapidCache</h1>
+            <p>Fast model downloads for this pod, served from the RapidCache network.</p>
+          </header>
+
+          <section class="model-section" aria-labelledby="account-heading">
+            <div class="section-heading">
+              <h2 id="account-heading">Sign in</h2>
+              <span id="account-state" class="catalog-state">Not signed in</span>
+            </div>
+
+            <div id="account-form" class="model-draft-row">
+              <label class="model-field">
+                <span class="sr-only">Email</span>
+                <input
+                  id="account-email"
+                  class="model-input"
+                  type="email"
+                  placeholder="Email"
+                  autocomplete="username"
+                />
+              </label>
+              <label class="model-field">
+                <span class="sr-only">Password</span>
+                <input
+                  id="account-password"
+                  class="model-input"
+                  type="password"
+                  placeholder="Password"
+                  autocomplete="current-password"
+                />
+              </label>
+              <button
+                id="account-signin"
+                class="button button-primary download-model-button"
+                type="button"
+              >
+                SIGN IN
+              </button>
+              <p id="account-error" class="draft-error" hidden></p>
+            </div>
+
+            <p id="account-summary" class="empty-state" hidden></p>
+            <button id="account-signout" class="button button-ghost" type="button" hidden>
+              SIGN OUT
+            </button>
+          </section>
+
+          <!-- Hidden by default so it cannot flash before /api/account resolves, and so
+               a failed request leaves it hidden. app.js decides; see renderAccount. -->
+          <section id="rapidcache-upsell" class="promo" hidden>
+            <h2 class="promo-headline">Stop paying to wait.</h2>
+            <p class="promo-lede">
+              Deploy to a fresh GPU pod up to 20&times; faster. Less setup, less idle
+              GPU time.
+            </p>
+
+            <div class="promo-stats">
+              <div class="promo-stat">
+                <p class="promo-stat-label">Standard setup</p>
+                <p class="promo-stat-value">30-60 minutes</p>
+              </div>
+              <div class="promo-stat is-accent">
+                <p class="promo-stat-label">RapidCache</p>
+                <p class="promo-stat-value">Ready in minutes</p>
+              </div>
+            </div>
+
+            <video
+              id="rapidcache-video"
+              class="promo-video"
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-hidden="true"
+              hidden
+            ></video>
+            <a
+              id="rapidcache-cta"
+              class="promo-cta"
+              href="https://10sorlabs.com/pages/rapidcache"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Get RapidCache &middot; &euro;8,99/month
+            </a>
+            <p class="promo-fineprint">Built for RunPod &middot; Cancel anytime</p>
+            <p id="rapidcache-signin-hint" class="promo-hint">
+              Already subscribed? Sign in above.
+            </p>
+          </section>
+        </section>
+
+        <!-- Inline, never fetched. Three reasons, and the first is fatal to the
+             alternative: the JS test harness stubs fetch() as a rejected promise, so a
+             fetched docs view would render empty under test while every assertion about
+             it appeared to pass. The other four views are inline too, and static content
+             that ships with the page cannot fail to load.
+
+             Images live under launcher/static/docs/. bootstrap.py pulls a GitHub zipball
+             of launcher/ at every pod boot, so a wording fix here reaches every existing
+             pod on its next start with no image rebuild. That is the cheapest
+             documentation channel this product has.
+
+             House style for this section only: no em dashes. This is meant to sound like
+             a person explaining something, and an em dash reads as written rather than
+             spoken. Code comments keep app.py's spaced-hyphen convention. -->
+        <section id="view-docs" class="app-view docs" data-view="docs" hidden>
+          <header class="view-header">
+            <div>
+              <h1>RapidCache Docs</h1>
+              <p class="view-subtitle">
+                What RapidCache does, and what your download speed is telling you.
+              </p>
+            </div>
+          </header>
+
+          <article class="docs-body">
+            <h2>What RapidCache is</h2>
+            <p>
+              Your pod has one internet connection. Think of it as a pipe.
+            </p>
+            <p>
+              Model files come from Hugging Face, and Hugging Face allows
+              <strong>one tap</strong> on that pipe per file. Their rule. There is no way
+              around it.
+            </p>
+            <p>
+              RapidCache holds the same files, byte for byte, on storage that allows
+              <strong>sixteen</strong>.
+            </p>
+            <p>
+              <strong>Why that matters when things are busy.</strong> Your pod shares its
+              server with other people's pods. One of them starts a big download and there
+              is less left for everyone, you included. It finishes and yours comes back.
+            </p>
+            <p>
+              Sixteen weak taps still fill a bucket sixteen times faster than one.
+            </p>
+
+            <h2>What a pod actually is</h2>
+            <p>
+              You rent a GPU. The internet connection and the storage belong to the
+              machine it sits in, shared with every other pod on that machine. You cannot
+              see them. Neither can we.
+            </p>
+            <p>
+              There is no such thing as a bad pod, only a busy server. The same pod can be
+              both inside ten minutes.
+            </p>
+
+            <h2>Why is my download only 80 MB/s?</h2>
+            <div class="docs-figures">
+              <figure class="docs-figure">
+                <img src="docs/speed-fast-97.png" alt="A pod signed in to RapidCache downloading at 97.2 MB/s" />
+                <figcaption>Signed in to RapidCache: 97.2 MB/s</figcaption>
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/speed-standard-6.png" alt="A standard pod downloading the same file at 6.2 MB/s" />
+                <figcaption>Standard, same file, same moment: 6.2 MB/s</figcaption>
+              </figure>
+            </div>
+            <p><strong>That number is your pod, not the service.</strong></p>
+            <p>
+              Two pods, same 11.46 GB file, same moment. Both busy. One signed in to
+              RapidCache, one not.
+            </p>
+            <div class="docs-table-wrap">
+              <table class="docs-table">
+                <thead>
+                  <tr><th></th><th>taps</th><th>speed</th><th>that one file</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>RapidCache</strong></td><td>16</td>
+                    <td><strong>97.2 MB/s</strong></td><td>about 2 minutes</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Standard</strong></td><td>1</td>
+                    <td><strong>6.2 MB/s</strong></td><td>about 31 minutes</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              97 MB/s is what RapidCache managed on a machine that could spare 6 MB/s for
+              a single connection.
+            </p>
+            <p>
+              <strong>Nothing is broken when this happens.</strong> Every connection stays
+              open and working. You get no error because there is no error, just smaller
+              numbers, and they climb back when the busy pod finishes.
+            </p>
+
+            <h2>What good and bad look like</h2>
+            <div class="docs-figures docs-figures-row">
+              <figure class="docs-figure">
+                <img src="docs/speed-range-1.png" alt="An install reading 88.8 MB/s" />
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/speed-range-2.png" alt="An install reading 475.5 MB/s" />
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/speed-range-3.png" alt="An install reading 51.9 MB/s" />
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/speed-range-4.png" alt="An install reading 55.6 MB/s" />
+              </figure>
+            </div>
+            <p>All four are real installs. Our own measurements:</p>
+            <div class="docs-table-wrap">
+              <table class="docs-table">
+                <tbody>
+                  <tr><td>healthy pod</td><td>330 to 950 MB/s</td></tr>
+                  <tr><td>busy pod</td><td>150 to 250 MB/s</td></tr>
+                  <tr><td>badly congested</td><td>under 150 MB/s</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              We have watched <strong>one file move 306 to 49 to 233 MB/s in a few
+              minutes</strong>, nothing changing at either end. One reading tells you
+              nothing.
+            </p>
+
+            <h2>When to wait, and when to start a new pod</h2>
+            <ul class="docs-list">
+              <li>
+                <strong>A slow reading in the first minute or two: ignore it.</strong>
+                Connections need a few seconds to reach full speed and a 300 MB file is
+                over before they get there. Small files always read lower.
+              </li>
+              <li>
+                <strong>Still under 150 MB/s after several minutes, with no sign of
+                recovery:</strong> you are on a busy machine. Stop the pod and deploy a new
+                one. You will land on a different machine.
+              </li>
+              <li>
+                <strong>Do not restart immediately.</strong> Redeploying usually costs more
+                time than waiting would have, and waiting is free. We have seen pods recover
+                fivefold on their own.
+              </li>
+              <li>
+                <strong>Not sure?</strong> Press <strong>Debug</strong>. It tells you what
+                your pod actually did.
+              </li>
+            </ul>
+
+            <h2>Cancelling, and picking up where you left off</h2>
+            <p>
+              Cancel stops the install. It does not throw away what has already come down.
+            </p>
+            <p>
+              It takes effect immediately, including during custom node installs, where
+              things otherwise sit for minutes.
+            </p>
+            <p>
+              Press the same workflow again on the same pod and it carries on. Finished
+              files are checked rather than fetched again, and a half-finished one picks up
+              where it stopped. Nothing comes down twice.
+            </p>
+            <p>Two things worth knowing:</p>
+            <ul class="docs-list">
+              <li>
+                This holds on the <strong>same pod</strong>. Deploy a new one and the
+                part-finished file is gone with the old pod's temporary storage. Models that
+                already finished survive only if <code>/workspace</code> is a Network
+                volume.
+              </li>
+              <li>
+                A part-finished file is kept on the pod and cleared automatically after a
+                day.
+              </li>
+            </ul>
+            <p class="docs-callout">
+              So if the server is busy, cancelling costs you nothing. Wait a few minutes and
+              press the tile again.
+            </p>
+
+            <h2>What the numbers mean</h2>
+            <div class="docs-figures">
+              <figure class="docs-figure">
+                <img src="docs/phase-downloading.png" alt="The panel while a file is downloading" />
+                <figcaption>Downloading</figcaption>
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/phase-placing.png" alt="The panel while a file is being saved to disk" />
+                <figcaption>Saving to disk</figcaption>
+              </figure>
+            </div>
+            <p>An install does two different things, and both show a speed:</p>
+            <ul class="docs-list">
+              <li>
+                <strong>Downloading:</strong> pulling the file from the internet. This is
+                where your pod's connection matters.
+              </li>
+              <li>
+                <strong>Saving to disk:</strong> copying the finished file onto your pod's
+                storage. No internet involved, so it usually reads much higher.
+              </li>
+            </ul>
+            <p>
+              Seeing 77 MB/s and then 1.10 GB/s a moment later is normal. Different job,
+              different number.
+            </p>
+
+            <h2>Setting up your pod</h2>
+            <figure class="docs-figure">
+              <img src="docs/runpod-storage.png" alt="RunPod's storage options: container disk, network volume and volume disk" />
+            </figure>
+            <p>
+              <strong>Container disk.</strong> Temporary space, wiped when the pod stops.
+              Downloads are staged here first. The largest single model is
+              <strong>28.43 GB</strong>, so give it <strong>100 GB or more</strong>. Our
+              template ships 200 GB.
+            </p>
+            <p><strong>Storage for your models.</strong> RunPod offers two:</p>
+            <div class="docs-table-wrap">
+              <table class="docs-table">
+                <tbody>
+                  <tr>
+                    <td><strong>Volume disk</strong></td>
+                    <td>local to your pod</td>
+                    <td><strong>Fastest.</strong> Deleted when the pod is terminated.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Network volume</strong></td>
+                    <td>shared storage</td>
+                    <td>
+                      Survives termination, mountable by several pods, cheaper. About ten
+                      times slower to write.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong>Size.</strong> Dataset Generator is 44.6 GB and MiniMax H3 is 63.4 GB,
+              plus ComfyUI itself. <strong>200 GB</strong> is comfortable for two or three
+              workflows. 100 GB is tight.
+            </p>
+            <p>
+              <strong>Environment variables.</strong> RunPod adds
+              <code>PUBLIC_KEY</code> and <code>JUPYTER_PASSWORD</code> to every pod
+              automatically, for its own SSH and Jupyter. RapidCache needs none. Sign in on
+              the RapidCache tab instead.
+            </p>
+
+            <h2>Signing in</h2>
+            <div class="docs-figures">
+              <figure class="docs-figure">
+                <img src="docs/account-signed-out.png" alt="The RapidCache tab with the sign-in form" />
+                <figcaption>Before</figcaption>
+              </figure>
+              <figure class="docs-figure">
+                <img src="docs/account-signed-in.png" alt="The RapidCache tab signed in, with the green badge showing" />
+                <figcaption>After</figcaption>
+              </figure>
+            </div>
+            <p>
+              Open the <strong>RapidCache</strong> tab, enter the email and password from
+              your subscription, and press Sign in. The green <strong>RapidCache</strong>
+              badge at the top of the workflow list is the only confirmation you need.
+            </p>
+
+            <h2>What success looks like</h2>
+            <figure class="docs-figure">
+              <img src="docs/install-complete.png" alt="A finished install showing 100 percent and Workflow ready" />
+            </figure>
+            <p>
+              100%, and <strong>Workflow ready</strong>. If it says a number of skipped
+              items, open the warning. The install finished, and one optional step did not.
+              It is usually safe to continue.
+            </p>
+
+            <h2>The Debug button</h2>
+            <figure class="docs-figure">
+              <img src="docs/debug-button.png" alt="The Debug button and a sample install report" />
+            </figure>
+            <p>
+              If something looks wrong, press <strong>Debug</strong>. It writes a report of
+              what your pod actually did: how fast each file downloaded, how long each step
+              took, what kind of storage you are on, and anything that failed.
+            </p>
+            <p>
+              No passwords, no links, no file locations. Safe to paste anywhere, and it
+              beats describing the problem.
+            </p>
+
+            <h2>What we promise</h2>
+            <p>RapidCache cannot make your server less busy. Nobody can.</p>
+            <p>
+              What it does is take everything your pod has to give, instead of the
+              fraction a single connection would get.
+            </p>
+            <p>
+              That is the promise. Not a number, because nobody can honestly promise a
+              number on shared hardware.
+            </p>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  <script src="/selfism.js" defer></script>
+  </body>
+</html>
