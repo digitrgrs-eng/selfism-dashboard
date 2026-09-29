@@ -1,148 +1,24 @@
 # syntax=docker/dockerfile:1.7
-
-ARG RUNPOD_COMFY_IMAGE=runpod/comfyui@sha256:7078f94dbe28d079c487c245dc3524443e2c6225a6208a1fff8c7a652c1b3a40
-FROM ${RUNPOD_COMFY_IMAGE}
+# Verified linux/amd64 manifest of 10sorllabs/comfyui-workflow-launcher:2.0.
+# Reuse its already-built CUDA/runtime layers. No RUN may be added here:
+# COPY --link allows BuildKit to publish without unpacking the CUDA rootfs.
+FROM 10sorllabs/comfyui-workflow-launcher@sha256:d01908958aa33cc9117b478d81845d14ed53c135f173e3db3eafe14e780e8846
 
 ARG IMAGE_VERSION=dev
-
-LABEL org.opencontainers.image.title="10sorLabs ComfyUI Workflow Launcher" \
-      org.opencontainers.image.description="Stock RunPod ComfyUI plus the remotely updateable 10sorLabs Model Grabber" \
+LABEL org.opencontainers.image.title="Selfora / Selfism dashboard" \
+      org.opencontainers.image.description="10sorLabs launcher with Selfism installation and runtime repair" \
       org.opencontainers.image.source="https://github.com/digitrgrs-eng/selfism-dashboard" \
       org.opencontainers.image.version="${IMAGE_VERSION}"
 
-USER root
-# LCT_API_BASE is what makes the image work with no configuration. remote._api_base()
-# reads it at call time and returns "" when it is unset, which is why every pod so far
-# reports service: "unconfigured" and offers no way to sign in. It stays an ENV rather
-# than a default baked into the code so a customer can still point a pod somewhere else.
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    LAUNCHER_PORT=3000 \
-    LAUNCHER_AUTO_UPDATE=0 \
+ENV LAUNCHER_AUTO_UPDATE=0 \
     SELFISM_AUTO_REPAIR=1 \
-    LAUNCHER_GITHUB_REPO=10sorlabs/AI1-Model-Grabber \
-    LAUNCHER_GITHUB_REF=main \
-    LCT_API_BASE=https://rapidcache.10sorlabs.com \
-    COMFYUI_DIR=/workspace/runpod-slim/ComfyUI \
-    HF_TOKEN_FILE=/opt/10sorlabs/secrets/hf_token
+    HF_TOKEN_FILE=/dev/null
 
-WORKDIR /opt/10sorlabs
+# User credentials must be supplied via RunPod environment variables.
+# Do not use credentials possibly baked into the upstream image.
+COPY --link launcher/ /opt/10sorlabs/launcher/
+COPY --link catalog/ /opt/10sorlabs/catalog/
+COPY --link selfism_workflows/ /opt/10sorlabs/selfism_workflows/
+COPY --link --chmod=755 docker/entrypoint.sh /start.sh
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends aria2 \
- && rm -rf /var/lib/apt/lists/*
-
-COPY requirements-launcher.txt /tmp/requirements-launcher.txt
-RUN python3.12 -m pip install \
-      --break-system-packages \
-      --no-cache-dir \
-      -r /tmp/requirements-launcher.txt \
-    && rm /tmp/requirements-launcher.txt \
-    && mv /start.sh /usr/local/bin/runpod-base-start.sh \
-    && chmod +x /usr/local/bin/runpod-base-start.sh
-
-# Pre-installed so a pod does not spend roughly three minutes in pip on every boot.
-# This is a cache warm and nothing else: the launcher still installs each node pack's
-# own requirements on the pod at runtime, so no behaviour depends on a package being
-# present here, and anything that would not install cleanly was dropped rather than
-# forced. See the header of custom-node-requirements.txt for what was left out and why.
-#
-# The constraints file is the load-bearing part. Several of those requirements pin numpy
-# and two ask for torch unpinned; resolving either here would pull a CPU torch over the
-# base image's 2.10.0+cu128, and ComfyUI would then fail to start on every pod built
-# from this image. So: capture what the base image already has, install against it, and
-# refuse to produce an image where torch moved. The expected version is read back out of
-# the constraints file rather than written here, so the check cannot drift from the pin.
-#
-# Placed above the COPY of launcher/ and catalog/ deliberately - those change on almost
-# every commit, and this layer is the expensive one to rebuild.
-COPY docker/custom-node-requirements.txt /tmp/custom-node-requirements.txt
-# Deliberately not a RUN heredoc. A heredoc body is passed to the shell byte for byte,
-# so on a Windows working copy - where this file is CRLF even though the index is LF -
-# the shell receives "set -eu\r" and dies. The classic continuation form is normalised
-# by the Dockerfile parser and builds the same on both.
-RUN set -eu; \
-    python3.12 -m pip freeze \
-      | grep -iE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' \
-      > /tmp/constraints.txt; \
-    echo "Holding the base image at:"; \
-    sed 's/^/  /' /tmp/constraints.txt; \
-    python3.12 -m pip install \
-      --break-system-packages \
-      --no-cache-dir \
-      -c /tmp/constraints.txt \
-      -r /tmp/custom-node-requirements.txt; \
-    expected="$(sed -n 's/^[Tt]orch==//p' /tmp/constraints.txt)"; \
-    if [ -z "$expected" ]; then \
-      echo "no torch pin was captured - the constraints file is not doing its job"; \
-      exit 1; \
-    fi; \
-    actual="$(python3.12 -c 'import torch; print(torch.__version__)')"; \
-    if [ "$actual" != "$expected" ]; then \
-      echo "torch changed during the custom-node install: $actual != $expected"; \
-      exit 1; \
-    fi; \
-    echo "torch intact: $actual"; \
-    rm /tmp/custom-node-requirements.txt /tmp/constraints.txt
-
-# dlib is built here so that no customer's pod ever builds it.
-#
-# It is the only requirement across all twelve pinned node packs with no wheel at all:
-# dlib 20.0.1 ships one file on PyPI, dlib-20.0.1.tar.gz, and every install is a CMake
-# C++ compile. ComfyUI_FaceAnalysis asks for it, ComfyUI_FaceAnalysis is in the
-# dataset-generator workflow, and that is a rented GPU spending its minutes on a
-# single-threaded compile of a CPU library. Once, on a build machine, is the right
-# number of times.
-#
-# custom-node-requirements.txt above deliberately excludes it: that file installs
-# unpinned and wheels-only, and a source build does not belong in it. This is the
-# same package, pinned, with the toolchain it needs, and verified immediately after.
-#
-# The cmake wheel carries its own binaries, so apt is only touched when the base image
-# turns out to have no C++ compiler - and then only for as long as the build takes.
-#
-# Build parallelism is capped at 4 on purpose, and it is the difference between a layer
-# that publishes and a layer that does not. Unpinned, this build ran one job per core and
-# GCC 13.3.0 died with an internal compiler error in try_forward_edges (cfgcleanup.cc:580)
-# compiling dlib/svm/structural_svm_problem_threaded.h - once in two attempts on a 32-core,
-# 31 GiB builder. Thirty-two concurrent cc1plus on headers that template-expand like dlib's
-# SVM code is roughly a gigabyte of peak resident set each; "there is lots of RAM" and
-# "no job is short of RAM" are not the same claim, and an intermittent failure on the layer
-# that gates image publishing is not something to leave to chance. Four jobs is slower and
-# it finishes.
-RUN set -eu; \
-    export MAKEFLAGS=-j4; \
-    export CMAKE_BUILD_PARALLEL_LEVEL=4; \
-    purge_toolchain=0; \
-    if ! command -v c++ >/dev/null 2>&1; then \
-      echo "no C++ compiler in the base image; installing build-essential for this layer"; \
-      apt-get update; \
-      apt-get install -y --no-install-recommends build-essential; \
-      purge_toolchain=1; \
-    fi; \
-    python3.12 -m pip install --break-system-packages --no-cache-dir cmake; \
-    python3.12 -m pip install --break-system-packages --no-cache-dir dlib==20.0.1; \
-    python3.12 -c 'import dlib; print("dlib intact:", dlib.__version__)'; \
-    python3.12 -m pip uninstall -y cmake; \
-    if [ "$purge_toolchain" = "1" ]; then \
-      apt-get purge -y build-essential; \
-      apt-get autoremove -y; \
-    fi; \
-    rm -rf /var/lib/apt/lists/*
-
-COPY launcher/ /opt/10sorlabs/launcher/
-COPY catalog/ /opt/10sorlabs/catalog/
-COPY selfism_workflows/ /opt/10sorlabs/selfism_workflows/
-COPY docker/entrypoint.sh /start.sh
-# Credentials are supplied at runtime via HF_TOKEN / CIVITAI_TOKEN.
-# Never copy account tokens into a distributable image layer.
-RUN chmod +x /start.sh
-
-WORKDIR /workspace/runpod-slim
-
-EXPOSE 3000 8188 8888
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl --fail --silent http://127.0.0.1:3000/api/health || exit 1
-
-ENTRYPOINT ["/start.sh"]
+# Inherit the original services, ports, working directory and entrypoint.

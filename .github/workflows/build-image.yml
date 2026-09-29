@@ -13,21 +13,21 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
-      - name: Make room for the CUDA image
+      - name: Check space for registry layer transfer
         shell: bash
         run: |
           set -euo pipefail
           echo "Disk before cleanup"
           df -h /
           # These are preinstalled SDKs on this disposable hosted runner only.
-          # The build uses its own Linux/Python/CUDA toolchain inside Docker.
+          # The build reuses upstream CUDA layers without unpacking them.
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache
           docker system prune --all --force
           echo "Disk after cleanup"
           df -h /
           available=$(df -B1 --output=avail / | tail -1 | tr -d ' ')
-          if (( available < 45 * 1024 * 1024 * 1024 )); then
-            echo "::error::Less than 45 GiB free after cleanup. Stop before unpacking the CUDA image."
+          if (( available < 15 * 1024 * 1024 * 1024 )); then
+            echo "::error::Less than 15 GiB free after cleanup. Stop before transferring registry layers."
             exit 1
           fi
       - uses: docker/setup-buildx-action@v3
@@ -52,4 +52,4 @@ jobs:
             ghcr.io/digitrgrs-eng/selfism-dashboard:${{ github.sha }}
           build-args: IMAGE_VERSION=${{ github.sha }}
       - name: Record immutable image tag
-        run: echo 'RunPod image tag — ghcr.io/digitrgrs-eng/selfism-dashboard:${{ github.sha }}' >> "$GITHUB_STEP_SUMMARY"
+        run: echo 'RunPod image tag â€” ghcr.io/digitrgrs-eng/selfism-dashboard:${{ github.sha }}' >> "$GITHUB_STEP_SUMMARY"

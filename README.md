@@ -1,5 +1,7 @@
 # Selfora / Selfism dashboard za digitrgrs-eng
 
+Build koristi gotov `10sorllabs/comfyui-workflow-launcher:2.0`, zakljucan na linux/amd64 manifest `sha256:d01908958aa33cc9117b478d81845d14ed53c135f173e3db3eafe14e780e8846`. Dodaje samo dashboard pomocu `COPY --link`, bez ponovne instalacije CUDA/Python/dlib baze. Prenosi oko 5,46 GiB kompresovanih postojecih slojeva izmedju registara, bez potrebe da ih raspakuje za RUN komande. Zbog promenjenog nacina izrade sada proverava najmanje 15 GiB slobodnog prostora. RunPod i dalje preuzima kompletan image. Autorov eventualno ugradjeni HF credential se ne koristi (`HF_TOKEN_FILE=/dev/null`); koristi svoj `HF_TOKEN`.
+
 Pripremljen iz korisnikovog 10sorLabs dashboard arhiva. Originalni Workflows, Custom models, Custom nodes i RapidCache interfejs ostaju prisutni. Dodat je Selfora / Selfism panel sa instalacijama Simple, AIO, dodatnih modela i Qwen/CUDA popravkom, uz prikaz izlaza instalacije.
 
 ## Trenutni status
