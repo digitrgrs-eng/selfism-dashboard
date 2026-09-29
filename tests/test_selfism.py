@@ -94,6 +94,22 @@ def test_streaming_runner_timeout_and_cancel():
             await ctrl._run_process(sys.executable,'-c','import time; time.sleep(20)',timeout=5)
     asyncio.run(run())
 
+def test_git_remote_stdout_is_preserved_but_ui_log_is_redacted(tmp_path):
+    import subprocess
+    repo='https://github.com/rgthree/rgthree-comfy.git'
+    subprocess.run(['git','init',str(tmp_path)],check=True,capture_output=True)
+    subprocess.run(['git','-C',str(tmp_path),'remote','add','origin',repo],check=True)
+    async def run():
+        rc, output=await m.selfism_controller._run_process(
+            'git','-C',str(tmp_path),'remote','get-url','origin',timeout=5)
+        assert rc==0
+        assert m.normalized_git_remote(output)==m.normalized_git_remote(repo)
+        with TestClient(m.app) as client:
+            logs=client.get('/api/selfism').json()['log']
+        assert logs[-1]==m.redacted_for_export(repo)
+        assert repo not in logs[-1]
+    asyncio.run(run())
+
 def test_catalog_destinations_and_node_pins():
     data=json.loads((Path(__file__).resolve().parents[1]/'catalog/selfism.json').read_text())
     for f in data['files'].values():

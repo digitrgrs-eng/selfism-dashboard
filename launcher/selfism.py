@@ -79,8 +79,10 @@ def register(host):
             output=deque(maxlen=1000)
             async def reader():
                 while line:=await process.stdout.readline():
-                    text=host.redacted_for_export(line.decode(errors='replace').rstrip())
-                    logs.append(text); output.append(text)
+                    text=line.decode(errors='replace').rstrip()
+                    # The caller parses stdout (Git origin URLs, version pins).
+                    # Redact only the UI copy, never the machine-readable result.
+                    logs.append(host.redacted_for_export(text)); output.append(text)
                 return await process.wait()
             read_task=asyncio.create_task(reader())
             cancel_task=asyncio.create_task(self.cancel_event.wait())
