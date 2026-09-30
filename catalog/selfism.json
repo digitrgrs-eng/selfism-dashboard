@@ -114,9 +114,10 @@
       "url": "https://github.com/starinspace/StarinspaceUpscale/releases/download/Models/4xPurePhoto-RealPLSKR.pth",
       "destination": "models/upscale_models/4xPurePhoto-RealPLSKR.pth",
       "size_bytes": 29663426,
-      "sha256": "",
+      "sha256": "5913af168a6a1d38d216c91eb60f475d27eeebbd57ff8ed8943fdc7a84d1b250",
       "auth": "none",
-      "id": "upscale"
+      "id": "upscale",
+      "verify": true
     },
     "span": {
       "name": "4xPurePhoto-Span.pth",
@@ -170,13 +171,14 @@
       "id": "krea-turbo"
     },
     "qwen-vae": {
-      "name": "Qwen Image VAE",
-      "url": "https://huggingface.co/QuantStack/Qwen-Image-Edit-GGUF/resolve/5cf642dd2b94af2a558ec06a9dde255c673e1fdf/VAE/Qwen_Image-VAE.safetensors",
+      "id": "qwen-vae",
+      "name": "qwen_image_vae.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/1f12b17be14c89b026c51a91d67c32f84bb047bc/split_files/vae/qwen_image_vae.safetensors",
       "destination": "models/vae/qwen_image_vae.safetensors",
       "size_bytes": 253806246,
       "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
       "auth": "none",
-      "id": "qwen-vae"
+      "verify": true
     },
     "bloom": {
       "name": "Krea 2 Bloomgirls Realism LoRA",
@@ -213,6 +215,36 @@
       "size_bytes": 1341395338,
       "sha256": "a7ea19fa0ed99244e67b624c72b8580b7e9553043245905be58796a608eb9345",
       "auth": "none"
+    },
+    "qwen-edit-2511": {
+      "id": "qwen-edit-2511",
+      "name": "qwen_image_edit_2511_fp8mixed.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/f68ace85e60b4a02a323e394253731947657b7d2/split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
+      "destination": "models/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
+      "size_bytes": 20533762817,
+      "sha256": "c9fdc158e46d3b61ef75f21ae866ca2fe808bf4a53643120d1c1e87c19280a4e",
+      "auth": "none",
+      "verify": true
+    },
+    "qwen-edit-encoder": {
+      "id": "qwen-edit-encoder",
+      "name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/1f12b17be14c89b026c51a91d67c32f84bb047bc/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "destination": "models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "size_bytes": 9384670680,
+      "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+      "auth": "none",
+      "verify": true
+    },
+    "person-seg": {
+      "id": "person-seg",
+      "name": "yolov8n-seg.pt",
+      "url": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n-seg.pt",
+      "destination": "models/ultralytics/segm/yolov8n-seg.pt",
+      "size_bytes": 7071756,
+      "sha256": "a7cd8f929e1903d78a12a48efecab430209f18dc46cb96c3599a5980c63c423c",
+      "auth": "none",
+      "verify": true
     }
   },
   "nodes": [
@@ -420,5 +452,28 @@
       "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
     }
+  ],
+  "carousel_files": [
+    "fp8",
+    "encoder",
+    "vae",
+    "llm",
+    "mmproj",
+    "upscale",
+    "depth",
+    "depth-anything",
+    "qwen-edit-2511",
+    "qwen-edit-encoder",
+    "qwen-vae",
+    "person-seg"
+  ],
+  "carousel_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-Custom-Scripts",
+    "comfyui-krea2-controlnet",
+    "comfyui_controlnet_aux",
+    "ComfyUI-Artfat-Resolution"
   ]
 }

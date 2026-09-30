@@ -6,6 +6,9 @@ import json
 import os
 import signal
 import re
+import shutil
+import uuid
+import hashlib
 from urllib.parse import urlsplit
 from collections import deque
 from pathlib import Path
@@ -18,7 +21,7 @@ from pydantic import BaseModel
 from launcher.private_r2 import r2_client, select_private
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -77,6 +80,13 @@ async def resolve_sources(host, files):
         preferred,messages={},['Private R2 unavailable; using fallback sources.']
     remaining=[i for i in range(len(files)) if i not in preferred]
     fallback,notes=await resolve_rapidcache(host,[files[i] for i in remaining])
+    for i, selected in preferred.items():
+        selected['_selfism_source']='R2'
+        selected['_selfism_original']=copy.deepcopy(files[i])
+    for i, selected in zip(remaining, fallback):
+        if selected.get('url') != files[i].get('url'):
+            selected['_selfism_source']='RapidCache'
+            selected['_selfism_original']=copy.deepcopy(files[i])
     preferred.update(zip(remaining,fallback))
     return [preferred[i] for i in range(len(files))], messages+notes
 
@@ -86,6 +96,71 @@ def register(host):
     logs = deque(maxlen=1500)
 
     class SelfismController(host.JobController):
+        async def _download_file(self, client, file_spec, *args):
+            original=file_spec.get('_selfism_original', file_spec)
+            current=copy.deepcopy(file_spec)
+            source=current.pop('_selfism_source', 'original')
+            current.pop('_selfism_original', None)
+            while True:
+                self.check_cancelled()
+                try:
+                    return await super()._download_file(client, current, *args)
+                except host.InstallCancelled:
+                    raise
+                except (httpx.HTTPError, RuntimeError) as exc:
+                    self.check_cancelled()
+                    # Keep signed URLs out of both UI errors and transfer diagnostics.
+                    message=host.redacted_for_export(str(exc))
+                    host.diagnostics.fail_in_flight(message)
+                    if source == 'original':
+                        raise RuntimeError(message) from None
+                    # A corrupt partial must not be resumed against the next source.
+                    # Network interruptions keep their valid partial data for resume.
+                    if 'checksum' in str(exc).lower() or 'wrong size' in str(exc).lower():
+                        self._discard_failed_partials(current)
+                    logs.append(f"{original.get('name', 'Model')}: {source} transfer failed; trying next source.")
+                    if source == 'R2':
+                        candidates, notes=await resolve_rapidcache(host, [copy.deepcopy(original)])
+                        logs.extend(notes)
+                        current=candidates[0]
+                        source='RapidCache' if current.get('url') != original.get('url') else 'original'
+                    else:
+                        current=copy.deepcopy(original)
+                        source='original'
+                    self.update(message=f"Retrying {original.get('name', 'model')} from {source}…",
+                                bytes_per_second=0)
+
+        def _discard_failed_partials(self, file_spec):
+            destination=host.safe_destination(file_spec['destination'])
+            paths=[destination.with_name(destination.name+'.part')]
+            scratch=host.scratch_dir()
+            if scratch is not None:
+                stem=hashlib.sha256(str(destination).encode('utf-8')).hexdigest()[:16]
+                paths.append(scratch/f'{stem}-{destination.name}.part')
+            for path in paths:
+                path.unlink(missing_ok=True)
+                path.with_name(path.name+'.aria2').unlink(missing_ok=True)
+
+        async def _install_carousel_helper(self, python):
+            source=root/'bundled_nodes/ComfyUI-AIO-Carousel'
+            self.update(stage='installing', message='Installing AIO Qwen Carousel helper nodes…', percent=95)
+            rc, output=await self._run_process(python, '-m', 'pip', 'install',
+                                             '-r', source/'requirements.txt', timeout=900)
+            if rc: raise RuntimeError('Carousel dependencies failed: '+output[-1500:])
+            rc, output=await self._run_process(python, '-c',
+                'import color_matcher, ultralytics; print("Carousel dependencies ready")', timeout=120)
+            if rc: raise RuntimeError('Carousel dependency import failed: '+output[-1500:])
+            self.check_cancelled()
+            target=host.COMFYUI_DIR/'custom_nodes/ComfyUI-AIO-Carousel'
+            if target.exists():
+                backup=host.COMFYUI_DIR/'user/carousel_backups'/uuid.uuid4().hex
+                backup.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(target, backup)
+                logs.append('Previous carousel helper saved: '+str(backup))
+            shutil.copytree(source, target, dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+            logs.append('Bundled AIO Qwen Carousel helper installed in the ComfyUI environment.')
+
         async def _run_process(self, *command, timeout=None, env=None):
             # Stream bounded, redacted output for node installers and environment repair.
             process = await asyncio.create_subprocess_exec(*map(str,command),
@@ -150,16 +225,18 @@ def register(host):
                     await super()._install_workflow(workflow)
                 if self.state.warnings:
                     raise RuntimeError('Some dependencies failed. See warnings and retry before running the workflow.')
+                if workflow.get('selfism_profile') == 'carousel':
+                    await self._install_carousel_helper(python)
                 if workflow.get('selfism_repair'):
                     self.update(stage='installing',message='Repairing Qwen / CUDA environment…',percent=96)
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
-                if profile in ('simple','aio','reference'):
+                if profile in ('simple','aio','reference','carousel'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
-                        if n['type']=='UNETLoader' and profile != 'reference': n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
-                        if profile == 'reference' and n['type']=='Power Lora Loader (rgthree)':
+                        if n['type']=='UNETLoader' and profile in ('simple','aio'): n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
+                        if profile in ('reference','carousel') and n['type']=='Power Lora Loader (rgthree)':
                             for row in n.get('widgets_values', []):
                                 if isinstance(row,dict) and row.get('lora')=='millie_000002750.safetensors':
                                     for name in ('millie_000002750.safetensors','millie.safetensors'):
@@ -168,7 +245,10 @@ def register(host):
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
                     # Keep the user's previously edited workflow instead of overwriting it.
-                    dest=folder/('10sorlabs_MILLIE_REFERENCE_DEPTH_v1.json' if profile=='reference' else f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json')
+                    filename={'reference':'10sorlabs_MILLIE_REFERENCE_DEPTH_v1.json',
+                              'carousel':'Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json'}.get(profile,
+                              f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json')
+                    dest=folder/filename
                     if not dest.exists(): dest.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Upload your reference image. Add your private Millie LoRA separately and enable its row.')
@@ -211,6 +291,9 @@ def register(host):
         elif profile=='reference':
             file_keys=catalog['reference_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reference_nodes']]
+        elif profile=='carousel':
+            file_keys=catalog['carousel_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['carousel_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -239,8 +322,9 @@ def register(host):
         logs.clear()
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':request.precision,'selfism_repair':profile in ('simple','aio','reference','repair','node'),
-                  'model_links':copy.deepcopy(catalog['reference_links']) if profile=='reference' else []}
+                  'precision':'fp8' if profile=='carousel' else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','carousel','repair','node'),
+                  'model_links':copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -248,7 +332,7 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel'): raise HTTPException(404)
         return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=f'Selfism_{profile}_m1lli3.json')
 
     async def startup_repair():

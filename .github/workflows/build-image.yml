@@ -13,6 +13,13 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test Selfism installers and source fallback
+        run: |
+          python -m pip install -r requirements-launcher.txt pytest boto3
+          python -m pytest tests/test_selfism.py tests/test_private_r2.py tests/test_carousel.py -q
       - name: Check space for registry layer transfer
         shell: bash
         run: |

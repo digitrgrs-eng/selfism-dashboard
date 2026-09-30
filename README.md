@@ -6,7 +6,7 @@ Pripremljen iz korisnikovog 10sorLabs dashboard arhiva. Originalni Workflows, Cu
 
 ## Trenutni status
 
-Image je uspesno izgradjen i objavljen: https://github.com/digitrgrs-eng/selfism-dashboard/actions/runs/36507212645 . Adresa: `ghcr.io/digitrgrs-eng/selfism-dashboard:220ec7f57a262b96fd1db93118cdf8b85c56a3b4`. GPU test na RunPod-u jos nije izvrsen. Pogledaj VALIDATION.md.
+Aktuelni buildovi i njihovi rezultati su u [GitHub Actions](https://github.com/digitrgrs-eng/selfism-dashboard/actions/workflows/build-image.yml). Svaki uspesan build objavljuje `ghcr.io/digitrgrs-eng/selfism-dashboard:latest` i nepromenljiv tag sa punim commit SHA. Novi Carousel GPU test na RunPod-u jos nije izvrsen. Pogledaj VALIDATION.md.
 
 ## 1. GitHub
 
@@ -41,7 +41,7 @@ Environment variables:
 - `CIVITAI_TOKEN` — lični Civitai API token za preuzimanje Selfora modela.
 - `HF_TOKEN` — tvoj Hugging Face read token, ako koristiš originalne workflowe sa modelima koji zahtevaju pristup. Prihvati njihove uslove na Hugging Face-u.
 
-Tokeni se unose u RunPod; ne ugrađuju se u Docker image. RapidCache koristi postojeću prijavu i postojeće uslove naloga. Pre instalacije prijavi se u RapidCache. Simple, AIO, dodatni i pojedinacni modeli proveravaju svez katalog tog naloga. Ubrzani HTTPS izvor koristi se samo kada SHA256 i poznata velicina odgovaraju originalu. Zadrzava se odredisni folder workflowa i provera integriteta. Bez podudaranja ili ako katalog nije dostupan koristi se originalni link. Proverava se katalog koji API izlozi nalogu, ne pretrazuje se ceo privatni RapidCache storage. Log prikazuje izbor izvora bez potpisanih URL-ova. Selfora i dalje zahteva Civitai metapodatke/token da bi se utvrdio originalni SHA256. Neuspeh vec zapocetog transfera prijavljuje se kao greska; ova izmena automatski bira fallback kada katalog nema odgovarajuci model ili nije dostupan.
+Tokeni se unose u RunPod; ne ugrađuju se u Docker image. RapidCache koristi postojeću prijavu i postojeće uslove naloga. Pre instalacije prijavi se u RapidCache. Simple, AIO, dodatni i pojedinacni modeli proveravaju svez katalog tog naloga. Ubrzani HTTPS izvor koristi se samo kada SHA256 i poznata velicina odgovaraju originalu. Zadrzava se odredisni folder workflowa i provera integriteta. Bez podudaranja ili ako katalog nije dostupan koristi se originalni link. Proverava se katalog koji API izlozi nalogu, ne pretrazuje se ceo privatni RapidCache storage. Log prikazuje izbor izvora bez potpisanih URL-ova. Selfora i dalje zahteva Civitai metapodatke/token da bi se utvrdio originalni SHA256. Ako R2 transfer ne uspe, proverava se RapidCache i zatim originalni link. Ako RapidCache transfer ne uspe, pokusava se original. Otkazivanje i greske diska ne pokrecu novi izvor. SHA256 i odredisna putanja ostaju isti.
 
 ## 3. Svaki novi pod
 
@@ -69,7 +69,7 @@ Dodaj ove environment promenljive u RunPod template i pod:
 - SELFISM_R2_ACCESS_KEY_ID: privatni Read only Access Key ID
 - SELFISM_R2_SECRET_ACCESS_KEY: privatni Read only Secret Access Key
 
-Kljuceve ne unositi u GitHub. Instalater najpre proverava privatni bucket, zatim RapidCache katalog, zatim originalne izvore. R2 objekti moraju imati metadata sha256 koju postavlja upload skripta; mora se poklopiti sa pouzdanim katalogom i velicinom. Fajlovi bez pouzdane SHA256 u katalogu ostaju na izvornim linkovima. Civitai token i dalje je potreban za originalne Selfora metapodatke. Potpisani linkovi traju 24 sata. Ovo je fallback pri izboru izvora; greska tokom zapocetog preuzimanja prikazuje se korisniku. Brzina nije garantovana i treba je izmeriti na pod-u.
+Kljuceve ne unositi u GitHub. Instalater najpre proverava privatni bucket, zatim RapidCache katalog, zatim originalne izvore. R2 objekti moraju imati metadata sha256 koju postavlja upload skripta; mora se poklopiti sa pouzdanim katalogom i velicinom. Fajlovi bez pouzdane SHA256 u katalogu ostaju na izvornim linkovima. Civitai token i dalje je potreban za originalne Selfora metapodatke. Potpisani linkovi traju 24 sata. Redosled R2 -> RapidCache -> original vazi i pri mreznoj gresci zapocetog transfera. Ako svi dostupni izvori zakazu, instalacija se prijavljuje kao neuspesna. Brzina nije garantovana i treba je izmeriti na pod-u.
 
 
 ## 10sorLabs Reference + Depth
@@ -84,3 +84,18 @@ PYTHONPATH=/opt/r2deps python3 /opt/10sorlabs/scripts/upload_models_r2.py --all
 ```
 
 The tool prompts for bucket-scoped upload credentials without saving them, verifies local files, and skips already matching objects. Runtime download credentials remain read-only. No upload is triggered by installing a workflow.
+
+
+## AIO Qwen Carousel (2026-09-30)
+
+U Selfora / Selfism dodato je **Download & install AIO Qwen Carousel**. Paket koristi Selfora FP8 za prvu sliku i Qwen-Image-Edit-2511 FP8 mixed za edit, nezavisno od dropdown izbora za Simple/AIO. Nije potrebno prethodno kliknuti Simple, AIO ili Reference + Depth.
+
+Dugme instalira Selfora osnovu, postojeci LLM i mmproj, Depth i Depth Anything, originalni upscaler, Qwen edit/encoder/VAE, person-seg model i potrebne custom nodove. Pomocni `ComfyUI-AIO-Carousel` dolazi iz ovog repozitorijuma; `color-matcher` i `ultralytics` se instaliraju u stvarni ComfyUI `.venv-cu128`, uz zasticene verzije osnovnih paketa. Raniji pomocni nodovi se kopiraju u `user/carousel_backups` pre zamene. Privatna Millie LoRA se ne preuzima: ako vec postoji pod jednim od podrzanih imena, povezuje se pri prvom cuvanju workflowa.
+
+Sva cetiri Qwen dodatka imaju iste putanje, velicine i SHA256 kao `upload_qwen_carousel_r2.py`. Postojeci lokalni modeli se proveravaju i preskacu. Runtime R2 kredencijali ostaju **Read only**; upload kredencijale nije potrebno dodavati u dashboard. Selfora metadata i dalje zahteva `CIVITAI_TOKEN`.
+
+Instalacija cuva `Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json` u `ComfyUI/user/default/workflows/Selfism`, a postojecu korisnicku verziju ne prepisuje. Posle uspesne instalacije ComfyUI se automatski restartuje. JSON se moze preuzeti i direktno iz nove kartice.
+
+Prvi test: `Use approved first photo`, jedna ukljucena referenca 02, reference 03-09 OFF, radna rezolucija 1 MP. Ovo je isti carousel paket koji je pripremljen za GPU test, bez novog generativnog koraka. Testovi instalatera ne potvrduju vizuelni kvalitet niti VRAM zahteve.
+
+Promena GitHub repozitorijuma ili objavljivanje novog Docker image-a ne menja automatski vec pokrenuti pod. Novi pod treba da koristi novi image tag iz uspesnog build-a. Postojeci uploadovani modeli u R2 ostaju dostupni.

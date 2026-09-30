@@ -9,13 +9,14 @@
           <div class="sf-grid">
             <article class="sf-card"><h2>Simple</h2><p>Selfora, encoder, VAE, Qwen, upscaler, osnovni nodovi i matched Power LoRA workflow.</p><button data-sf-action="simple">Download &amp; install Simple</button></article>
             <article class="sf-card"><h2>AIO</h2><p>Osnovni modeli, dodatni AIO nodovi, face detector, SAM, edit VAE i matched AIO workflow. Opcione grane ostaju isključene.</p><button data-sf-action="aio">Download &amp; install AIO</button></article>
+            <article class="sf-card"><h2>AIO Qwen Carousel</h2><p>Selfora FP8 + Millie za prvu fotografiju; Qwen-Image-Edit-2511 FP8 za naredne slajdove. Instalira AIO osnovu, Depth, LLM, upscaler, Qwen modele i Carousel nodove. Reference 2–9 imaju ON/OFF. Paket koristi FP8 nezavisno od izbora iznad.</p><button data-sf-action="carousel">Download &amp; install AIO Qwen Carousel</button></article>
             <article class="sf-card"><h2>10sorLabs Reference + Depth</h2><p>Krea 2 Turbo FP8, automatski opis reference i natpisa, Millie identitet, Depth kontrola i Artfat Resolution. Uključuje modele za opcioni upscale i obradu lica. Izbor Selfora formata iznad ne utiče na ovaj paket.</p><button data-sf-action="reference">Download &amp; install Reference + Depth</button></article>
             <article class="sf-card"><h2>AIO dodatni modeli</h2><p>Eyes, Hair, Depth Control LoRA, Identity Edit LoRA, Skin Detail i dodatni upscaler. Instaliraj AIO nodove prvo.</p><button data-sf-action="extras">Download dodatne modele</button></article>
             <article class="sf-card"><h2>Qwen / CUDA popravka</h2><p>Proverava Qwen35 handler, instalira provereni CUDA llama.cpp paket po potrebi, podešava biblioteke i testira GPU offload.</p><button data-sf-action="repair">Instaliraj / popravi okruženje</button></article>
           </div>
           <p class="sf-info">Millie LoRA je tvoj privatni fajl: dodaj je kroz <a href="#custom-models">Custom models</a> u <strong>loras</strong>, pa uključi njen red u workflowu. Prefix je <strong>m1lli3</strong>.
             Izvori: tvoj privatni R2, zatim RapidCache, zatim originalni linkovi. R2 se podesava kroz SELFISM_R2 environment promenljive na pod-u. Koriste se samo proverena podudaranja; izabrani izvor je u logu.</p>
-          <div class="sf-toolbar"><a href="/api/selfism/workflow/simple">Preuzmi Simple JSON</a><a href="/api/selfism/workflow/aio">Preuzmi AIO JSON</a><a href="/api/selfism/workflow/reference">Preuzmi Reference + Depth JSON</a></div>
+          <div class="sf-toolbar"><a href="/api/selfism/workflow/simple">Preuzmi Simple JSON</a><a href="/api/selfism/workflow/aio">Preuzmi AIO JSON</a><a href="/api/selfism/workflow/reference">Preuzmi Reference + Depth JSON</a><a href="/api/selfism/workflow/carousel">Preuzmi AIO Qwen Carousel JSON</a></div>
           <p id="sf-error" role="alert"></p>
           <section class="sf-status"><h2 id="sf-status" aria-live="polite">Učitavanje…</h2><progress id="sf-progress" max="100" value="0"></progress><p id="sf-message" aria-live="polite"></p>
             <button id="sf-cancel" class="secondary-button" disabled>Otkaži instalaciju</button>
