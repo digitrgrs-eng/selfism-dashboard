@@ -14,6 +14,7 @@ LABEL org.opencontainers.image.title="Selfora / Selfism dashboard" \
 
 ENV LAUNCHER_AUTO_UPDATE=0 \
     SELFISM_AUTO_REPAIR=1 \
+    SELFISM_AUTO_COMFY_UPDATE=1 \
     HF_TOKEN_FILE=/dev/null \
     PYTHONPATH=/opt/r2deps:/opt/10sorlabs
 

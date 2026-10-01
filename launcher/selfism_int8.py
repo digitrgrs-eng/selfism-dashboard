@@ -14,6 +14,7 @@ import argparse
 import importlib.metadata
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -134,7 +135,13 @@ def install_requirements(comfy, constraints):
         env=env, timeout=2100)
 
 
+def _terminated(signum, frame):
+    # SIGTERM (boot-time timeout, pod stop) becomes an exception so the rollback runs.
+    raise KeyboardInterrupt('terminated by signal %d' % signum)
+
+
 def main():
+    signal.signal(signal.SIGTERM, _terminated)
     parser = argparse.ArgumentParser()
     parser.add_argument('--comfy-dir', default=os.environ.get('COMFYUI_DIR',
                         '/workspace/runpod-slim/ComfyUI'))
@@ -185,7 +192,7 @@ def main():
 
     try:
         install_requirements(comfy, constraints)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, KeyboardInterrupt) as exc:
         log('Installing requirements failed: %s' % exc)
         if not has_source:
             log('Rolling ComfyUI back to ' + (branch or head)[:40])

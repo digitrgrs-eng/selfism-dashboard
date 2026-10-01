@@ -38,6 +38,7 @@ Environment variables:
 
 - `LAUNCHER_AUTO_UPDATE=0` — obavezno, da originalni auto-update ne zameni dodatak.
 - `SELFISM_AUTO_REPAIR=1` — nakon dostupnosti ComfyUI-a pokreće Qwen/CUDA popravku.
+- `SELFISM_AUTO_COMFY_UPDATE=1` (podrazumevano) — pri svakom startu poda, PRE pokretanja ComfyUI-a, `launcher/selfism_boot.py` pokreće `selfism_int8.py`: ako ComfyUI nema `int8_tensorwise` ili je `comfy-kitchen` < 0.2.16, prebacuje ga na v0.38.1 (uz `PIP_CONSTRAINT` zaštitu torch/numpy/transformers i rollback). Kada je već ažurno, traje nekoliko sekundi. Greška nikad ne blokira start; log je `/workspace/selfism-boot.log`. `0` isključuje, `force` zanemaruje limit ponovnih pokušaja (nakon 2 uzastopna neuspeha za isti tag boot ne pokušava ponovo). `SELFISM_AUTO_COMFY_UPDATE_TIMEOUT` (sekunde, podrazumevano 1800).
 - `CIVITAI_TOKEN` — lični Civitai API token za preuzimanje Selfora modela.
 - `HF_TOKEN` — tvoj Hugging Face read token, ako koristiš originalne workflowe sa modelima koji zahtevaju pristup. Prihvati njihove uslove na Hugging Face-u.
 
