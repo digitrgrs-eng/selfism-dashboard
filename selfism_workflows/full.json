@@ -1853,102 +1853,17 @@
       "mode": 0,
       "inputs": [
         {
-          "localized_name": "size",
-          "name": "size",
-          "type": "COMBO",
-          "widget": {
-            "name": "size"
-          },
+          "localized_name": "image",
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
           "link": null
         },
         {
-          "localized_name": "base",
-          "name": "base",
-          "type": "INT",
-          "widget": {
-            "name": "base"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "ratio_w",
-          "name": "ratio_w",
-          "type": "INT",
-          "widget": {
-            "name": "ratio_w"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "ratio_h",
-          "name": "ratio_h",
-          "type": "INT",
-          "widget": {
-            "name": "ratio_h"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "manual_w",
-          "name": "manual_w",
-          "type": "INT",
-          "widget": {
-            "name": "manual_w"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "manual_h",
-          "name": "manual_h",
-          "type": "INT",
-          "widget": {
-            "name": "manual_h"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "multiple",
-          "name": "multiple",
-          "type": "COMBO",
-          "widget": {
-            "name": "multiple"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "upscale_1",
-          "name": "upscale_1",
-          "type": "FLOAT",
-          "widget": {
-            "name": "upscale_1"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "upscale_2",
-          "name": "upscale_2",
-          "type": "FLOAT",
-          "widget": {
-            "name": "upscale_2"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_size",
-          "name": "batch_size",
-          "type": "INT",
-          "widget": {
-            "name": "batch_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "latent_type",
-          "name": "latent_type",
-          "type": "COMBO",
-          "widget": {
-            "name": "latent_type"
-          },
+          "localized_name": "mask",
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
           "link": null
         }
       ],
@@ -1966,27 +1881,15 @@
           "links": null
         },
         {
-          "localized_name": "mid_width",
-          "name": "mid_width",
-          "type": "INT",
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
           "links": null
         },
         {
-          "localized_name": "mid_height",
-          "name": "mid_height",
-          "type": "INT",
-          "links": null
-        },
-        {
-          "localized_name": "final_width",
-          "name": "final_width",
-          "type": "INT",
-          "links": null
-        },
-        {
-          "localized_name": "final_height",
-          "name": "final_height",
-          "type": "INT",
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
           "links": null
         },
         {
@@ -2006,7 +1909,7 @@
       ],
       "properties": {
         "cnr_id": "comfyui-artfat-resolution",
-        "ver": "08e5d67be40a5b9fdb9737e65319364a94ed7b7e",
+        "ver": "ce95fe7099c146f825fbdc7d12de09bfe9ae32b5",
         "Node name for S&R": "ArtfatResolution",
         "aux_id": "artfat-creator/ComfyUI-Artfat-Resolution"
       },
@@ -2015,11 +1918,15 @@
         896,
         9,
         16,
+        1.0,
+        "9:16 portrait",
         512,
         512,
         "16",
         2,
         2,
+        "lanczos",
+        "center",
         1,
         "SD3 / Flux / Krea 2 (16ch)"
       ],
@@ -6757,7 +6664,7 @@
     [
       1990,
       1021,
-      6,
+      4,
       929,
       0,
       "LATENT"

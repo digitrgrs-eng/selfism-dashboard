@@ -20,6 +20,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from launcher.private_r2 import r2_client, select_private
 
+# Profiles that need a ComfyUI able to load Selfora INT8 (int8_tensorwise).
+INT8_PROFILES = ('simple','aio','full','repair')
+
 class Selection(BaseModel):
     profile: Literal['simple','aio','reference','carousel','full','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
@@ -216,6 +219,13 @@ def register(host):
                 constraints.write_text(constraints.read_text()+Path(previous).read_text())
             os.environ['PIP_CONSTRAINT']=str(constraints)
             try:
+                if workflow.get('selfism_profile') in INT8_PROFILES:
+                    # First, so the restart after the install loads the new ComfyUI.
+                    self.update(stage='installing',message='Checking ComfyUI INT8 support…',percent=1)
+                    rc,output=await self._run_process(python,'-u',root/'launcher/selfism_int8.py',
+                        '--comfy-dir',host.COMFYUI_DIR,'--stash',timeout=2400)
+                    if rc: raise RuntimeError('ComfyUI INT8 upgrade failed: '+output[-1500:])
+                    self.check_cancelled()
                 if workflow.get('files') or workflow.get('custom_nodes'):
                     workflow = copy.deepcopy(workflow)
                     self.update(message='Checking private R2 and RapidCache for identical models…')
