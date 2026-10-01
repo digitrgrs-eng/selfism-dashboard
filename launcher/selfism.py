@@ -21,7 +21,7 @@ from pydantic import BaseModel
 from launcher.private_r2 import r2_client, select_private
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -232,10 +232,10 @@ def register(host):
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
-                if profile in ('simple','aio','reference','carousel'):
+                if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
-                        if n['type']=='UNETLoader' and profile in ('simple','aio'): n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
+                        if n['type']=='UNETLoader' and profile in ('simple','aio','full'): n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
                         if profile in ('reference','carousel') and n['type']=='Power Lora Loader (rgthree)':
                             for row in n.get('widgets_values', []):
                                 if isinstance(row,dict) and row.get('lora')=='millie_000002750.safetensors':
@@ -246,7 +246,8 @@ def register(host):
                     folder.mkdir(parents=True,exist_ok=True)
                     # Keep the user's previously edited workflow instead of overwriting it.
                     filename={'reference':'10sorlabs_MILLIE_REFERENCE_DEPTH_v1.json',
-                              'carousel':'Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json'}.get(profile,
+                              'carousel':'Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json',
+                              'full':f'Selfism_FULL_{workflow["precision"]}_v1.json'}.get(profile,
                               f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json')
                     dest=folder/filename
                     if not dest.exists(): dest.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -294,6 +295,14 @@ def register(host):
         elif profile=='carousel':
             file_keys=catalog['carousel_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['carousel_nodes']]
+        elif profile=='full':
+            # Kompletan workflow: only INT8 (default) or FP8; BF16 is intentionally not offered.
+            precision=request.precision if 'precision' in request.model_fields_set else 'int8'
+            if precision not in ('int8','fp8'):
+                raise HTTPException(400,'Kompletan workflow podržava samo Selfora INT8 ili FP8.')
+            request=request.model_copy(update={'precision':precision})
+            file_keys=[precision]+catalog['full_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['full_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -323,8 +332,8 @@ def register(host):
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile=='carousel' else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','carousel','repair','node'),
-                  'model_links':copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
+                  'selfism_repair':profile in ('simple','aio','reference','carousel','full','repair','node'),
+                  'model_links':(copy.deepcopy(catalog['full_links']) if profile=='full' else copy.deepcopy(catalog['reference_links'])) if profile in ('reference','carousel','full') else []}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -332,8 +341,8 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel'): raise HTTPException(404)
-        return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=f'Selfism_{profile}_m1lli3.json')
+        if profile not in ('simple','aio','reference','carousel','full'): raise HTTPException(404)
+        return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=('Selfism_FULL_workflow.json' if profile=='full' else f'Selfism_{profile}_m1lli3.json'))
 
     async def startup_repair():
         # Called only by the opt-in image setting, after Comfy's base startup.

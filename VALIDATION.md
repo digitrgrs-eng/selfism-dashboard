@@ -32,3 +32,7 @@ Reference + Depth addition: 24 focused tests pass (Selfism and private R2), incl
 - Fokusirana kolekcija sada ima 35 testova. CI izvrsava tu kolekciju pre Docker build-a.
 - Sira lokalna kolekcija pri proveri: 221 prolazi, 6 pada. Svih sest padova ponovljeno je na neizmenjenom prethodnom HEAD-u 5024932 u zasebnom privremenom direktorijumu: pet testova ocekuje 5 originalnih workflowa umesto 4, jedan ocekuje 5 sidebar stavki umesto 6. Nisu novonastale regresije. Dve naknadno dodate Carousel provere takodje prolaze.
 - Nije izvrsena stvarna GPU generacija, instalacija na korisnikovom aktivnom podu niti pristup njegovom privatnom R2 bucketu. Uspeh Docker build-a je odvojena provera u GitHub Actions.
+
+## Kompletan workflow (full profil)
+- `tests/test_full.py`: 8 testova (INT8 podrazumevano / FP8, BF16 odbijen, pokrivenost svih loader fajlova u workflowu katalogom, čuvanje workflowa bez prepisivanja, UI/JSON link, SHA256/veličine u katalogu).
+- Svi fajlovi profila postoje u privatnom R2 sa odgovarajućim sha256 metapodatkom. Nije izvršena GPU instalacija ni generisanje.

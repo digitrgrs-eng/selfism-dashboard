@@ -99,3 +99,8 @@ Instalacija cuva `Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json` u `ComfyUI/user
 Prvi test: `Use approved first photo`, jedna ukljucena referenca 02, reference 03-09 OFF, radna rezolucija 1 MP. Ovo je isti carousel paket koji je pripremljen za GPU test, bez novog generativnog koraka. Testovi instalatera ne potvrduju vizuelni kvalitet niti VRAM zahteve.
 
 Promena GitHub repozitorijuma ili objavljivanje novog Docker image-a ne menja automatski vec pokrenuti pod. Novi pod treba da koristi novi image tag iz uspesnog build-a. Postojeci uploadovani modeli u R2 ostaju dostupni.
+
+## Kompletan workflow (Selfora Full)
+Na stranici Selfora / Selfism postoji kartica **Kompletan workflow** sa dugmetom **Instaliraj sve**. Instalira sve modele i custom nodove koje workflow `selfism_workflows/full.json` referencira: Selfora v2.1 (INT8 je podrazumevan, FP8 kao alternativa; BF16 nije u ovom paketu), Qwen3-VL encoder, VAE-ove, Artfat LLM Prompter GGUF + mmproj, upscalere, detektore (lice, oči, kosa, ruke), SAM, Identity Edit, Depth i OpenPose LoRA sa DWPose modelima, Power LoRA slajdere i nodove. Procenjeno oko 35 GB (INT8) / 34,5 GB (FP8) slobodnog prostora.
+
+Izvori su isti kao kod ostalih paketa: privatni R2 -> RapidCache -> originalni link, sa istom SHA256 proverom. Svi fajlovi iz ovog paketa imaju SHA256 i veličinu u `catalog/selfism.json`. Workflow se čuva kao `user/default/workflows/Selfism/Selfism_FULL_<format>_v1.json`; postojeći fajl se ne prepisuje. JSON se može preuzeti i direktno sa kartice. Civitai LoRA fajlovi traže `CIVITAI_TOKEN`. Putanje LoRA/GGUF u workflowu su svedene na imena fajlova u osnovnim folderima. Nije testirano na GPU podu.

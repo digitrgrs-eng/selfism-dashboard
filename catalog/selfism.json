@@ -124,7 +124,7 @@
       "url": "https://github.com/starinspace/StarinspaceUpscale/releases/download/Models/4xPurePhoto-Span.pth",
       "destination": "models/upscale_models/4xPurePhoto-Span.pth",
       "size_bytes": 9016490,
-      "sha256": "",
+      "sha256": "c689eec59771ed3eaffc10eea933c44fdb9131f83251c51c5bab4cae7c4d3bf2",
       "auth": "none",
       "id": "span"
     },
@@ -132,8 +132,8 @@
       "name": "Selfora v2.1 FP8",
       "url": "https://civitai.com/api/download/models/3231658?fileId=3114237",
       "destination": "models/diffusion_models/selforaV21NightFix_selforaV21Fp8.safetensors",
-      "size_bytes": 0,
-      "sha256": "",
+      "size_bytes": 12821672489,
+      "sha256": "1867b304e36285681c5e36b5545d107740a8130d75150e2c939d5d1dec283cc5",
       "auth": "civitai",
       "civitai_version": 3231658,
       "civitai_file": 3114237,
@@ -143,8 +143,8 @@
       "name": "Selfora v2.1 INT8",
       "url": "https://civitai.com/api/download/models/3231439?fileId=3113969",
       "destination": "models/diffusion_models/selforaV21NightFix_selfora21Int8.safetensors",
-      "size_bytes": 0,
-      "sha256": "",
+      "size_bytes": 13485148168,
+      "sha256": "42f0589e9944bdfb7b6740afacc607bbe40cf1554f35e8b89d0dd691d1ea912f",
       "auth": "civitai",
       "civitai_version": 3231439,
       "civitai_file": 3113969,
@@ -245,6 +245,188 @@
       "sha256": "a7cd8f929e1903d78a12a48efecab430209f18dc46cb96c3599a5980c63c423c",
       "auth": "none",
       "verify": true
+    },
+    "face-v9": {
+      "name": "face_yolov9c.pt",
+      "url": "https://huggingface.co/Bingsu/adetailer/resolve/53cc19de382014514d9d4038601d261a7faa9b7b/face_yolov9c.pt",
+      "destination": "models/ultralytics/bbox/face_yolov9c.pt",
+      "size_bytes": 51648019,
+      "sha256": "d02fe493c31e1bbc6450f4dc6f1db86a02a59322ff1f6d318da0661d72ddd084",
+      "auth": "none",
+      "id": "face-v9"
+    },
+    "hand": {
+      "name": "hand_yolov8s.pt",
+      "url": "https://huggingface.co/Bingsu/adetailer/resolve/53cc19de382014514d9d4038601d261a7faa9b7b/hand_yolov8s.pt",
+      "destination": "models/ultralytics/bbox/hand_yolov8s.pt",
+      "size_bytes": 22507643,
+      "sha256": "70b540063fbc385736d8258970744a4afbc4cbf7932134bae3b24cdadeadec06",
+      "auth": "none",
+      "id": "hand"
+    },
+    "pose-lora": {
+      "name": "krea2_turbo_openpose_controlnet.safetensors",
+      "url": "https://huggingface.co/thedeoxen/Krea-2-pose-controlnet/resolve/1da9762ca46e6c9e4014b309bf0147889f10982a/krea2_turbo_openpose_controlnet.safetensors",
+      "destination": "models/loras/krea2_turbo_openpose_controlnet.safetensors",
+      "size_bytes": 228587504,
+      "sha256": "0ddc3aafce4abdf7af3309b2f00c1bacdf15df1f2b4fb7adc9ff71795da90ecf",
+      "auth": "none",
+      "id": "pose-lora"
+    },
+    "dwpose-det": {
+      "name": "DWPose yolox_l.onnx",
+      "url": "https://huggingface.co/yzd-v/DWPose/resolve/1a7144101628d69ee7a3768d1ee3a094070dc388/yolox_l.onnx",
+      "destination": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "size_bytes": 216746733,
+      "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411",
+      "auth": "none",
+      "id": "dwpose-det"
+    },
+    "dwpose-pose": {
+      "name": "DWPose dw-ll_ucoco_384_bs5.torchscript.pt",
+      "url": "https://huggingface.co/hr16/DWPose-TorchScript-BatchSize5/resolve/359d662a9b33b73f6d0f21732baf8845f17bb4be/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "size_bytes": 135059124,
+      "sha256": "d86a0b2b59fddc0901a7076e9f59c9f8602602133ed72511c693fd11eea23d91",
+      "auth": "none",
+      "id": "dwpose-pose"
+    },
+    "nomos": {
+      "name": "4xNomosWebPhoto_RealPLKSR.safetensors",
+      "url": "https://github.com/Phhofm/models/releases/download/4xNomosWebPhoto_RealPLKSR/4xNomosWebPhoto_RealPLKSR.safetensors",
+      "destination": "models/upscale_models/4xNomosWebPhoto_RealPLKSR.safetensors",
+      "size_bytes": 29590440,
+      "sha256": "9be0228f98156a100d6636d99b373ed2785b999723f9adc4cca504329ab157f2",
+      "auth": "none",
+      "id": "nomos"
+    },
+    "llm-fable": {
+      "name": "Qwen3.6-14B-A3B-FableVibes-Q4_K_M.gguf",
+      "url": "https://huggingface.co/tvall43/Qwen3.6-14B-A3B-FableVibes-GGUF/resolve/9cf910a7ad68dfedcbdfc46ef0fe5003dec07c23/Qwen3.6-14B-A3B-FableVibes-Q4_K_M.gguf",
+      "destination": "models/LLM/Qwen3.6-14B-A3B-FableVibes-Q4_K_M.gguf",
+      "size_bytes": 8465553920,
+      "sha256": "21aa4b0b28090469e8a319c889451df2f1ea6aad27ac3818c8c8a86f86d5bc9e",
+      "auth": "none",
+      "id": "llm-fable"
+    },
+    "mmproj-fable": {
+      "name": "Qwen3.6-14B-A3B-FableVibes-mmproj-F16.gguf",
+      "url": "https://huggingface.co/tvall43/Qwen3.6-14B-A3B-FableVibes-GGUF/resolve/9cf910a7ad68dfedcbdfc46ef0fe5003dec07c23/Qwen3.6-14B-A3B-FableVibes-mmproj-F16.gguf",
+      "destination": "models/LLM/Qwen3.6-14B-A3B-FableVibes-mmproj-F16.gguf",
+      "size_bytes": 899283680,
+      "sha256": "8971ee4f331ff0a4c609374f32984b3d4e6dc086c0aa35f1d637fad1829e887f",
+      "auth": "none",
+      "id": "mmproj-fable"
+    },
+    "lora-skin-tone": {
+      "name": "PornMaster Krea2 Skin Tone Slider V1",
+      "url": "https://civitai.com/api/download/models/3131460?fileId=3013136",
+      "destination": "models/loras/PornMaster_Krea2_Skin_Tone_Slider_V1.safetensors",
+      "size_bytes": 29527002,
+      "sha256": "3d2ee1db8fb14f49f860f9f763fe70ef4aa6a44b122df4d3e5f5272520b63770",
+      "auth": "civitai",
+      "id": "lora-skin-tone",
+      "civitai_version": 3131460,
+      "civitai_file": 3013136
+    },
+    "lora-peephole": {
+      "name": "PornMaster Krea2 Peephole Slider V1",
+      "url": "https://civitai.com/api/download/models/3143935?fileId=3024294",
+      "destination": "models/loras/PornMaster_Krea2_Peephole_Slider_V1.safetensors",
+      "size_bytes": 7531410,
+      "sha256": "aa3f227d9cc02d5e119b09b85f68e88dd9c3408f52a136959f54fc8f7822ac53",
+      "auth": "civitai",
+      "id": "lora-peephole",
+      "civitai_version": 3143935,
+      "civitai_file": 3024294
+    },
+    "lora-light": {
+      "name": "PornMaster Krea2 Light Slider V1",
+      "url": "https://civitai.com/api/download/models/3132251?fileId=3013134",
+      "destination": "models/loras/PornMaster_Krea2_Light_Slider_V1.safetensors",
+      "size_bytes": 29527002,
+      "sha256": "64b5273c744f43e1f6de721aee5fc61b9252c358996245b251d7f8257bc45ead",
+      "auth": "civitai",
+      "id": "lora-light",
+      "civitai_version": 3132251,
+      "civitai_file": 3013134
+    },
+    "lora-lowres": {
+      "name": "PornMaster Krea2 Low Resolution Slider V1",
+      "url": "https://civitai.com/api/download/models/3106092?fileId=2985983",
+      "destination": "models/loras/PornMaster_Low_Resolution_Slider_Krea2_V1.safetensors",
+      "size_bytes": 28627800,
+      "sha256": "304a58c8632c7c4b0a0e11477f7c11ccaa3b2916f3e8b18c290293490f6a6ec5",
+      "auth": "civitai",
+      "id": "lora-lowres",
+      "civitai_version": 3106092,
+      "civitai_file": 2985983
+    },
+    "lora-detail": {
+      "name": "PornMaster Krea2 Detail Slider V1",
+      "url": "https://civitai.com/api/download/models/3077180?fileId=2956355",
+      "destination": "models/loras/PornMaster_Detail_Slider_Krea2_V1_000000225.safetensors",
+      "size_bytes": 28627784,
+      "sha256": "c66d88068aa1444c1d7524b0ab4454d7de73847847966e848b14dd92a19a1a3d",
+      "auth": "civitai",
+      "id": "lora-detail",
+      "civitai_version": 3077180,
+      "civitai_file": 2956355
+    },
+    "lora-warmlight": {
+      "name": "Warm Light Slider KREA2 v1",
+      "url": "https://civitai.com/api/download/models/3111233?fileId=2991275",
+      "destination": "models/loras/WarmLightSlider-KREA2_v1.safetensors",
+      "size_bytes": 7202400,
+      "sha256": "3b5c0b3dc13fd2b8c706991c9b1a710024f80cb0390bece552c32e8e5bc5c777",
+      "auth": "civitai",
+      "id": "lora-warmlight",
+      "civitai_version": 3111233,
+      "civitai_file": 2991275
+    },
+    "lora-amateur": {
+      "name": "Amateur Slider KREA2 v1",
+      "url": "https://civitai.com/api/download/models/3122721?fileId=3003108",
+      "destination": "models/loras/AmateurSlider-KREA2_v1.safetensors",
+      "size_bytes": 6696848,
+      "sha256": "424be9cab885fdeac74652b627a1104c8717b6ca0834553044c6cd4eb3dfe0a1",
+      "auth": "civitai",
+      "id": "lora-amateur",
+      "civitai_version": 3122721,
+      "civitai_file": 3003108
+    },
+    "lora-waist": {
+      "name": "Waist slider Krea 2 v1",
+      "url": "https://civitai.com/api/download/models/3127275?fileId=3007750",
+      "destination": "models/loras/waist_slider_krea2.safetensors",
+      "size_bytes": 14344640,
+      "sha256": "8496e8b9c4b5e2abb87d012ca5b9596a62357edc8ab6fa1edd7414323acbc1ea",
+      "auth": "civitai",
+      "id": "lora-waist",
+      "civitai_version": 3127275,
+      "civitai_file": 3007750
+    },
+    "lora-pantyhose": {
+      "name": "Krea 2 Pantyhose with panties v3",
+      "url": "https://civitai.com/api/download/models/3276130?fileId=3160202",
+      "destination": "models/loras/Pantyhose and panties_v3.safetensors",
+      "size_bytes": 228588912,
+      "sha256": "c3c8be35fe8ed973bc5637d1b209fad06031a0e7accbe27303dafb16e2dfa713",
+      "auth": "civitai",
+      "id": "lora-pantyhose",
+      "civitai_version": 3276130,
+      "civitai_file": 3160202
+    },
+    "lora-wetness": {
+      "name": "Wetness Slider Krea2 v1",
+      "url": "https://civitai.com/api/download/models/3079282?fileId=2960993",
+      "destination": "models/loras/wetness_krea2_loraholic.safetensors",
+      "size_bytes": 7202984,
+      "sha256": "6cde29e21668aa10a60bcc1ed44b3f92ca2c07026b3fa6715200a670bee11880",
+      "auth": "civitai",
+      "id": "lora-wetness",
+      "civitai_version": 3079282,
+      "civitai_file": 2960993
     }
   },
   "nodes": [
@@ -475,5 +657,75 @@
     "comfyui-krea2-controlnet",
     "comfyui_controlnet_aux",
     "ComfyUI-Artfat-Resolution"
+  ],
+  "full_files": [
+    "encoder",
+    "qwen-vae",
+    "edit-vae",
+    "llm-fable",
+    "mmproj-fable",
+    "nomos",
+    "upscale",
+    "span",
+    "skin",
+    "sam",
+    "face-v9",
+    "eyes",
+    "hair",
+    "edit",
+    "depth",
+    "depth-anything",
+    "lora-skin-tone",
+    "lora-peephole",
+    "lora-light",
+    "lora-lowres",
+    "lora-detail",
+    "lora-warmlight",
+    "lora-amateur",
+    "lora-waist",
+    "lora-pantyhose",
+    "lora-wetness",
+    "pose-lora",
+    "hand",
+    "dwpose-det",
+    "dwpose-pose"
+  ],
+  "full_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI_tinyterraNodes",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-Custom-Scripts",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Face-Style-Preset-for-FaceDetailer-",
+    "ComfyUI-Krea2-Projector-Tuner",
+    "comfyui-krea2-controlnet",
+    "ComfyUI-OlmLUT",
+    "ComfyUI-VAE-Utils",
+    "comfyui-krea2edit",
+    "ComfyUI-Easy-Use",
+    "ComfyUI-post-processing-nodes",
+    "ComfyUI-RvTools_v2",
+    "comfyui_controlnet_aux",
+    "ComfyUI_essentials",
+    "ComfyUI_LayerStyle",
+    "ComfyUI_UltimateSDUpscale",
+    "ComfyUI-Artfat-Resolution"
+  ],
+  "full_links": [
+    {
+      "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    },
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
   ]
 }

@@ -58,7 +58,7 @@
     error.textContent = ''; b.disabled = true;
     try {
       await json('/api/selfism/install', {method:'POST', body:JSON.stringify({
-        profile:b.dataset.sfAction, item:b.dataset.sfItem || '', precision:panel.querySelector('#sf-precision').value
+        profile:b.dataset.sfAction, item:b.dataset.sfItem || '', precision:(b.dataset.sfAction === 'full' ? panel.querySelector('#sf-full-precision') : panel.querySelector('#sf-precision')).value
       })});
       await refresh();
     } catch (e) { error.textContent = e.message; b.disabled = false; }

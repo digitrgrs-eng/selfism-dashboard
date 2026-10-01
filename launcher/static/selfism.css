@@ -13,3 +13,5 @@
 .sf-row a {color:#a8bcff;overflow-wrap:anywhere}.sf-row small {display:block;color:#a2aaba;margin-top:6px;overflow-wrap:anywhere}
 .sf-row button {flex-shrink:0}.sf-details {margin:20px 0}.sf-details summary {cursor:pointer;padding:16px 0;font-size:18px}
 #sf-error {color:#ff9e9e;white-space:pre-wrap}
+.sf-card select {padding:10px;background:#151922;color:#fff;border:1px solid #394150;border-radius:8px}
+.sf-card label {color:#aeb7c7;font-size:14px}
