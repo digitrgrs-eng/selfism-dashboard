@@ -436,6 +436,116 @@
       "sha256": "1c4fccd291ad2b6b073ea8c4f59b21799afe13cb9796068f7c32200cf002bc85",
       "auth": "none",
       "id": "millie"
+    },
+    "mm-ref2va": {
+      "name": "MiniMax H3 Ref2VA INT8 ConvRot (pruned)",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "destination": "models/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "size_bytes": 20970379616,
+      "sha256": "9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779",
+      "auth": "none",
+      "id": "mm-ref2va"
+    },
+    "mm-fl2va": {
+      "name": "MiniMax H3 FL2VA INT8 ConvRot (pruned)",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "destination": "models/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "size_bytes": 20970379616,
+      "sha256": "e889202c41dafb67b10d67b97f0d8541508036a6090af23425a5c2615d03c47a",
+      "auth": "none",
+      "id": "mm-fl2va"
+    },
+    "mm-enc-int4": {
+      "name": "MiniMax H3 Qwen3-VL 32B encoder INT4 ConvRot",
+      "url": "https://huggingface.co/Merserk/MiniMax-H3-INT4-ConvRot/resolve/main/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "destination": "models/text_encoders/qwen3vl_32b_minimax_h3_int4_convrot.safetensors",
+      "size_bytes": 14952506624,
+      "sha256": "4389571ab5db4180bcae33d13d07855319530f60a85ab0f1061379401a8ef66c",
+      "auth": "none",
+      "id": "mm-enc-int4"
+    },
+    "mm-enc-nvfp4": {
+      "name": "MiniMax H3 Qwen3-VL 32B encoder NVFP4 AWQ",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "destination": "models/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "size_bytes": 15687142551,
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "auth": "none",
+      "id": "mm-enc-nvfp4"
+    },
+    "mm-vae-int8": {
+      "name": "MiniMax H3 video VAE INT8 ConvRot",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "destination": "models/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "size_bytes": 2811065184,
+      "sha256": "52a2c8c73583c86e4f41cdcce3a6ad0ea562987bc0bf3d60a0cef5f5c8e60c0e",
+      "auth": "none",
+      "id": "mm-vae-int8"
+    },
+    "mm-vae-fp16": {
+      "name": "MiniMax H3 video VAE FP16",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+      "destination": "models/vae/minimax_h3_video_vae_fp16.safetensors",
+      "size_bytes": 5207808496,
+      "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "auth": "none",
+      "id": "mm-vae-fp16"
+    },
+    "mm-vae-audio": {
+      "name": "MiniMax H3 audio VAE FP32",
+      "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors",
+      "destination": "models/vae/minimax_h3_audio_vae_fp32.safetensors",
+      "size_bytes": 605254808,
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "auth": "none",
+      "id": "mm-vae-audio"
+    },
+    "mm-latent-up": {
+      "name": "MiniMax H3 latent upscaler 3D conv v1 FP16",
+      "url": "https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler/resolve/main/minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_fp16.safetensors",
+      "destination": "models/latent_upscale_models/minimax_h3_latent_upscaler_3d_conv_v1_fp16.safetensors",
+      "size_bytes": 690592672,
+      "sha256": "043e5a48e161610ef6c3ea974645220354d06fa618abca15f76d084812eb55c2",
+      "auth": "none",
+      "id": "mm-latent-up"
+    },
+    "mm-gemma-e4b": {
+      "name": "Gemma-4 E4B IT INT8 ConvRot (LLM prompt step)",
+      "url": "https://huggingface.co/Comfy-Org/gemma-4/resolve/main/text_encoders/gemma4_e4b_it_int8_convrot.safetensors",
+      "destination": "models/text_encoders/gemma4_e4b_it_int8_convrot.safetensors",
+      "size_bytes": 8090965702,
+      "sha256": "974d0c838ef4ac1a989b06ccb4e57691c21b6270dd8e345ffa7531f9388f117c",
+      "auth": "none",
+      "id": "mm-gemma-e4b"
+    },
+    "mm-gemma-e2b": {
+      "name": "Gemma-4 E2B IT INT8 ConvRot (faster LLM prompt step)",
+      "url": "https://huggingface.co/Comfy-Org/gemma-4/resolve/main/text_encoders/gemma4_e2b_it_int8_convrot.safetensors",
+      "destination": "models/text_encoders/gemma4_e2b_it_int8_convrot.safetensors",
+      "size_bytes": 5199997904,
+      "sha256": "efeca0fcad2f863e5ed0a75e3af952b72bc963604c1dda6d20aee87a32b17566",
+      "auth": "none",
+      "id": "mm-gemma-e2b"
+    },
+    "mm-lora-turbo": {
+      "name": "MiniMax H3 FL2V turbo LoRA (silver dareties pruned)",
+      "url": "https://huggingface.co/silveroxides/MiniMax-H3_tests/resolve/main/minimax_h3_fl2v_turbo_silver_dareties_comfy_pruned_v1.safetensors",
+      "destination": "models/loras/minimax_h3_fl2v_turbo_silver_dareties_comfy_pruned_v1.safetensors",
+      "size_bytes": 765582016,
+      "sha256": "9aab6353ce76f0a1c6a6fbbeaa1a4c60deced365e328bc14ddb0b7b9f0849b48",
+      "auth": "none",
+      "id": "mm-lora-turbo"
+    },
+    "mm-lora-taomate": {
+      "name": "TaoMate H3 3-step LoRA (rank 19 bf16)",
+      "url": "https://civitai.com/api/download/models/3322134?fileId=3207816",
+      "destination": "models/loras/minimax_h3_taomate_3step_lora_avg_rank_19_bf16.safetensors",
+      "size_bytes": 1240539224,
+      "sha256": "908d6c9a8d4cb7311b9b48aece606a1d29033f07e2ef23676f8404acc07d5173",
+      "auth": "civitai",
+      "id": "mm-lora-taomate",
+      "civitai_version": 3322134,
+      "civitai_file": 3207816
     }
   },
   "nodes": [
@@ -582,6 +692,42 @@
       "repo": "https://github.com/artfat-creator/ComfyUI-Artfat-Resolution.git",
       "ref": "ce95fe7099c146f825fbdc7d12de09bfe9ae32b5",
       "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Logic",
+      "repo": "https://github.com/theUpsider/ComfyUI-Logic.git",
+      "ref": "ae0ca532177eef7325d207f8b8a2f88f4d1a837c",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-VideoHelperSuite",
+      "repo": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git",
+      "ref": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Spectrum-MiniMax-H3",
+      "repo": "https://github.com/xmarre/ComfyUI-Spectrum-MiniMax-H3.git",
+      "ref": "beb32dd210ef9e95520453107f158241d4f2ecf3",
+      "install_requirements": false
+    },
+    {
+      "name": "Comfyui_Minimax_h3_latent_Upscaler",
+      "repo": "https://github.com/LBH-123-AI/Comfyui_Minimax_h3_latent_Upscaler.git",
+      "ref": "40316cf008b2fd8663263270669eb4da23f89d2c",
+      "install_requirements": false
+    },
+    {
+      "name": "comfyui-various",
+      "repo": "https://github.com/jamesWalker55/comfyui-various.git",
+      "ref": "5bd85aaf7616878471469c4ec7e11bbd0cef3bf2",
+      "install_requirements": false
+    },
+    {
+      "name": "comfyui_essential-er",
+      "repo": "https://github.com/altoiddealer/comfyui_essential-er.git",
+      "ref": "cbbc455f09f96dd13c70d6a67e02c725c842440c",
+      "install_requirements": false
     }
   ],
   "simple_files": [
@@ -723,5 +869,24 @@
       "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
     }
+  ],
+  "minimax_files": [
+    "mm-ref2va",
+    "mm-enc-int4",
+    "mm-vae-int8",
+    "mm-vae-audio",
+    "mm-latent-up",
+    "mm-gemma-e4b"
+  ],
+  "minimax_nodes": [
+    "ComfyUI-KJNodes",
+    "rgthree-comfy",
+    "ComfyUI-Easy-Use",
+    "ComfyUI-Logic",
+    "ComfyUI-Spectrum-MiniMax-H3",
+    "Comfyui_Minimax_h3_latent_Upscaler",
+    "comfyui-various",
+    "ComfyUI-VideoHelperSuite",
+    "comfyui_essential-er"
   ]
 }

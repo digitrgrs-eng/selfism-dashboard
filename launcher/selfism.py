@@ -22,9 +22,10 @@ from launcher.private_r2 import r2_client, select_private
 
 # Profiles that need a ComfyUI able to load Selfora INT8 (int8_tensorwise).
 INT8_PROFILES = ('simple','aio','full','repair')
+MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -242,6 +243,14 @@ def register(host):
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
+                if profile=='minimax':
+                    # Third-party workflow shipped byte-for-byte: no patching and no re-serialisation.
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_simply_advanced.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Backend Attention defaults to "sage attention"; if SageAttention is not installed, choose "pytorch attention" in that subgraph.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -322,6 +331,10 @@ def register(host):
             request=request.model_copy(update={'precision':precision})
             file_keys=[precision]+catalog['full_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['full_nodes']]
+        elif profile=='minimax':
+            # MiniMax H3 Simply Advanced: exactly the default-active models of the workflow (R2 first, HF fallback).
+            file_keys=catalog['minimax_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -360,7 +373,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax'): raise HTTPException(404)
+        if profile=='minimax':
+            return FileResponse(root/'selfism_workflows/minimax_h3_simply_advanced.json',filename=MINIMAX_WORKFLOW_NAME)
         return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=('Selfism_FULL_workflow.json' if profile=='full' else f'Selfism_{profile}_m1lli3.json'))
 
     async def startup_repair():
