@@ -92,23 +92,48 @@ def test_full_card_size_matches_catalog():
     assert f'{(base+files["fp8"]["size_bytes"])/1e9:.1f}'.replace('.', ',') + ' GB (FP8)' in html
 
 
+# Refs that exist only in the bypassed (mode 4) Identity-Edit branch of the Recreate workflow. Nothing downstream of them
+# reaches an output, so "Instaliraj sve" intentionally does not download them (still available via single-model install).
+EDIT_MODE_ONLY = {'krea2_identity_edit_v1_2.safetensors', 'krea2RealVae_v10.safetensors'}
+REMOVED_FROM_FULL = {'edit', 'edit-vae', 'llm-fable', 'mmproj-fable', 'pose-lora', 'hand', 'dwpose-det', 'dwpose-pose'}
+RECREATE_PRESETS = [f'Recreate_{a}_{b}.txt' for a in ('SFW', 'NSFW') for b in ('prefix', 'noprefix')]
+
+
+def test_full_is_exactly_the_recreate_file_set():
+    full = set(CATALOG['full_files'])
+    assert not REMOVED_FROM_FULL & full
+    assert {'millie', 'llm', 'mmproj'} <= full
+    files = CATALOG['files']
+    assert files['llm']['destination'] == 'models/LLM/RVN-Q4_K_M-multilingual-mtp.gguf'
+    assert files['mmproj']['destination'] == 'models/LLM/mmproj-Qwen3.8-27B-Q8_0.gguf'
+    assert files['millie']['destination'] == 'models/loras/millie_000002750.safetensors'
+    assert files['millie']['url'].startswith('https://huggingface.co/daneheh/millie/resolve/')
+    assert files['millie']['auth'] == 'none'
+    # nothing outside the catalog subset is referenced by an active loader, and every downloaded file is used by the workflow
+    text = json.dumps(WORKFLOW, ensure_ascii=False)
+    for k in full - {'int8', 'fp8'}:
+        name = Path(files[k]['destination']).name
+        assert name in text or name == 'depth_anything_v2_vitl.pth', k
+    assert {l['source'] for l in CATALOG['full_links']} == {files['depth-anything']['destination']}
+    assert not any('DWPose' in l['source'] or 'dw-ll' in l['source'] for l in CATALOG['full_links'])
+
+
 def test_full_workflow_download_and_static_model_coverage():
     with TestClient(m.app) as client:
         w = client.get('/api/selfism/workflow/full').json()
     assert w == WORKFLOW
+    assert not any(n['type'] in ('DWPreprocessor', 'OpenposePreprocessor') for n in all_nodes(w))
     names = {Path(CATALOG['files'][k]['destination']).name for k in CATALOG['full_files'] + ['int8', 'fp8']}
     names |= {'ComfyUI_temp'}
     for n in all_nodes(w):
         t, v = n['type'], n.get('widgets_values')
         if t in ('UNETLoader', 'VAELoader', 'CLIPLoader', 'UpscaleModelLoader', 'SAMLoader',
                  'Krea2ControlLoRALoader', 'DepthAnythingV2Preprocessor', 'LoraLoaderModelOnly'):
-            assert Path(v[0]).name in names, (t, v[0])
+            assert Path(v[0]).name in names | EDIT_MODE_ONLY, (t, v[0])
         if t == 'UltralyticsDetectorProvider':
             assert Path(v[0]).name in names, v[0]
         if t == 'ArtfatLLMPrompter':
             assert v[0] in names and v[1] in names
-        if t == 'DWPreprocessor':
-            assert v[4] in names and v[5] in names
         if t == 'Power Lora Loader (rgthree)':
             for row in v:
                 if isinstance(row, dict) and 'lora' in row:
@@ -132,7 +157,7 @@ def test_full_workflow_saved_once_with_chosen_precision_and_nondestructive(monke
     monkeypatch.setattr(s, 'resolve_sources', sources)
     folder = tmp_path/'user/default/workflows/Selfism'
     asyncio.run(ctrl._install_workflow({'selfism_profile': 'full', 'precision': 'fp8', 'files': [{'id': 'x'}]}))
-    saved = folder/'Selfism_FULL_fp8_v1.json'
+    saved = folder/'Selfism_FULL_fp8_recreate_v1.json'
     w = json.loads(saved.read_text(encoding='utf-8'))
     assert [n['widgets_values'][0] for n in w['nodes'] if n['type'] == 'UNETLoader'] == [
         'selforaV21NightFix_selforaV21Fp8.safetensors']
@@ -140,6 +165,14 @@ def test_full_workflow_saved_once_with_chosen_precision_and_nondestructive(monke
     asyncio.run(ctrl._install_workflow({'selfism_profile': 'full', 'precision': 'fp8', 'files': [{'id': 'x'}]}))
     assert json.loads(saved.read_text()) == {'user_edited': True}
     asyncio.run(ctrl._install_workflow({'selfism_profile': 'full', 'precision': 'int8', 'files': [{'id': 'x'}]}))
-    w = json.loads((folder/'Selfism_FULL_int8_v1.json').read_text(encoding='utf-8'))
+    w = json.loads((folder/'Selfism_FULL_int8_recreate_v1.json').read_text(encoding='utf-8'))
     assert [n['widgets_values'][0] for n in w['nodes'] if n['type'] == 'UNETLoader'] == [
         'selforaV21NightFix_selfora21Int8.safetensors']
+    presets = tmp_path/'models/LLM/prompts'
+    assert sorted(p.name for p in presets.iterdir()) == sorted(RECREATE_PRESETS)
+    for name in RECREATE_PRESETS:
+        assert (presets/name).read_bytes() == (ROOT/'selfism_workflows/presets'/name).read_bytes()
+    # presets on the pod override the node's baked text, so they are refreshed to match the shipped workflow
+    (presets/RECREATE_PRESETS[0]).write_text('stale')
+    asyncio.run(ctrl._install_workflow({'selfism_profile': 'full', 'precision': 'int8', 'files': [{'id': 'x'}]}))
+    assert (presets/RECREATE_PRESETS[0]).read_bytes() == (ROOT/'selfism_workflows/presets'/RECREATE_PRESETS[0]).read_bytes()

@@ -35,4 +35,5 @@ Reference + Depth addition: 24 focused tests pass (Selfism and private R2), incl
 
 ## Kompletan workflow (full profil)
 - `tests/test_full.py`: 8 testova (INT8 podrazumevano / FP8, BF16 odbijen, pokrivenost svih loader fajlova u workflowu katalogom, čuvanje workflowa bez prepisivanja, UI/JSON link, SHA256/veličine u katalogu).
-- Svi fajlovi profila postoje u privatnom R2 sa odgovarajućim sha256 metapodatkom. Nije izvršena GPU instalacija ni generisanje.
+- Paket je sveden na fajlove koje Recreate workflow stvarno koristi (bez Identity Edit, OpenPose/DWPose, detektora ruku i FableVibes LLM-a); Millie LoRA dolazi sa Hugging Facea, LLM je `RVN-Q4_K_M-multilingual-mtp.gguf` + `mmproj-Qwen3.8-27B-Q8_0.gguf`; Recreate preseti se kopiraju u `models/LLM/prompts/`.
+- Svi fajlovi profila osim Millie LoRA postoje u privatnom R2 sa odgovarajućim sha256 metapodatkom. Nije izvršena GPU instalacija ni generisanje.

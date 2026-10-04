@@ -427,6 +427,15 @@
       "id": "lora-wetness",
       "civitai_version": 3079282,
       "civitai_file": 2960993
+    },
+    "millie": {
+      "name": "Millie LoRA (millie_000002750)",
+      "url": "https://huggingface.co/daneheh/millie/resolve/b5cf56c415179eb9bb056e8bcbf4597da838b213/millie_000002750.safetensors",
+      "destination": "models/loras/millie_000002750.safetensors",
+      "size_bytes": 457112016,
+      "sha256": "1c4fccd291ad2b6b073ea8c4f59b21799afe13cb9796068f7c32200cf002bc85",
+      "auth": "none",
+      "id": "millie"
     }
   },
   "nodes": [
@@ -661,9 +670,8 @@
   "full_files": [
     "encoder",
     "qwen-vae",
-    "edit-vae",
-    "llm-fable",
-    "mmproj-fable",
+    "llm",
+    "mmproj",
     "nomos",
     "upscale",
     "span",
@@ -672,9 +680,9 @@
     "face-v9",
     "eyes",
     "hair",
-    "edit",
     "depth",
     "depth-anything",
+    "millie",
     "lora-skin-tone",
     "lora-peephole",
     "lora-light",
@@ -684,11 +692,7 @@
     "lora-amateur",
     "lora-waist",
     "lora-pantyhose",
-    "lora-wetness",
-    "pose-lora",
-    "hand",
-    "dwpose-det",
-    "dwpose-pose"
+    "lora-wetness"
   ],
   "full_nodes": [
     "rgthree-comfy",
@@ -718,14 +722,6 @@
     {
       "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
-    },
-    {
-      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
-      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
-    },
-    {
-      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
-      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
   ]
 }
