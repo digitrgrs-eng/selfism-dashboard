@@ -97,6 +97,8 @@ def test_full_card_size_matches_catalog():
 EDIT_MODE_ONLY = {'krea2_identity_edit_v1_2.safetensors', 'krea2RealVae_v10.safetensors'}
 REMOVED_FROM_FULL = {'edit', 'edit-vae', 'llm-fable', 'mmproj-fable', 'pose-lora', 'hand', 'dwpose-det', 'dwpose-pose'}
 RECREATE_PRESETS = [f'Recreate_{a}_{b}.txt' for a in ('SFW', 'NSFW') for b in ('prefix', 'noprefix')]
+FIRSTFRAME_PRESETS = [f'Recreate_FirstFrame_{a}_{b}.txt' for a in ('SFW', 'NSFW') for b in ('prefix', 'noprefix')]
+ALL_PRESETS = RECREATE_PRESETS + FIRSTFRAME_PRESETS
 
 
 def test_full_is_exactly_the_recreate_file_set():
@@ -169,10 +171,22 @@ def test_full_workflow_saved_once_with_chosen_precision_and_nondestructive(monke
     assert [n['widgets_values'][0] for n in w['nodes'] if n['type'] == 'UNETLoader'] == [
         'selforaV21NightFix_selfora21Int8.safetensors']
     presets = tmp_path/'models/LLM/prompts'
-    assert sorted(p.name for p in presets.iterdir()) == sorted(RECREATE_PRESETS)
-    for name in RECREATE_PRESETS:
+    assert sorted(p.name for p in presets.iterdir()) == sorted(ALL_PRESETS)
+    for name in ALL_PRESETS:
         assert (presets/name).read_bytes() == (ROOT/'selfism_workflows/presets'/name).read_bytes()
     # presets on the pod override the node's baked text, so they are refreshed to match the shipped workflow
     (presets/RECREATE_PRESETS[0]).write_text('stale')
     asyncio.run(ctrl._install_workflow({'selfism_profile': 'full', 'precision': 'int8', 'files': [{'id': 'x'}]}))
     assert (presets/RECREATE_PRESETS[0]).read_bytes() == (ROOT/'selfism_workflows/presets'/RECREATE_PRESETS[0]).read_bytes()
+
+
+def test_full_baked_system_prompt_matches_shipped_sfw_prefix_preset():
+    w = json.loads((ROOT/'selfism_workflows/full.json').read_text(encoding='utf-8'))
+    node = next(n for n in w['nodes'] if n['id'] == 866)
+    baked = node['widgets_values'][15]
+    assert baked == (ROOT/'selfism_workflows/presets/Recreate_SFW_prefix.txt').read_text(encoding='utf-8')
+    assert 'IDENTITY RULE' in baked
+    for name in ALL_PRESETS:
+        text = (ROOT/'selfism_workflows/presets'/name).read_text(encoding='utf-8')
+        assert text.startswith('# RECREATE') and '## IDENTITY RULE' in text and 'never beyond 480 tokens' in text
+        assert ('FIRST FRAME RULE' in text) == ('FirstFrame' in name)

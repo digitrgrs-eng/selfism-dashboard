@@ -274,11 +274,13 @@ def register(host):
                     if profile=='full':
                         # The Recreate workflow selects these LLM system presets by file name. A preset file on the pod
                         # overrides the text baked into the node, so keep the shipped files in sync with the workflow.
+                        # Recreate_{SFW,NSFW}_{prefix,noprefix}.txt (v2, identity-safe) and
+                        # Recreate_FirstFrame_{SFW,NSFW}_{prefix,noprefix}.txt (reel first frame) match this glob.
                         prompts=host.COMFYUI_DIR/'models/LLM/prompts'
                         prompts.mkdir(parents=True,exist_ok=True)
                         for preset in sorted((root/'selfism_workflows/presets').glob('Recreate_*.txt')):
                             (prompts/preset.name).write_bytes(preset.read_bytes())
-                        logs.append('Recreate LLM presets copied to '+str(prompts)+'. Restart ComfyUI if the prompter does not list them.')
+                        logs.append('Recreate + Recreate FirstFrame LLM presets copied to '+str(prompts)+'. Restart ComfyUI if the prompter does not list them.')
                     if profile=='full': logs.append('Upload your reference image. Millie LoRA is installed (first row of the Power Lora Loader).')
                     else: logs.append('Upload your reference image. Add your private Millie LoRA separately and enable its row.')
             finally:
