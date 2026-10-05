@@ -696,7 +696,7 @@
     {
       "name": "ComfyUI-Logic",
       "repo": "https://github.com/theUpsider/ComfyUI-Logic.git",
-      "ref": "ae0ca532177eef7325d207f8b8a2f88f4d1a837c",
+      "ref": "f95b332091ec1d6a8b1df4bedf1b054e9807f5e2",
       "install_requirements": true
     },
     {
@@ -727,6 +727,18 @@
       "name": "comfyui_essential-er",
       "repo": "https://github.com/altoiddealer/comfyui_essential-er.git",
       "ref": "cbbc455f09f96dd13c70d6a67e02c725c842440c",
+      "install_requirements": false
+    },
+    {
+      "name": "ComfyUI-LLM-text-processor",
+      "repo": "https://github.com/KingManiya/ComfyUI-LLM-text-processor.git",
+      "ref": "65983de33681816f856db7e16767da906084c688",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-MiniMaxH3Mod",
+      "repo": "https://github.com/Luisacaotica/ComfyUI-MiniMaxH3Mod.git",
+      "ref": "6131c1f62c612a074d6aac8435c26ffa19c00563",
       "install_requirements": false
     }
   ],
@@ -887,6 +899,11 @@
     "Comfyui_Minimax_h3_latent_Upscaler",
     "comfyui-various",
     "ComfyUI-VideoHelperSuite",
-    "comfyui_essential-er"
+    "comfyui_essential-er",
+    "ComfyUI-LLM-text-processor",
+    "ComfyUI-MiniMaxH3Mod"
+  ],
+  "minimax_pip": [
+    "soundfile"
   ]
 }

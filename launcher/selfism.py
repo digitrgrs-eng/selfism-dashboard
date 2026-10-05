@@ -202,6 +202,21 @@ def register(host):
                     if not task.done(): task.cancel()
                 await asyncio.gather(read_task,cancel_task,return_exceptions=True)
 
+        async def _install_python_packages(self, python, packages):
+            # Some node packs import a package at load time without declaring it (comfyui-various does
+            # `import soundfile` at the top of comfyui_sound.py and has no requirements.txt), so the whole pack fails
+            # to import. PIP_CONSTRAINT (torch/numpy/...) is already active here, so this cannot move the core stack.
+            safe=[p for p in packages if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*(==[A-Za-z0-9.*+-]+)?',str(p))]
+            if len(safe)!=len(packages): raise RuntimeError('Unsafe Python package name in catalog.')
+            self.update(stage='installing',message='Installing Python packages for node packs: '+', '.join(safe),percent=97)
+            rc,output=await self._run_process(python,'-m','pip','install','--timeout','15','--retries','3',*safe,timeout=900)
+            if rc: raise RuntimeError('Python packages failed ('+', '.join(safe)+'): '+output[-500:])
+            for name in safe:
+                module=name.split('==')[0].replace('-','_')
+                rc,output=await self._run_process(python,'-c','import '+module,timeout=60)
+                if rc: raise RuntimeError('Installed '+name+' but it cannot be imported: '+output[-500:])
+            logs.append('Python packages installed for node packs: '+', '.join(safe)+'. Restart ComfyUI.')
+
         async def _install_workflow(self, workflow):
             await self._wait_for_comfyui()
             python=host.COMFYUI_VENV/'bin/python'
@@ -236,6 +251,8 @@ def register(host):
                     await super()._install_workflow(workflow)
                 if self.state.warnings:
                     raise RuntimeError('Some dependencies failed. See warnings and retry before running the workflow.')
+                if workflow.get('pip_packages'):
+                    await self._install_python_packages(python,workflow['pip_packages'])
                 if workflow.get('selfism_profile') == 'carousel':
                     await self._install_carousel_helper(python)
                 if workflow.get('selfism_repair'):
@@ -367,6 +384,7 @@ def register(host):
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile=='carousel' else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','carousel','full','repair','node'),
+                  'pip_packages':list(catalog.get('minimax_pip',[])) if profile=='minimax' else [],
                   'model_links':(copy.deepcopy(catalog['full_links']) if profile=='full' else copy.deepcopy(catalog['reference_links'])) if profile in ('reference','carousel','full') else []}
         return await controller.start(workflow)
 

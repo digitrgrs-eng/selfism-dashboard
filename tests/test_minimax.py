@@ -19,7 +19,33 @@ WF_SHA256 = '31979ea700c3e1297194ecc263e3d0adcecb34891410f77633b08f7bb4e74b60'
 MM_IDS = ['mm-ref2va', 'mm-fl2va', 'mm-enc-int4', 'mm-enc-nvfp4', 'mm-vae-int8', 'mm-vae-fp16', 'mm-vae-audio',
           'mm-latent-up', 'mm-gemma-e4b', 'mm-gemma-e2b', 'mm-lora-turbo', 'mm-lora-taomate']
 NODES = ['ComfyUI-KJNodes', 'rgthree-comfy', 'ComfyUI-Easy-Use', 'ComfyUI-Logic', 'ComfyUI-Spectrum-MiniMax-H3',
-         'Comfyui_Minimax_h3_latent_Upscaler', 'comfyui-various', 'ComfyUI-VideoHelperSuite', 'comfyui_essential-er']
+         'Comfyui_Minimax_h3_latent_Upscaler', 'comfyui-various', 'ComfyUI-VideoHelperSuite', 'comfyui_essential-er',
+         'ComfyUI-LLM-text-processor', 'ComfyUI-MiniMaxH3Mod']
+# ComfyUI-Logic must stay on the 1.0.0 line: the workflow uses node type "Bool", and the later 1.0.1 pin registers it as
+# "Bool-🔬", which ComfyUI Manager then reports as a missing node.
+LOGIC_REF = 'f95b332091ec1d6a8b1df4bedf1b054e9807f5e2'
+# Every non-core node type used by the workflow, mapped to the catalog pack that provides it. The workflow's own
+# cnr_id / aux_id properties name the source pack; types without either come from the pack that registers them.
+TYPE_TO_PACK = {
+    'Bool': 'ComfyUI-Logic', 'JWDatetimeString': 'comfyui-various',
+    'LLMTextProcessor': 'ComfyUI-LLM-text-processor',
+    'MiniMaxH3RefModApply': 'ComfyUI-MiniMaxH3Mod', 'MiniMaxH3RefModsLoader': 'ComfyUI-MiniMaxH3Mod',
+    'MinimaxH3LatentUpscaler3D': 'Comfyui_Minimax_h3_latent_Upscaler', 'SpectrumApplyMiniMaxH3': 'ComfyUI-Spectrum-MiniMax-H3',
+    'VHS_LoadVideo': 'ComfyUI-VideoHelperSuite', 'ResizeImageMaskAlt': 'comfyui_essential-er',
+    'Any Switch (rgthree)': 'rgthree-comfy', 'Power Lora Loader (rgthree)': 'rgthree-comfy',
+    'GetNode': 'ComfyUI-KJNodes', 'SetNode': 'ComfyUI-KJNodes', 'ImageBatchMulti': 'ComfyUI-KJNodes',
+}
+CNR_TO_PACK = {
+    'comfyui-logic': 'ComfyUI-Logic', 'jameswalker-nodes': 'comfyui-various', 'comfyui-various': 'comfyui-various',
+    'ComfyUI-LLM-text-processor': 'ComfyUI-LLM-text-processor', 'ComfyUI-MiniMaxH3Mod': 'ComfyUI-MiniMaxH3Mod',
+    'comfyui-kjnodes': 'ComfyUI-KJNodes', 'rgthree-comfy': 'rgthree-comfy', 'comfyui-easy-use': 'ComfyUI-Easy-Use',
+    'comfyui-videohelpersuite': 'ComfyUI-VideoHelperSuite', 'comfyui-spectrum-minimax-h3': 'ComfyUI-Spectrum-MiniMax-H3',
+}
+AUX_TO_PACK = {
+    'altoiddealer/ComfyUI-Easy-Use-alt': 'ComfyUI-Easy-Use', 'altoiddealer/comfyui_essential-er': 'comfyui_essential-er',
+    'kijai/ComfyUI-KJNodes': 'ComfyUI-KJNodes',
+    'LBH-123-AI/Comfyui_Minimax_h3_latent_Upscaler': 'Comfyui_Minimax_h3_latent_Upscaler',
+}
 
 
 def all_nodes(w):
@@ -67,6 +93,8 @@ def test_minimax_catalog_metadata_and_r2_layout():
     assert set(MM_IDS) <= set(files)
     names = {n['name']: n for n in CATALOG['nodes']}
     assert set(CATALOG['minimax_nodes']) == set(NODES) and set(NODES) <= set(names)
+    assert names['ComfyUI-Logic']['ref'] == LOGIC_REF
+    assert CATALOG['minimax_pip'] == ['soundfile']
     for n in NODES:
         assert re.fullmatch(r'[0-9a-f]{40}', names[n]['ref']) and names[n]['repo'].startswith('https://github.com/'), n
 
@@ -79,7 +107,10 @@ def test_minimax_install_selects_only_default_active_files(monkeypatch):
                                                'mm-latent-up', 'mm-gemma-e4b']
     assert captured['selfism_profile'] == 'minimax' and captured['selfism_repair'] is False
     assert {n['name'] for n in captured['custom_nodes']} == set(NODES)
+    assert captured['pip_packages'] == ['soundfile']
     assert all(len(f['sha256']) == 64 for f in captured['files'])
+    for label in ('LLM Text Processor', 'MiniMax H3 RefMod', 'soundfile'):
+        assert label in html and label in (ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')
     assert 'data-sf-action="minimax"' in html and 'MiniMax H3 Simply Advanced' in html
     total = sum(CATALOG['files'][k]['size_bytes'] for k in ids)
     assert f'{total/1e9:.1f}'.replace('.', ',') + ' GB' in html
@@ -130,3 +161,54 @@ def test_minimax_workflow_download_and_install_is_byte_identical_and_nondestruct
     saved.write_text('{"user_edited":true}')
     asyncio.run(ctrl._install_workflow({'selfism_profile': 'minimax', 'precision': 'fp8', 'files': [{'id': 'x'}]}))
     assert json.loads(saved.read_text()) == {'user_edited': True}
+
+
+def test_every_non_core_node_in_the_workflow_is_installed_by_the_minimax_card():
+    w = json.loads(WF_PATH.read_bytes())
+    installed = set(CATALOG['minimax_nodes'])
+    seen = {}
+    for n in all_nodes(w):
+        props = n.get('properties') or {}
+        cnr, aux = props.get('cnr_id'), props.get('aux_id')
+        if cnr and cnr != 'comfy-core':
+            assert cnr in CNR_TO_PACK, f"{n['type']}: unmapped cnr_id {cnr}"
+            seen[cnr] = CNR_TO_PACK[cnr]
+        if aux:
+            assert aux in AUX_TO_PACK, f"{n['type']}: unmapped aux_id {aux}"
+            seen[aux] = AUX_TO_PACK[aux]
+        if n['type'] in TYPE_TO_PACK: seen[n['type']] = TYPE_TO_PACK[n['type']]
+    # the three packs ComfyUI Manager reported as missing on a freshly installed pod are really used by the workflow
+    assert {'comfyui-logic', 'jameswalker-nodes', 'ComfyUI-LLM-text-processor', 'ComfyUI-MiniMaxH3Mod'} <= set(seen)
+    assert set(seen.values()) <= installed, set(seen.values()) - installed
+    assert {'Bool', 'JWDatetimeString', 'LLMTextProcessor', 'MiniMaxH3RefModApply', 'MiniMaxH3RefModsLoader'} <= set(seen)
+
+
+def test_minimax_install_pip_installs_soundfile_after_the_packs_and_checks_the_import(monkeypatch, tmp_path):
+    monkeypatch.setattr(m, 'COMFYUI_DIR', tmp_path)
+    monkeypatch.setattr(m, 'COMFYUI_VENV', tmp_path/'.venv')
+    python = m.COMFYUI_VENV/'bin/python'
+    python.parent.mkdir(parents=True); python.touch()
+    ctrl = type(m.selfism_controller)()
+    calls = []
+    async def ready(*args): calls.append('packs')
+    async def run(*args, **kwargs):
+        calls.append([str(a) for a in args[1:]])
+        return 0, 'torch==2.8.0'
+    async def sources(host, files): return files, []
+    monkeypatch.setattr(ctrl, '_wait_for_comfyui', lambda: ready())
+    monkeypatch.setattr(ctrl, '_run_process', run)
+    monkeypatch.setattr(m.JobController, '_install_workflow', ready)
+    monkeypatch.setattr(s, 'resolve_sources', sources)
+    wf = {'selfism_profile': 'minimax', 'precision': 'fp8', 'files': [{'id': 'x'}], 'pip_packages': ['soundfile']}
+    asyncio.run(ctrl._install_workflow(wf))
+    pip = [c for c in calls if isinstance(c, list) and c[:3] == ['-m', 'pip', 'install']]
+    assert len(pip) == 1 and pip[0][-1] == 'soundfile'
+    assert calls.index('packs') < calls.index(pip[0]) and ['-c', 'import soundfile'] in calls
+    # a failing pip install must fail the card instead of being reported as success
+    async def failing(*args, **kwargs): return (1, 'boom') if 'pip' in args else (0, 'torch==2.8.0')
+    monkeypatch.setattr(ctrl, '_run_process', failing)
+    with pytest.raises(RuntimeError, match='soundfile'):
+        asyncio.run(ctrl._install_workflow(wf))
+    # catalog values never reach the shell unchecked
+    with pytest.raises(RuntimeError, match='Unsafe'):
+        asyncio.run(ctrl._install_workflow({**wf, 'pip_packages': ['soundfile; rm -rf /']}))
