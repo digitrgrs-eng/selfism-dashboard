@@ -276,7 +276,7 @@ def register(host):
                     dest=folder/MINIMAX_R2V_WORKFLOW_NAME
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('The MiniMax References Manager node writes the prompt through OpenRouter by default: set OPENROUTER_API_KEY (or LLM_KEY) in the pod environment, or choose prompt_provider "none" in that node. The Power Lora row "hmmotion_minimax-h3_epoch40" is on by default but optional and not installed; it is skipped.')
+                    logs.append('The MiniMax References Manager node writes the prompt through OpenRouter by default: set OPENROUTER_API_KEY (or LLM_KEY) in the pod environment, or choose prompt_provider "none" in that node. Latent preview is pinned to none at boot. The hmmotion LoRA row is off; optional HM* LoRAs are not installed.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:

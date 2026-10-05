@@ -110,6 +110,19 @@ if [ "$SKIP_SMOKE" != "1" ]; then
   log "ComfyUI smoke test passed"
 fi
 
+# 5b. Seed user defaults so a first-boot `cp -r /opt/comfyui-baked` already has preview=none.
+# entrypoint also re-applies these on every boot for existing volumes (see apply_preview_defaults.py).
+mkdir -p "$BAKED/user/default" "$BAKED/user/__manager"
+cat > "$BAKED/user/default/comfy.settings.json" <<'JSON'
+{
+  "Comfy.Execution.PreviewMethod": "none"
+}
+JSON
+cat > "$BAKED/user/__manager/config.ini" <<'INI'
+[default]
+preview_method = none
+INI
+
 # 6. RunPod bundle marker: a start.sh that knows about it re-syncs ComfyUI core files from
 # the baked tree whenever the marker differs from the one on the volume (it excludes
 # models, input, output, user, custom_nodes and .venv*).  The base start.sh shipped in

@@ -40,6 +40,7 @@ COPY --link scripts/upload_models_r2.py /opt/10sorlabs/scripts/upload_models_r2.
 COPY --link catalog/ /opt/10sorlabs/catalog/
 COPY --link selfism_workflows/ /opt/10sorlabs/selfism_workflows/
 COPY --link bundled_nodes/ /opt/10sorlabs/bundled_nodes/
+COPY --link docker/comfyui_defaults/ /opt/10sorlabs/docker/comfyui_defaults/
 COPY --link --chmod=755 docker/entrypoint.sh /start.sh
 
 # Inherit the original services, ports, working directory and entrypoint.

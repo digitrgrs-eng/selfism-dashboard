@@ -624,7 +624,7 @@
         true,
         120,
         5,
-        "taeh3.safetensors",
+        "none",
         ""
       ]
     },
@@ -1031,7 +1031,7 @@
           "strengthTwo": null
         },
         {
-          "on": true,
+          "on": false,
           "lora": "hmmotion_minimax-h3_epoch40.safetensors",
           "strength": 1,
           "strengthTwo": null

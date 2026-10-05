@@ -49,6 +49,10 @@ BOOT_PID=$!
 wait "$BOOT_PID" || echo "ComfyUI boot update hook exited abnormally; continuing."
 BOOT_PID=""
 
+# Pin latent preview to none so Manager / a leftover frontend setting cannot load a broken
+# taeh3/taehv and crash sampling. Idempotent; see docker/comfyui_defaults/apply_preview_defaults.py.
+python3.12 /opt/10sorlabs/docker/comfyui_defaults/apply_preview_defaults.py || true
+
 echo "Starting stock RunPod ComfyUI services..."
 /usr/local/bin/runpod-base-start.sh &
 BASE_PID=$!

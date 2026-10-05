@@ -953,8 +953,7 @@
     "r2v-enc",
     "mm-vae-fp16",
     "mm-vae-audio",
-    "r2v-lora-turbo",
-    "r2v-taeh3"
+    "r2v-lora-turbo"
   ],
   "r2v_nodes": [
     "rgthree-comfy",

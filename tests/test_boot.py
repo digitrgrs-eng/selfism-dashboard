@@ -185,3 +185,43 @@ def test_entrypoint_runs_hook_before_base_script_and_dockerfile_enables_it():
     assert 'BASE_PID=$!' in entry and entry.index('wait "$BOOT_PID"') < entry.index('runpod-base-start.sh &')
     assert subprocess.run(['bash', '-n', str(ROOT/'docker/entrypoint.sh')]).returncode == 0
     assert 'SELFISM_AUTO_COMFY_UPDATE=1' in (ROOT/'Dockerfile').read_text()
+    assert 'apply_preview_defaults.py' in entry
+    assert entry.index('apply_preview_defaults.py') < entry.index('runpod-base-start.sh')
+    assert 'docker/comfyui_defaults/' in (ROOT/'Dockerfile').read_text()
+
+
+def test_preview_defaults_pin_args_settings_and_manager_config(tmp_path, monkeypatch):
+    import importlib.util
+    script = ROOT/'docker/comfyui_defaults/apply_preview_defaults.py'
+    spec = importlib.util.spec_from_file_location('apply_preview_defaults', script)
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    work = tmp_path/'runpod-slim'; comfy = work/'ComfyUI'
+    (comfy/'user'/'default').mkdir(parents=True)
+    monkeypatch.setenv('SELFISM_WORKSPACE', str(work))
+    monkeypatch.setenv('COMFYUI_DIR', str(comfy))
+    # first apply creates everything
+    assert mod.main() == 0
+    args = (work/'comfyui_args.txt').read_text()
+    assert '--preview-method none' in args and args.count('--preview-method') == 1
+    settings = json.loads((comfy/'user'/'default'/'comfy.settings.json').read_text())
+    assert settings['Comfy.Execution.PreviewMethod'] == 'none'
+    mgr = (comfy/'user'/'__manager'/'config.ini').read_text()
+    assert 'preview_method = none' in mgr
+    # a leftover auto/taesd setting is overwritten; other settings and args are kept
+    (work/'comfyui_args.txt').write_text('# keep me\n--preview-method auto\n--highvram\n')
+    (comfy/'user'/'default'/'comfy.settings.json').write_text(json.dumps({
+        'Comfy.Execution.PreviewMethod': 'taesd', 'Comfy.Other': True})+'\n')
+    (comfy/'user'/'__manager'/'config.ini').write_text('[default]\npreview_method = auto\nchannel_url = x\n')
+    assert mod.main() == 0
+    args = (work/'comfyui_args.txt').read_text()
+    assert '--preview-method none' in args and '--highvram' in args and '# keep me' in args
+    assert args.count('--preview-method') == 1
+    settings = json.loads((comfy/'user'/'default'/'comfy.settings.json').read_text())
+    assert settings == {'Comfy.Execution.PreviewMethod': 'none', 'Comfy.Other': True}
+    assert 'preview_method = none' in (comfy/'user'/'__manager'/'config.ini').read_text()
+    assert 'channel_url = x' in (comfy/'user'/'__manager'/'config.ini').read_text()
+
+
+def test_bake_script_seeds_preview_none_into_the_baked_user_tree():
+    bake = (ROOT/'docker/bake_comfyui.sh').read_text()
+    assert 'Comfy.Execution.PreviewMethod' in bake and 'preview_method = none' in bake

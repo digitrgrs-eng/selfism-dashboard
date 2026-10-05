@@ -1,0 +1,3 @@
+# Selfism image default: disable latent previews so a broken taeh3/taehv never crashes sampling.
+# Edit this file to add more ComfyUI flags (one per line). To change the preview, replace the line below.
+--preview-method none

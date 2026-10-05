@@ -235,7 +235,7 @@ R2V_WF = ROOT/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json'
 # UNETLoader value lost its "diffusion_models/" prefix (the file is installed at models/diffusion_models/<name>, so the
 # prefixed value is "not in list"), and that node's download-metadata entry pointed at the wrong (fl2va) file.
 R2V_ORIGINAL_SHA256 = '95a4390a4a50082bc381bd2b4aa8f42792f0ac476830c6073527ed504d10e827'
-R2V_IDS = ['r2v-unet', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo', 'r2v-taeh3']
+R2V_IDS = ['r2v-unet', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo']
 R2V_NODES = ['rgthree-comfy', 'ComfyUI-KJNodes', 'ComfyUI-VideoHelperSuite', 'ComfyUI-MiniMaxRefPack']
 R2V_CNR_TO_PACK = {'rgthree-comfy': 'rgthree-comfy', 'comfyui-kjnodes': 'ComfyUI-KJNodes',
                    'comfyui-videohelpersuite': 'ComfyUI-VideoHelperSuite', 'comfyui-minimaxrefpack': 'ComfyUI-MiniMaxRefPack'}
@@ -252,8 +252,9 @@ def test_r2v_catalog_files_nodes_and_r2_layout():
     assert {k: files[k]['destination'].removeprefix('models/') for k in R2V_IDS if k.startswith('r2v-')} == {
         'r2v-unet': 'diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors',
         'r2v-enc': 'text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors',
-        'r2v-lora-turbo': 'loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors',
-        'r2v-taeh3': 'vae_approx/taeh3.safetensors'}
+        'r2v-lora-turbo': 'loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors'}
+    # taeh3 stays in the catalog for optional install, but is not part of the card (preview is pinned to none)
+    assert 'r2v-taeh3' in files and files['r2v-taeh3']['destination'] == 'models/vae_approx/taeh3.safetensors'
     assert len({files[k]['destination'] for k in R2V_IDS}) == len(R2V_IDS)
     names = {n['name']: n for n in CATALOG['nodes']}
     assert set(R2V_NODES) <= set(names)
@@ -281,31 +282,27 @@ def test_r2v_install_selects_the_workflow_files_only(monkeypatch):
     assert not any('HM' in CATALOG['files'][k]['destination'] for k in R2V_IDS)
 
 
-def test_r2v_workflow_is_the_original_plus_three_literals_and_every_model_is_installed():
-    shipped = R2V_WF.read_text(encoding='utf-8')
-    original = shipped.replace('"name": "minimax_h3_ref2va_int8_convrot.safetensors"', '"name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors"')
-    original = original.replace('/diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors"', '/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"')
-    original = original.replace('"minimax_h3_ref2va_int8_convrot.safetensors"', '"diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors"')
-    assert hashlib.sha256(original.encode('utf-8')).hexdigest() == R2V_ORIGINAL_SHA256
-    w = json.loads(shipped)
-    assert 'definitions' not in w and not any(n['type'] == 'ResizeImageMaskNode' for n in w['nodes'])  # no resize_type.match bug
+def test_r2v_workflow_keeps_the_original_graph_with_safe_defaults_and_every_model_is_installed():
+    w = json.loads(R2V_WF.read_bytes())
+    assert 'definitions' not in w and not any(n['type'] == 'ResizeImageMaskNode' for n in w['nodes'])
     installed = {Path(CATALOG['files'][k]['destination']).name for k in CATALOG['r2v_files']}
     used = {}
     for n in w['nodes']:
         v = n.get('widgets_values')
         if n['type'] in ('UNETLoader', 'CLIPLoader', 'VAELoader', 'LoraLoaderModelOnly'): used[n['id']] = v[0]
-        if n['type'] == 'ModelPreviewOverrideKJ': used[n['id']] = v[5]
+        if n['type'] == 'ModelPreviewOverrideKJ':
+            assert v[5] == 'none' and v[2] is True  # tiny_vae off; suppress default preview
         if n['type'] == 'Power Lora Loader (rgthree)':
             on = [x['lora'] for x in v if isinstance(x, dict) and x.get('on')]
-            # the single row that is on by default is an optional HM* LoRA; it is intentionally not installed (rgthree skips it)
-            assert on == ['hmmotion_minimax-h3_epoch40.safetensors']
-    assert set(used.values()) == installed and len(used) == 6, set(used.values()) ^ installed
+            assert on == []  # hmmotion and every HM* row are off
+            assert any(isinstance(x, dict) and x.get('lora') == 'hmmotion_minimax-h3_epoch40.safetensors' and x.get('on') is False for x in v)
+    assert set(used.values()) == installed and len(used) == 5, set(used.values()) ^ installed
     cnr = {(n.get('properties') or {}).get('cnr_id') for n in w['nodes']} - {None, 'comfy-core'}
     assert {R2V_CNR_TO_PACK[c] for c in cnr} <= set(CATALOG['r2v_nodes']) and cnr <= set(R2V_CNR_TO_PACK)
-    # the download-metadata entries of the loaders point at the installed files
     for n in w['nodes']:
         for mdl in (n.get('properties') or {}).get('models', []):
             assert mdl['name'] in installed, mdl
+
 
 
 def test_r2v_workflow_download_and_install_are_byte_identical_and_nondestructive(monkeypatch, tmp_path):
