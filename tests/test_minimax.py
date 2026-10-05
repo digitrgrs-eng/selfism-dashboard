@@ -24,6 +24,9 @@ NODES = ['ComfyUI-KJNodes', 'rgthree-comfy', 'ComfyUI-Easy-Use', 'ComfyUI-Logic'
 # ComfyUI-Logic must stay on the 1.0.0 line: the workflow uses node type "Bool", and the later 1.0.1 pin registers it as
 # "Bool-🔬", which ComfyUI Manager then reports as a missing node.
 LOGIC_REF = 'f95b332091ec1d6a8b1df4bedf1b054e9807f5e2'
+# VHS_LoadVideo's `format: H3` exists from Kosinkadink/ComfyUI-VideoHelperSuite 593fcb0 ("Support h3 as input format");
+# older pins fail validation with "Value not in list: format: 'H3'". The workflow was saved with this exact commit.
+VHS_REF = '4d907bee61e92c2e65af3bd6383a4e4d356126d1'
 # Every non-core node type used by the workflow, mapped to the catalog pack that provides it. The workflow's own
 # cnr_id / aux_id properties name the source pack; types without either come from the pack that registers them.
 TYPE_TO_PACK = {
@@ -94,6 +97,7 @@ def test_minimax_catalog_metadata_and_r2_layout():
     names = {n['name']: n for n in CATALOG['nodes']}
     assert set(CATALOG['minimax_nodes']) == set(NODES) and set(NODES) <= set(names)
     assert names['ComfyUI-Logic']['ref'] == LOGIC_REF
+    assert names['ComfyUI-VideoHelperSuite']['ref'] == VHS_REF
     assert CATALOG['minimax_pip'] == ['soundfile']
     for n in NODES:
         assert re.fullmatch(r'[0-9a-f]{40}', names[n]['ref']) and names[n]['repo'].startswith('https://github.com/'), n
@@ -212,3 +216,14 @@ def test_minimax_install_pip_installs_soundfile_after_the_packs_and_checks_the_i
     # catalog values never reach the shell unchecked
     with pytest.raises(RuntimeError, match='Unsafe'):
         asyncio.run(ctrl._install_workflow({**wf, 'pip_packages': ['soundfile; rm -rf /']}))
+
+
+def test_vhs_pin_is_the_commit_the_workflow_was_saved_with_and_supports_the_h3_format():
+    w = json.loads(WF_PATH.read_bytes())
+    loaders = [n for n in all_nodes(w) if n['type'] == 'VHS_LoadVideo']
+    assert loaders and all(n['widgets_values']['format'] == 'H3' for n in loaders)
+    assert {n['properties']['ver'] for n in loaders} == {VHS_REF}
+    ref = {n['name']: n['ref'] for n in CATALOG['nodes']}['ComfyUI-VideoHelperSuite']
+    assert ref == VHS_REF
+    # 593fcb07 (Support h3 as input format) is an ancestor of the pin; the previous pin predates it
+    assert ref != '4ee72c065db22c9d96c2427954dc69e7b908444b'

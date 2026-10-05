@@ -702,7 +702,7 @@
     {
       "name": "ComfyUI-VideoHelperSuite",
       "repo": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git",
-      "ref": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+      "ref": "4d907bee61e92c2e65af3bd6383a4e4d356126d1",
       "install_requirements": true
     },
     {
