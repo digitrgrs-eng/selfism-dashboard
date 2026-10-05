@@ -227,3 +227,108 @@ def test_vhs_pin_is_the_commit_the_workflow_was_saved_with_and_supports_the_h3_f
     assert ref == VHS_REF
     # 593fcb07 (Support h3 as input format) is an ancestor of the pin; the previous pin predates it
     assert ref != '4ee72c065db22c9d96c2427954dc69e7b908444b'
+
+
+# ---- MiniMax H3 R2V Turbo (HearmemanAI) card -------------------------------------------------------------------
+R2V_WF = ROOT/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json'
+# sha256 of the HearmemanAI workflow exactly as supplied. The shipped copy differs by three string literals only: the
+# UNETLoader value lost its "diffusion_models/" prefix (the file is installed at models/diffusion_models/<name>, so the
+# prefixed value is "not in list"), and that node's download-metadata entry pointed at the wrong (fl2va) file.
+R2V_ORIGINAL_SHA256 = '95a4390a4a50082bc381bd2b4aa8f42792f0ac476830c6073527ed504d10e827'
+R2V_IDS = ['r2v-unet', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo', 'r2v-taeh3']
+R2V_NODES = ['rgthree-comfy', 'ComfyUI-KJNodes', 'ComfyUI-VideoHelperSuite', 'ComfyUI-MiniMaxRefPack']
+R2V_CNR_TO_PACK = {'rgthree-comfy': 'rgthree-comfy', 'comfyui-kjnodes': 'ComfyUI-KJNodes',
+                   'comfyui-videohelpersuite': 'ComfyUI-VideoHelperSuite', 'comfyui-minimaxrefpack': 'ComfyUI-MiniMaxRefPack'}
+
+
+def test_r2v_catalog_files_nodes_and_r2_layout():
+    files = CATALOG['files']
+    assert CATALOG['r2v_files'] == R2V_IDS and CATALOG['r2v_nodes'] == R2V_NODES
+    for k in R2V_IDS:
+        f = files[k]
+        assert re.fullmatch(r'[0-9a-f]{64}', f['sha256']) and f['size_bytes'] > 0 and f['auth'] == 'none', k
+        assert f['destination'].startswith('models/') and f['url'].startswith('https://huggingface.co/'), k
+    # destinations double as the R2 keys (destination minus "models/") that were uploaded for these files
+    assert {k: files[k]['destination'].removeprefix('models/') for k in R2V_IDS if k.startswith('r2v-')} == {
+        'r2v-unet': 'diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors',
+        'r2v-enc': 'text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors',
+        'r2v-lora-turbo': 'loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors',
+        'r2v-taeh3': 'vae_approx/taeh3.safetensors'}
+    assert len({files[k]['destination'] for k in R2V_IDS}) == len(R2V_IDS)
+    names = {n['name']: n for n in CATALOG['nodes']}
+    assert set(R2V_NODES) <= set(names)
+    for n in R2V_NODES:
+        assert re.fullmatch(r'[0-9a-f]{40}', names[n]['ref']) and names[n]['repo'].startswith('https://github.com/'), n
+    # shared packs keep the pins of the Simply Advanced card; the new pack is the 0.3.5 release the workflow was saved with
+    assert names['ComfyUI-VideoHelperSuite']['ref'] == VHS_REF
+    assert names['ComfyUI-MiniMaxRefPack']['ref'] == '7012734eabf6f98063d6eaf8ce1f9264ee803664'
+    assert names['ComfyUI-MiniMaxRefPack']['repo'] == 'https://github.com/Hearmeman24/ComfyUI-MiniMaxRefPack.git'
+
+
+def test_r2v_install_selects_the_workflow_files_only(monkeypatch):
+    r, captured, html = start_install(monkeypatch, {'profile': 'minimax_r2v'})
+    assert r.status_code == 200
+    assert [f['id'] for f in captured['files']] == R2V_IDS
+    assert captured['selfism_profile'] == 'minimax_r2v' and captured['selfism_repair'] is False
+    assert captured['pip_packages'] == []
+    assert {n['name'] for n in captured['custom_nodes']} == set(R2V_NODES)
+    total = sum(CATALOG['files'][k]['size_bytes'] for k in R2V_IDS)
+    scripts = (ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')
+    for page in (html, scripts):
+        assert 'data-sf-action="minimax_r2v"' in page and 'MiniMax H3 R2V Turbo (Hearmeman)' in page
+        assert f'{total/1e9:.1f}'.replace('.', ',') + ' GB' in page
+    # the optional NSFW LoRAs are not part of the card
+    assert not any('HM' in CATALOG['files'][k]['destination'] for k in R2V_IDS)
+
+
+def test_r2v_workflow_is_the_original_plus_three_literals_and_every_model_is_installed():
+    shipped = R2V_WF.read_text(encoding='utf-8')
+    original = shipped.replace('"name": "minimax_h3_ref2va_int8_convrot.safetensors"', '"name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors"')
+    original = original.replace('/diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors"', '/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors"')
+    original = original.replace('"minimax_h3_ref2va_int8_convrot.safetensors"', '"diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors"')
+    assert hashlib.sha256(original.encode('utf-8')).hexdigest() == R2V_ORIGINAL_SHA256
+    w = json.loads(shipped)
+    assert 'definitions' not in w and not any(n['type'] == 'ResizeImageMaskNode' for n in w['nodes'])  # no resize_type.match bug
+    installed = {Path(CATALOG['files'][k]['destination']).name for k in CATALOG['r2v_files']}
+    used = {}
+    for n in w['nodes']:
+        v = n.get('widgets_values')
+        if n['type'] in ('UNETLoader', 'CLIPLoader', 'VAELoader', 'LoraLoaderModelOnly'): used[n['id']] = v[0]
+        if n['type'] == 'ModelPreviewOverrideKJ': used[n['id']] = v[5]
+        if n['type'] == 'Power Lora Loader (rgthree)':
+            on = [x['lora'] for x in v if isinstance(x, dict) and x.get('on')]
+            # the single row that is on by default is an optional HM* LoRA; it is intentionally not installed (rgthree skips it)
+            assert on == ['hmmotion_minimax-h3_epoch40.safetensors']
+    assert set(used.values()) == installed and len(used) == 6, set(used.values()) ^ installed
+    cnr = {(n.get('properties') or {}).get('cnr_id') for n in w['nodes']} - {None, 'comfy-core'}
+    assert {R2V_CNR_TO_PACK[c] for c in cnr} <= set(CATALOG['r2v_nodes']) and cnr <= set(R2V_CNR_TO_PACK)
+    # the download-metadata entries of the loaders point at the installed files
+    for n in w['nodes']:
+        for mdl in (n.get('properties') or {}).get('models', []):
+            assert mdl['name'] in installed, mdl
+
+
+def test_r2v_workflow_download_and_install_are_byte_identical_and_nondestructive(monkeypatch, tmp_path):
+    with TestClient(m.app) as client:
+        r = client.get('/api/selfism/workflow/minimax_r2v')
+    assert r.status_code == 200 and r.content == R2V_WF.read_bytes()
+    assert s.MINIMAX_R2V_WORKFLOW_NAME in r.headers['content-disposition']
+    monkeypatch.setattr(m, 'COMFYUI_DIR', tmp_path)
+    monkeypatch.setattr(m, 'COMFYUI_VENV', tmp_path/'.venv')
+    python = m.COMFYUI_VENV/'bin/python'
+    python.parent.mkdir(parents=True); python.touch()
+    ctrl = type(m.selfism_controller)()
+    async def ready(*args): pass
+    async def run(*args, **kwargs): return 0, 'torch==2.8.0'
+    async def sources(host, files): return files, []
+    monkeypatch.setattr(ctrl, '_wait_for_comfyui', ready)
+    monkeypatch.setattr(ctrl, '_run_process', run)
+    monkeypatch.setattr(m.JobController, '_install_workflow', ready)
+    monkeypatch.setattr(s, 'resolve_sources', sources)
+    saved = tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_WORKFLOW_NAME
+    wf = {'selfism_profile': 'minimax_r2v', 'precision': 'fp8', 'files': [{'id': 'x'}], 'pip_packages': []}
+    asyncio.run(ctrl._install_workflow(wf))
+    assert saved.read_bytes() == R2V_WF.read_bytes()
+    saved.write_text('{"user_edited":true}')
+    asyncio.run(ctrl._install_workflow(wf))
+    assert json.loads(saved.read_text()) == {'user_edited': True}

@@ -23,9 +23,10 @@ from launcher.private_r2 import r2_client, select_private
 # Profiles that need a ComfyUI able to load Selfora INT8 (int8_tensorwise).
 INT8_PROFILES = ('simple','aio','full','repair')
 MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
+MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -268,6 +269,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_simply_advanced.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Backend Attention defaults to "sage attention"; if SageAttention is not installed, choose "pytorch attention" in that subgraph.')
+                if profile=='minimax_r2v':
+                    # HearmemanAI R2V Turbo workflow: shipped as-is (only the UNETLoader file name was made to match the installed file).
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_R2V_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('The MiniMax References Manager node writes the prompt through OpenRouter by default: set OPENROUTER_API_KEY (or LLM_KEY) in the pod environment, or choose prompt_provider "none" in that node. The Power Lora row "hmmotion_minimax-h3_epoch40" is on by default but optional and not installed; it is skipped.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -354,6 +363,10 @@ def register(host):
             # MiniMax H3 Simply Advanced: exactly the default-active models of the workflow (R2 first, HF fallback).
             file_keys=catalog['minimax_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_nodes']]
+        elif profile=='minimax_r2v':
+            # MiniMax H3 R2V Turbo (HearmemanAI): INT8 Ref2VA + INT8 encoder + FP16/audio VAEs + turbo LoRA + TAEH3 preview decoder.
+            file_keys=catalog['r2v_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -393,7 +406,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v'): raise HTTPException(404)
+        if profile=='minimax_r2v':
+            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json',filename=MINIMAX_R2V_WORKFLOW_NAME)
         if profile=='minimax':
             return FileResponse(root/'selfism_workflows/minimax_h3_simply_advanced.json',filename=MINIMAX_WORKFLOW_NAME)
         return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=('Selfism_FULL_workflow.json' if profile=='full' else f'Selfism_{profile}_m1lli3.json'))
