@@ -38,11 +38,15 @@ log "base torch: $torch_base — upgrading to 2.10.0+cu130"
   --index-url https://download.pytorch.org/whl/cu130
 
 # Constraints: hold every package that ties ComfyUI to the (now cu130) CUDA build.
+# The base image may still ship /opt/comfyui-runtime-constraints.txt with cu128 torch
+# pins; those must not be merged for torch/torchvision/torchaudio or pip will see
+# conflicting ==cu128,==cu130 constraints.
 constraints=/tmp/bake-constraints.txt
 "${PIP[@]}" freeze --disable-pip-version-check \
   | grep -iE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' > "$constraints"
 if [ -f /opt/comfyui-runtime-constraints.txt ]; then
-  grep -E '^[A-Za-z]' /opt/comfyui-runtime-constraints.txt >> "$constraints" || true
+  grep -E '^[A-Za-z]' /opt/comfyui-runtime-constraints.txt \
+    | grep -viE '^(torch|torchvision|torchaudio)==' >> "$constraints" || true
 fi
 sort -u "$constraints" -o "$constraints"
 log "holding:"; sed 's/^/  /' "$constraints"

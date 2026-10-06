@@ -70,6 +70,8 @@ def test_script_upgrades_torch_to_cu130_and_asserts_metadata():
     upgrade_at = text.index('whl/cu130')
     constraints_at = text.index('hold every package that ties ComfyUI to the (now cu130)')
     assert upgrade_at < constraints_at
+    # stale cu128 pins from the base runtime-constraints file must not conflict
+    assert "grep -viE '^(torch|torchvision|torchaudio)=='" in text
 
 
 def test_script_keeps_git_checkout_with_upstream_remote():
