@@ -28,9 +28,10 @@ MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
 MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_HighRes_Hearmeman.json'
 MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_OriginalAudio_v2.json'
 MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_FirstFrame_OriginalAudio_v3.json'
+GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -332,6 +333,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_reel_recreation_v3.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Load Picture 1 (recreated first frame with persona IN scene; also MiniMaxH3AddGuide frame_idx=0), Picture 2 (matching persona portrait) and Video 1 (source reel). Fixed roles + scene prompt concatenate into R2V. Original reel audio feeds <Audio 1> and the MP4. Defaults: 5 s, 768x1344, base Ref2VA, res_multistep/simple 20 steps, INT8 encoder, no Turbo LoRA. If the reel has no audio track, delete both audio links from Video 1.')
+                if profile=='god_mode':
+                    # GOD Mode: Wan 2.2 Animate character replacement / animation (Kijai WanVideoWrapper + preprocess + SAM2 + RIFE).
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/GOD_MODE_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/wan22_animate_god_mode.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('GOD Mode: load a reference image (start frame) and a driving video. Pose/face detection (ViTPose+YOLO), SAM2 mask, Wan 2.2 Animate 14B + LoRAs, RIFE 2x. Relight + LightX2V + Pusa + Fun MPS LoRAs are selected in the graph. Needs a large GPU and lots of VRAM/RAM.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -438,6 +447,10 @@ def register(host):
             # MiniMax H3 Reel Recreation v3: same INT8 set as v2 without turbo LoRA; first-frame MiniMaxH3AddGuide; VHS only.
             file_keys=catalog['reel_recreation_v3_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reel_recreation_v3_nodes']]
+        elif profile=='god_mode':
+            # GOD Mode: Wan 2.2 Animate 14B bf16 + VAE/UMT5/CLIP/SAM2/ViTPose/YOLO + LoRAs + RIFE; WanVideoWrapper stack.
+            file_keys=catalog['god_mode_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['god_mode_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -468,8 +481,8 @@ def register(host):
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile=='carousel' else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','carousel','full','repair','node'),
-                  'pip_packages':list(catalog.get('minimax_pip',[])) if profile=='minimax' else [],
-                  'model_links':(copy.deepcopy(catalog['full_links']) if profile=='full' else copy.deepcopy(catalog['reference_links'])) if profile in ('reference','carousel','full') else []}
+                  'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
+                  'model_links':(copy.deepcopy(catalog['god_mode_links']) if profile=='god_mode' else (copy.deepcopy(catalog['full_links']) if profile=='full' else copy.deepcopy(catalog['reference_links']))) if profile in ('reference','carousel','full','god_mode') else []}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -477,7 +490,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode'): raise HTTPException(404)
+        if profile=='god_mode':
+            return FileResponse(root/'selfism_workflows/wan22_animate_god_mode.json',filename=GOD_MODE_WORKFLOW_NAME)
         if profile=='minimax_reel_recreation_v3':
             return FileResponse(root/'selfism_workflows/minimax_h3_reel_recreation_v3.json',filename=MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME)
         if profile=='minimax_reel_recreation_v2':
