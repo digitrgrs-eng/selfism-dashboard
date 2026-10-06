@@ -582,6 +582,15 @@
       "sha256": "4fd022bfcab08772fe0536b17ea1a3bbb5625be11e397868d1c5d891863d4c13",
       "auth": "none",
       "id": "r2v-taeh3"
+    },
+    "r2v-lora-turbo-8step": {
+      "name": "MiniMax H3 Ref2V turbo 8-step v1.0 768p LoRA (ComfyUI bf16)",
+      "url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "destination": "models/loras/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "size_bytes": 1956193000,
+      "sha256": "6a56f41ab4229c9dd845b9501bbd475ee57e112d846cf2e819d534a1ae928c5a",
+      "auth": "none",
+      "id": "r2v-lora-turbo-8step"
     }
   },
   "nodes": [
@@ -983,5 +992,15 @@
     "rgthree-comfy",
     "ComfyUI-VideoHelperSuite",
     "ComfyUI-KJNodes"
+  ],
+  "reel_recreation_v2_files": [
+    "mm-ref2va",
+    "r2v-enc",
+    "mm-vae-fp16",
+    "mm-vae-audio",
+    "r2v-lora-turbo-8step"
+  ],
+  "reel_recreation_v2_nodes": [
+    "ComfyUI-VideoHelperSuite"
   ]
 }

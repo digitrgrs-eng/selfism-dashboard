@@ -26,9 +26,10 @@ MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
 MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
 MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
 MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_HighRes_Hearmeman.json'
+MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_OriginalAudio_v2.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -313,6 +314,15 @@ def register(host):
                             logs.append('comfyui_args.txt not found at '+str(args_path)+'; skipped --reserve-vram 8 (soft-fail).')
                     except Exception as exc:
                         logs.append('Could not update comfyui_args.txt for --reserve-vram 8: '+str(exc))
+                if profile=='minimax_reel_recreation_v2':
+                    # Reel Recreation v2: persona photos (front + 3/4) + source reel with original audio export;
+                    # fixed roles + scene prompt concatenated into MiniMaxH3ReferenceToVideo; turbo 8-step.
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_reel_recreation_v2.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Load Picture 1 (persona front), Picture 2 (persona 3/4) and Video 1 (source reel). Fixed roles + scene prompt are concatenated into the R2V prompt. The reel audio feeds <Audio 1> and is exported in the MP4. Defaults: 5 s, 768x1344, turbo 8-step @ 0.85, euler/simple 8 steps, INT8 encoder. If the reel has no audio track, delete both audio links from Video 1.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -411,6 +421,10 @@ def register(host):
             # MiniMax H3 R2V Swap High-Res: same models as Low-VRAM + KJNodes (Chunk FeedForward / Low VRAM Attention).
             file_keys=catalog['r2v_swap_highres_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_highres_nodes']]
+        elif profile=='minimax_reel_recreation_v2':
+            # MiniMax H3 Reel Recreation v2: pruned Ref2VA INT8 + INT8 encoder + FP16/audio VAEs + 8-step turbo LoRA; VHS only.
+            file_keys=catalog['reel_recreation_v2_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reel_recreation_v2_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -450,7 +464,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2'): raise HTTPException(404)
+        if profile=='minimax_reel_recreation_v2':
+            return FileResponse(root/'selfism_workflows/minimax_h3_reel_recreation_v2.json',filename=MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME)
         if profile=='minimax_r2v_swap_highres':
             return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_highres.json',filename=MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME)
         if profile=='minimax_r2v_swap_lowvram':

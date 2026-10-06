@@ -640,3 +640,171 @@ def test_highres_workflow_download_and_install_are_byte_identical_and_nondestruc
     asyncio.run(ctrl._install_workflow(wf))
     assert json.loads(saved.read_text()) == {'user_edited': True}
     assert args.read_text(encoding='utf-8') == before  # do not duplicate --reserve-vram 8
+
+
+# ---- MiniMax H3 Reel Recreation v2 card ------------------------------------------------------------------------
+REEL_WF = ROOT/'selfism_workflows/minimax_h3_reel_recreation_v2.json'
+REEL_IDS = ['mm-ref2va', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo-8step']
+REEL_NODES = ['ComfyUI-VideoHelperSuite']
+# sibling R2V / Low-VRAM / High-Res workflows must stay byte-identical
+HIGHRES_SHIPPED_SHA256 = 'e310f6d61e5e3fc064b20106f77503d121506e99009b309e5d4019e0f5e15ff8'
+REEL_FIXED_START = 'subject_definitions: <Subject 1> is the original main person in <Video 1>'
+
+
+def reel_nodes():
+    w = json.loads(REEL_WF.read_bytes())
+    return w, {n['id']: n for n in w['nodes']}
+
+
+def test_reel_catalog_files_nodes_and_unchanged_siblings():
+    files = CATALOG['files']
+    assert CATALOG['reel_recreation_v2_files'] == REEL_IDS
+    assert CATALOG['reel_recreation_v2_nodes'] == REEL_NODES
+    for k in REEL_IDS:
+        f = files[k]
+        assert re.fullmatch(r'[0-9a-f]{64}', f['sha256']) and f['size_bytes'] > 0 and f['auth'] == 'none', k
+        assert f['destination'].startswith('models/') and f['url'].startswith('https://huggingface.co/'), k
+    assert {k: files[k]['destination'].removeprefix('models/') for k in REEL_IDS} == {
+        'mm-ref2va': 'diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors',
+        'r2v-enc': 'text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors',
+        'mm-vae-fp16': 'vae/minimax_h3_video_vae_fp16.safetensors',
+        'mm-vae-audio': 'vae/minimax_h3_audio_vae_fp32.safetensors',
+        'r2v-lora-turbo-8step': 'loras/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors'}
+    assert files['r2v-lora-turbo-8step']['url'] == (
+        'https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/main/'
+        'minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors')
+    names = {n['name']: n for n in CATALOG['nodes']}
+    assert set(REEL_NODES) <= set(names)
+    assert names['ComfyUI-VideoHelperSuite']['ref'] == VHS_REF
+    # sibling cards unchanged
+    assert CATALOG['r2v_swap_files'] == SWAP_IDS and CATALOG['r2v_swap_nodes'] == SWAP_NODES
+    assert CATALOG['r2v_swap_highres_files'] == HIGHRES_IDS and CATALOG['r2v_swap_highres_nodes'] == HIGHRES_NODES
+    assert CATALOG['r2v_files'] == R2V_IDS and CATALOG['r2v_nodes'] == R2V_NODES
+    assert hashlib.sha256(R2V_WF.read_bytes()).hexdigest() == R2V_SHIPPED_SHA256
+    assert hashlib.sha256(SWAP_WF.read_bytes()).hexdigest() == SWAP_SHIPPED_SHA256
+    assert hashlib.sha256(HIGHRES_WF.read_bytes()).hexdigest() == HIGHRES_SHIPPED_SHA256
+
+
+def test_reel_install_selects_the_workflow_files_only(monkeypatch):
+    r, captured, html = start_install(monkeypatch, {'profile': 'minimax_reel_recreation_v2'})
+    assert r.status_code == 200
+    assert [f['id'] for f in captured['files']] == REEL_IDS
+    assert captured['selfism_profile'] == 'minimax_reel_recreation_v2' and captured['selfism_repair'] is False
+    assert captured['pip_packages'] == []
+    assert {n['name'] for n in captured['custom_nodes']} == set(REEL_NODES)
+    total = sum(CATALOG['files'][k]['size_bytes'] for k in REEL_IDS)
+    scripts = (ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')
+    for page in (html, scripts):
+        assert 'data-sf-action="minimax_reel_recreation_v2"' in page
+        assert 'MiniMax H3 Reel Recreation v2' in page
+        assert f'{total/1e9:.1f}'.replace('.', ',') + ' GB' in page
+        assert 'data-sf-action="minimax_r2v_swap_lowvram"' in page
+        assert 'data-sf-action="minimax_r2v_swap_highres"' in page
+        assert 'data-sf-action="minimax_r2v"' in page
+
+
+def test_reel_workflow_graph_links_models_prompt_and_original_audio():
+    w, N = reel_nodes()
+    assert w['id'] == '13d16ef8-5c1d-4e99-9d66-bdea8d294cf3'
+    assert 'definitions' not in w and w['last_node_id'] >= max(N)
+    types = {n['type'] for n in w['nodes']}
+    assert not types & {'MiniMaxH3ReferencePack', 'Display Any (rgthree)', 'ModelPreviewOverrideKJ',
+                        'ResolutionSelector', 'Power Lora Loader (rgthree)', 'VAEDecodeAudio',
+                        'BetaSamplingScheduler', 'ExtendIntermediateSigmas'}
+    assert 'OpenRouter' not in REEL_WF.read_text(encoding='utf-8')
+    assert 'ReferencePack' not in REEL_WF.read_text(encoding='utf-8')
+    L = {l[0]: l for l in w['links']}
+    assert len(L) == len(w['links']) and w['last_link_id'] >= max(L)
+    for lid, src, ss, dst, ds, typ in w['links']:
+        assert lid in N[src]['outputs'][ss]['links'] and N[dst]['inputs'][ds]['link'] == lid, lid
+    for n in w['nodes']:
+        for i in n.get('inputs', []):
+            assert i['link'] is None or L[i['link']][3] == n['id'], (n['id'], i['name'])
+
+    def src(nid, name):
+        i = next(x for x in N[nid]['inputs'] if x['name'] == name)
+        l = L[i['link']]
+        return N[l[1]], l[2]
+
+    r2v = next(n for n in w['nodes'] if n['type'] == 'MiniMaxH3ReferenceToVideo')
+    p1, _ = src(r2v['id'], 'ref_images.ref_image_0'); p2, _ = src(r2v['id'], 'ref_images.ref_image_1')
+    v1, vs = src(r2v['id'], 'ref_videos.ref_video_0'); va, vas = src(r2v['id'], 'ref_video_audios.ref_video_audio_0')
+    assert (p1['type'], p1['title']) == ('LoadImage', 'Picture 1 (persona front)')
+    assert (p2['type'], p2['title']) == ('LoadImage', 'Picture 2 (persona 3/4)')
+    assert v1['type'] == 'VHS_LoadVideo' and v1['title'] == 'Video 1 (source reel)' and vs == 0
+    assert va is v1 and vas == 2
+    vv = v1['widgets_values']
+    assert (vv['custom_width'], vv['custom_height'], vv['force_rate'], vv['format']) == (640, 0, 24, 'H3')
+    math, ms = src(r2v['id'], 'length')
+    assert math['type'] == 'ComfyMathExpression' and src(v1['id'], 'frame_load_cap') == (math, ms)
+    dur, _ = src(math['id'], 'values.a')
+    assert dur['type'] == 'PrimitiveFloat' and dur['widgets_values'] == [5]
+    a = 5
+    length = eval(math['widgets_values'][0], {'max': max, 'round': round, 'a': a})
+    assert length == 124 and length % 17 == 5 and vv['frame_load_cap'] == length
+    # size widgets on R2V (no ResolutionSelector)
+    assert r2v['widgets_values'][1:5] == [768, 1344, 124, 'match']
+    assert next(x for x in r2v['inputs'] if x['name'] == 'width')['link'] is None
+    assert next(x for x in r2v['inputs'] if x['name'] == 'height')['link'] is None
+    # fixed roles + scene concatenated into prompt
+    concat, _ = src(r2v['id'], 'prompt')
+    assert concat['type'] == 'StringConcatenate'
+    fixed, _ = src(concat['id'], 'string_a'); scene, _ = src(concat['id'], 'string_b')
+    assert fixed['type'] == 'PrimitiveStringMultiline' and scene['type'] == 'PrimitiveStringMultiline'
+    assert fixed['widgets_values'][0].startswith(REEL_FIXED_START)
+    assert 'audio_roles:' in fixed['widgets_values'][0]
+    assert scene['widgets_values'][0].lstrip().startswith('detailed_description:')
+    assert concat['widgets_values'][2] == '\n\n'
+    # original source audio also feeds VideoCombine (no VAEDecodeAudio)
+    combine = next(n for n in w['nodes'] if n['type'] == 'VHS_VideoCombine')
+    ca, cas = src(combine['id'], 'audio')
+    assert ca is v1 and cas == 2
+    assert combine['widgets_values']['filename_prefix'] == 'MiniMax_H3/Reel_Recreation_v2/source_audio'
+    # models + sampler
+    installed = {Path(CATALOG['files'][k]['destination']).name for k in CATALOG['reel_recreation_v2_files']}
+    used = {}
+    for n in w['nodes']:
+        v = n.get('widgets_values')
+        if n['type'] in ('UNETLoader', 'CLIPLoader', 'VAELoader', 'LoraLoaderModelOnly'): used[n['id']] = v[0]
+        if n['type'] == 'UNETLoader': assert v == ['minimax_h3_ref2va_pruned_int8_convrot.safetensors', 'default']
+        if n['type'] == 'CLIPLoader': assert v == ['qwen3vl_32b_minimax_h3_int8_convrot.safetensors', 'minimax', 'default']
+        if n['type'] == 'LoraLoaderModelOnly':
+            assert v == ['minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors', 0.85]
+        if n['type'] == 'BasicScheduler': assert v == ['simple', 8, 1]
+        if n['type'] == 'KSamplerSelect': assert v == ['euler']
+        if n['type'] == 'RandomNoise': assert v == [703673408085144, 'fixed']
+        for mdl in (n.get('properties') or {}).get('models', []):
+            assert mdl['name'] in installed, mdl
+    assert set(used.values()) == installed and len(used) == 5, set(used.values()) ^ installed
+    cnr = {(n.get('properties') or {}).get('cnr_id') for n in w['nodes']} - {None, 'comfy-core'}
+    assert cnr == {'comfyui-videohelpersuite'}
+    assert {R2V_CNR_TO_PACK[c] for c in cnr} == set(CATALOG['reel_recreation_v2_nodes'])
+
+
+def test_reel_workflow_download_and_install_are_byte_identical_and_nondestructive(monkeypatch, tmp_path):
+    with TestClient(m.app) as client:
+        r = client.get('/api/selfism/workflow/minimax_reel_recreation_v2')
+    assert r.status_code == 200 and r.content == REEL_WF.read_bytes()
+    assert s.MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME in r.headers['content-disposition']
+    monkeypatch.setattr(m, 'COMFYUI_DIR', tmp_path)
+    monkeypatch.setattr(m, 'COMFYUI_VENV', tmp_path/'.venv')
+    python = m.COMFYUI_VENV/'bin/python'
+    python.parent.mkdir(parents=True); python.touch()
+    ctrl = type(m.selfism_controller)()
+    async def ready(*args): pass
+    async def run(*args, **kwargs): return 0, 'torch==2.8.0'
+    async def sources(host, files): return files, []
+    monkeypatch.setattr(ctrl, '_wait_for_comfyui', ready)
+    monkeypatch.setattr(ctrl, '_run_process', run)
+    monkeypatch.setattr(m.JobController, '_install_workflow', ready)
+    monkeypatch.setattr(s, 'resolve_sources', sources)
+    saved = tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME
+    wf = {'selfism_profile': 'minimax_reel_recreation_v2', 'precision': 'fp8', 'files': [{'id': 'x'}], 'pip_packages': []}
+    asyncio.run(ctrl._install_workflow(wf))
+    assert saved.read_bytes() == REEL_WF.read_bytes()
+    assert not (tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_WORKFLOW_NAME).exists()
+    assert not (tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_SWAP_WORKFLOW_NAME).exists()
+    assert not (tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME).exists()
+    saved.write_text('{"user_edited":true}')
+    asyncio.run(ctrl._install_workflow(wf))
+    assert json.loads(saved.read_text()) == {'user_edited': True}
