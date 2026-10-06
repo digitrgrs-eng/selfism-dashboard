@@ -24,9 +24,10 @@ from launcher.private_r2 import r2_client, select_private
 INT8_PROFILES = ('simple','aio','full','repair')
 MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
 MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
+MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -277,6 +278,15 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('The MiniMax References Manager node writes the prompt through OpenRouter by default: set OPENROUTER_API_KEY (or LLM_KEY) in the pod environment, or choose prompt_provider "none" in that node. Latent preview is pinned to none at boot. The hmmotion LoRA row is off; optional HM* LoRAs are not installed.')
+                if profile=='minimax_r2v_swap_lowvram':
+                    # Low-VRAM character swap built on the HearmemanAI R2V workflow: Picture 1/2 (LoadImage) and Video 1
+                    # (VHS_LoadVideo, 640 wide, 24 fps, frame cap = duration) wired straight into MiniMax H3 Reference to Video.
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_R2V_SWAP_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Load Picture 1 (original woman from video), Picture 2 (Millie / new person) and Video 1 (source reel). The reel\'s audio feeds <Audio 1>; if the reel has no audio track, delete the audio link from Video 1. No OpenRouter key is needed: the Prompt node goes straight to MiniMax H3 Reference to Video.')
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -367,6 +377,10 @@ def register(host):
             # MiniMax H3 R2V Turbo (HearmemanAI): INT8 Ref2VA + INT8 encoder + FP16/audio VAEs + turbo LoRA + TAEH3 preview decoder.
             file_keys=catalog['r2v_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_nodes']]
+        elif profile=='minimax_r2v_swap_lowvram':
+            # MiniMax H3 R2V Swap Low-VRAM: pruned Ref2VA INT8 + NVFP4 encoder + FP16/audio VAEs + turbo LoRA; rgthree + VHS only.
+            file_keys=catalog['r2v_swap_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -406,7 +420,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram'): raise HTTPException(404)
+        if profile=='minimax_r2v_swap_lowvram':
+            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json',filename=MINIMAX_R2V_SWAP_WORKFLOW_NAME)
         if profile=='minimax_r2v':
             return FileResponse(root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json',filename=MINIMAX_R2V_WORKFLOW_NAME)
         if profile=='minimax':
