@@ -1,0 +1,1427 @@
+{
+  "id": "243e1b66-47bd-4749-9fd5-4806b0bfbd61",
+  "revision": 0,
+  "last_node_id": 80,
+  "last_link_id": 35,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        20,
+        1050
+      ],
+      "size": [
+        530,
+        100
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            29,
+            30
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        "default"
+      ],
+      "title": "Diffusion model - Ref2VA INT8"
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        20,
+        1190
+      ],
+      "size": [
+        530,
+        120
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "directory": "text_encoders"
+          }
+        ]
+      },
+      "widgets_values": [
+        "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+        "minimax",
+        "default"
+      ],
+      "title": "Text encoder - Qwen3VL INT8"
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        20,
+        1350
+      ],
+      "size": [
+        530,
+        75
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            3,
+            24,
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_video_vae_fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_video_vae_fp16.safetensors"
+      ],
+      "title": "Video VAE"
+    },
+    {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+        20,
+        1460
+      ],
+      "size": [
+        530,
+        75
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_audio_vae_fp32.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_audio_vae_fp32.safetensors",
+            "directory": "vae"
+          }
+        ]
+      },
+      "widgets_values": [
+        "minimax_h3_audio_vae_fp32.safetensors"
+      ],
+      "title": "Audio VAE"
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [
+        20,
+        100
+      ],
+      "size": [
+        360,
+        380
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5,
+            34
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "title": "01 - RECREATED FIRST FRAME / your persona IN the scene",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.38.1",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "UPLOAD_RECREATED_FIRST_FRAME.png",
+        "image"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 11,
+      "type": "LoadImage",
+      "pos": [
+        410,
+        100
+      ],
+      "size": [
+        360,
+        380
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "title": "02 - PERSONA FACE / same identity as Picture 1",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.38.1",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "UPLOAD_MATCHING_PERSONA_PORTRAIT.png",
+        "image"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 12,
+      "type": "VHS_LoadVideo",
+      "pos": [
+        800,
+        100
+      ],
+      "size": [
+        380,
+        660
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            27,
+            28
+          ]
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": []
+        }
+      ],
+      "title": "03 - SOURCE REEL / action, scene, timing, original audio",
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "4d907bee61e92c2e65af3bd6383a4e4d356126d1",
+        "Node name for S&R": "VHS_LoadVideo",
+        "aux_id": "Kosinkadink/ComfyUI-VideoHelperSuite"
+      },
+      "widgets_values": {
+        "video": "UPLOAD_REFERENCE_VIDEO.mp4",
+        "force_rate": 24,
+        "custom_width": 640,
+        "custom_height": 0,
+        "frame_load_cap": 124,
+        "skip_first_frames": 0,
+        "select_every_nth": 1,
+        "format": "H3",
+        "choose video to upload": "image"
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 20,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        20,
+        560
+      ],
+      "size": [
+        750,
+        400
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "title": "04 - PASTE REEL RECREATION PROMPT / describe source beats",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.38.1",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "detailed_description: Recreate the selected source segment with <Subject 2> replacing <Subject 1>. Preserve the source visual style and lighting. [Shot 1] The shot begins from <Picture 1>, the prepared opening composition with the AI persona already in the scene. Preserve her facial structure, eyes, nose, lips, hairline and hair as represented in <Picture 1> and the matching portrait <Picture 2>. Continue through the actions, gestures, head turns, expressions and interactions in <Video 1>, keeping their order and timing. Follow the source clothing, props, environment and camera. Keep the persona recognizable as her expression and viewing angle change. Reproduce any source cuts at the corresponding times. Match the target person's speaking turns in <Audio 1>; when another speaker talks, the persona listens or reacts as in the source.\n\noverall_soundscape: Preserve the original dialogue, distinct voices, pauses, laughter, ambience and sound effects from <Audio 1>.\n\nnon_diegetic_music: Preserve any music already present in <Audio 1>; add no new music."
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 21,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        1240,
+        100
+      ],
+      "size": [
+        560,
+        370
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "title": "Fixed roles / first frame + persona + reel",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.38.1",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "subject_definitions: <Subject 1> is the original main person to be replaced in <Video 1>. <Subject 2> is the adult AI persona shown in BOTH <Picture 1> and <Picture 2>. <Picture 1> is the reconstructed opening frame of the source segment: the persona already occupies the source person's position, in the source scene and clothing. It is supplied as both a reference image and a frame-zero guide. <Picture 2> is a clear face reference of the same persona, not a different character or frame anchor. <Video 1> supplies the source performance and shot structure. <Audio 1> is its original soundtrack.\n\nretention_analysis: Preserve the opening composition and target person's appearance from <Picture 1>, with consistent facial identity supported by <Picture 2>. Transfer the original performer's action, pose changes, expressions, gaze, interactions and timing from <Video 1> to <Subject 2>. Preserve the source environment, clothing, props, camera and other people's roles. Keep the persona's own facial structure, hair and body proportions as she moves.\n\nrecreation_rules: The opening shot begins from the prepared scene in <Picture 1>. Continue with the source action rather than introducing the portrait's background, outfit or pose. The persona remains the same person during head turns, expression changes and occlusions. The original performer's facial features are not the target identity. Follow the source shot boundaries and local action timing described below.\n\naudio_roles: Follow the original speaking turns in <Audio 1>. The persona speaks only the replaced person's lines. Other visible or off-camera speakers keep their own roles, while the persona follows the source listening reactions. The original audio recording, including all voices and ambience, is exported directly. No voice conversion is performed."
+      ],
+      "color": "#233",
+      "bgcolor": "#355"
+    },
+    {
+      "id": 22,
+      "type": "StringConcatenate",
+      "pos": [
+        1240,
+        520
+      ],
+      "size": [
+        420,
+        150
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "string_a",
+          "type": "STRING",
+          "widget": {
+            "name": "string_a"
+          },
+          "link": 9
+        },
+        {
+          "name": "string_b",
+          "type": "STRING",
+          "widget": {
+            "name": "string_b"
+          },
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "title": "Final prompt = reference roles + your scene",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.38.1",
+        "Node name for S&R": "StringConcatenate"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "\n\n"
+      ]
+    },
+    {
+      "id": 30,
+      "type": "PrimitiveFloat",
+      "pos": [
+        800,
+        820
+      ],
+      "size": [
+        380,
+        90
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "title": "05 - DURATION IN SECONDS (start with 5)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "PrimitiveFloat"
+      },
+      "widgets_values": [
+        5
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 31,
+      "type": "ComfyMathExpression",
+      "pos": [
+        1240,
+        740
+      ],
+      "size": [
+        460,
+        130
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "a",
+          "name": "values.a",
+          "type": "FLOAT,INT,BOOLEAN",
+          "link": 12
+        },
+        {
+          "label": "b",
+          "name": "values.b",
+          "shape": 7,
+          "type": "FLOAT,INT,BOOLEAN",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": []
+        },
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            8,
+            13
+          ]
+        },
+        {
+          "name": "BOOL",
+          "type": "BOOLEAN",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "ComfyMathExpression"
+      },
+      "widgets_values": [
+        "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
+      ],
+      "title": "24 FPS / valid H3 frame count"
+    },
+    {
+      "id": 40,
+      "type": "MiniMaxH3ReferenceToVideo",
+      "pos": [
+        1850,
+        100
+      ],
+      "size": [
+        530,
+        690
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 3
+        },
+        {
+          "name": "audio_vae",
+          "type": "VAE",
+          "link": 4
+        },
+        {
+          "label": "ref_image_0",
+          "name": "ref_images.ref_image_0",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 5
+        },
+        {
+          "label": "ref_image_1",
+          "name": "ref_images.ref_image_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "label": "ref_image_2",
+          "name": "ref_images.ref_image_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "ref_video_0",
+          "name": "ref_videos.ref_video_0",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 7
+        },
+        {
+          "label": "ref_video_1",
+          "name": "ref_videos.ref_video_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "label": "ref_video_audio_0",
+          "name": "ref_video_audios.ref_video_audio_0",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 27
+        },
+        {
+          "label": "ref_video_audio_1",
+          "name": "ref_video_audios.ref_video_audio_1",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "label": "ref_audio_0",
+          "name": "ref_audios.ref_audio_0",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 11
+        },
+        {
+          "name": "length",
+          "type": "INT",
+          "widget": {
+            "name": "length"
+          },
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            31
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            21,
+            32
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.32.0",
+        "Node name for S&R": "MiniMaxH3ReferenceToVideo"
+      },
+      "widgets_values": [
+        "",
+        768,
+        1344,
+        124,
+        "match"
+      ],
+      "title": "06 - OUTPUT SIZE / reference conditioning"
+    },
+    {
+      "id": 50,
+      "type": "RandomNoise",
+      "pos": [
+        1240,
+        1000
+      ],
+      "size": [
+        420,
+        100
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "NOISE",
+          "type": "NOISE",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "RandomNoise"
+      },
+      "widgets_values": [
+        703673408085144,
+        "fixed"
+      ],
+      "title": "Fixed seed - keep while comparing identity"
+    },
+    {
+      "id": 51,
+      "type": "KSamplerSelect",
+      "pos": [
+        1240,
+        1150
+      ],
+      "size": [
+        420,
+        75
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "res_multistep"
+      ],
+      "title": "Sampler / res_multistep (Simply first-pass setting)"
+    },
+    {
+      "id": 52,
+      "type": "BasicScheduler",
+      "pos": [
+        1240,
+        1290
+      ],
+      "size": [
+        420,
+        130
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.34.0",
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "simple",
+        20,
+        1
+      ],
+      "title": "Base model / 20 steps / no Turbo LoRA"
+    },
+    {
+      "id": 53,
+      "type": "BasicGuider",
+      "pos": [
+        1850,
+        1030
+      ],
+      "size": [
+        360,
+        95
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 30
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "BasicGuider"
+      },
+      "title": "Guider"
+    },
+    {
+      "id": 54,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1850,
+        1170
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 17
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 20
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 18
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 19
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            22
+          ]
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "SamplerCustomAdvanced"
+      },
+      "title": "Generate video + audio"
+    },
+    {
+      "id": 60,
+      "type": "VAEDecode",
+      "pos": [
+        2440,
+        1000
+      ],
+      "size": [
+        320,
+        80
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 22
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            26
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "VAEDecode"
+      },
+      "title": "Decode video"
+    },
+    {
+      "id": 62,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        2440,
+        100
+      ],
+      "size": [
+        560,
+        720
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 26
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 28
+        },
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+        "Node name for S&R": "VHS_VideoCombine",
+        "aux_id": "Kosinkadink/ComfyUI-VideoHelperSuite"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "MiniMax_H3/Reel_Recreation_v3/first_frame_original_audio",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 12,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true
+      },
+      "title": "07 - SAVE MP4 / ORIGINAL SOURCE AUDIO"
+    },
+    {
+      "id": 70,
+      "type": "Note",
+      "pos": [
+        600,
+        1220
+      ],
+      "size": [
+        540,
+        430
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "title": "V3 / READ BEFORE UPLOADING PICTURE 1",
+      "widgets_values": [
+        "Picture 1 MUST be a prepared opening frame with your persona already in the source scene, pose and clothing. A standalone selfie/portrait here also guides the opening scene and can replace the intended composition.\n\nPicture 1 feeds BOTH the H3 image reference and MiniMaxH3AddGuide at frame_idx=0. Picture 2 is a matching persona portrait, used only as an identity reference.\n\nStart with a 5-second continuous shot. The default output is 768x1344; prepare Picture 1 at that size, or change node 40 width/height to match its aspect ratio. Dimensions must be multiples of 32. AddGuide center-crops images when the aspect ratio differs.\n\nBase Ref2VA, res_multistep, simple, 20 steps. No Turbo LoRA. Image sizing remains match to bound reference memory. This is not a complete copy of Simply Advanced.\n\nOriginal audio remains connected to H3 and the final MP4. Raw video remains a visual reference, so identity leakage is still possible. A first-frame guide is not an identity guarantee.\n\nStructure checked offline; GPU generation has not been run. Use the updated v3 prompt skill."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 80,
+      "type": "MiniMaxH3AddGuide",
+      "pos": [
+        1840,
+        790
+      ],
+      "size": [
+        540,
+        155
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 31
+        },
+        {
+          "localized_name": "latent",
+          "name": "latent",
+          "type": "LATENT",
+          "link": 32
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": 33
+        },
+        {
+          "localized_name": "audio_vae",
+          "name": "audio_vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "localized_name": "image",
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 34
+        },
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            35
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.34.0",
+        "Node name for S&R": "MiniMaxH3AddGuide"
+      },
+      "widgets_values": [
+        0
+      ],
+      "title": "FIRST FRAME GUIDE / Picture 1 at frame 0"
+    }
+  ],
+  "links": [
+    [
+      2,
+      2,
+      0,
+      40,
+      0,
+      "CLIP"
+    ],
+    [
+      3,
+      3,
+      0,
+      40,
+      1,
+      "VAE"
+    ],
+    [
+      4,
+      4,
+      0,
+      40,
+      2,
+      "VAE"
+    ],
+    [
+      5,
+      10,
+      0,
+      40,
+      3,
+      "IMAGE"
+    ],
+    [
+      6,
+      11,
+      0,
+      40,
+      4,
+      "IMAGE"
+    ],
+    [
+      7,
+      12,
+      0,
+      40,
+      6,
+      "IMAGE"
+    ],
+    [
+      8,
+      31,
+      1,
+      12,
+      2,
+      "INT"
+    ],
+    [
+      9,
+      21,
+      0,
+      22,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      20,
+      0,
+      22,
+      1,
+      "STRING"
+    ],
+    [
+      11,
+      22,
+      0,
+      40,
+      11,
+      "STRING"
+    ],
+    [
+      12,
+      30,
+      0,
+      31,
+      0,
+      "FLOAT"
+    ],
+    [
+      13,
+      31,
+      1,
+      40,
+      12,
+      "INT"
+    ],
+    [
+      17,
+      50,
+      0,
+      54,
+      0,
+      "NOISE"
+    ],
+    [
+      18,
+      51,
+      0,
+      54,
+      2,
+      "SAMPLER"
+    ],
+    [
+      19,
+      52,
+      0,
+      54,
+      3,
+      "SIGMAS"
+    ],
+    [
+      20,
+      53,
+      0,
+      54,
+      1,
+      "GUIDER"
+    ],
+    [
+      21,
+      40,
+      1,
+      54,
+      4,
+      "LATENT"
+    ],
+    [
+      22,
+      54,
+      0,
+      60,
+      0,
+      "LATENT"
+    ],
+    [
+      24,
+      3,
+      0,
+      60,
+      1,
+      "VAE"
+    ],
+    [
+      26,
+      60,
+      0,
+      62,
+      0,
+      "IMAGE"
+    ],
+    [
+      27,
+      12,
+      2,
+      40,
+      8,
+      "AUDIO"
+    ],
+    [
+      28,
+      12,
+      2,
+      62,
+      1,
+      "AUDIO"
+    ],
+    [
+      29,
+      1,
+      0,
+      52,
+      0,
+      "MODEL"
+    ],
+    [
+      30,
+      1,
+      0,
+      53,
+      0,
+      "MODEL"
+    ],
+    [
+      31,
+      40,
+      0,
+      80,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      32,
+      40,
+      1,
+      80,
+      1,
+      "LATENT"
+    ],
+    [
+      33,
+      3,
+      0,
+      80,
+      2,
+      "VAE"
+    ],
+    [
+      34,
+      10,
+      0,
+      80,
+      4,
+      "IMAGE"
+    ],
+    [
+      35,
+      80,
+      0,
+      53,
+      1,
+      "CONDITIONING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "A - YOUR INPUTS / TVOJI ULAZI",
+      "bounding": [
+        -10,
+        20,
+        1220,
+        970
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "B - REFERENCE ROLES / OUTPUT SIZE",
+      "bounding": [
+        1210,
+        20,
+        1200,
+        900
+      ],
+      "color": "#5c8b60",
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "C - MODELS / SAMPLING",
+      "bounding": [
+        -10,
+        980,
+        2420,
+        650
+      ],
+      "color": "#b58b2a",
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "D - RESULT",
+      "bounding": [
+        2410,
+        20,
+        630,
+        1230
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "frontendVersion": "1.49.6",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": false,
+    "ds": {
+      "scale": 0.6,
+      "offset": [
+        50,
+        30
+      ]
+    },
+    "persona_manual_contract": "Reel Recreation v3: Picture 1 prepared first frame AND reference; Picture 2 matching portrait only; Subject 2 persona; Video 1 source performance; Audio 1 original soundtrack."
+  },
+  "version": 0.4
+}

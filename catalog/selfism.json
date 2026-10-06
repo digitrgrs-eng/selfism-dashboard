@@ -1002,5 +1002,14 @@
   ],
   "reel_recreation_v2_nodes": [
     "ComfyUI-VideoHelperSuite"
+  ],
+  "reel_recreation_v3_files": [
+    "mm-ref2va",
+    "r2v-enc",
+    "mm-vae-fp16",
+    "mm-vae-audio"
+  ],
+  "reel_recreation_v3_nodes": [
+    "ComfyUI-VideoHelperSuite"
   ]
 }
