@@ -971,5 +971,17 @@
   "r2v_swap_nodes": [
     "rgthree-comfy",
     "ComfyUI-VideoHelperSuite"
+  ],
+  "r2v_swap_highres_files": [
+    "mm-ref2va",
+    "mm-enc-nvfp4",
+    "mm-vae-fp16",
+    "mm-vae-audio",
+    "r2v-lora-turbo"
+  ],
+  "r2v_swap_highres_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-VideoHelperSuite",
+    "ComfyUI-KJNodes"
   ]
 }

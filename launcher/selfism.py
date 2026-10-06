@@ -25,9 +25,10 @@ INT8_PROFILES = ('simple','aio','full','repair')
 MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
 MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
 MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
+MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_HighRes_Hearmeman.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -287,6 +288,31 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Load Picture 1 (original woman from video), Picture 2 (Millie / new person) and Video 1 (source reel). The reel\'s audio feeds <Audio 1>; if the reel has no audio track, delete the audio link from Video 1. No OpenRouter key is needed: the Prompt node goes straight to MiniMax H3 Reference to Video.')
+                if profile=='minimax_r2v_swap_highres':
+                    # High-Res character swap: same Picture 1/2 + Video 1 wiring as Low-VRAM, plus Chunk FeedForward + Low VRAM Attention.
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_swap_highres.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Load Picture 1 (original woman from video), Picture 2 (Millie / new person) and Video 1 (source reel, width 512). Defaults: 9:16 at 0.98 MP, 5 s; raise duration to 11 for a full reel. Chunk FeedForward + Low VRAM Attention are on; optional Sage attention is off. If the reel has no audio track, delete the audio link from Video 1.')
+                    # Soft-ensure --reserve-vram 8 in workspace comfyui_args.txt (append if missing; do not create the file).
+                    try:
+                        ws=Path(os.environ.get('SELFISM_WORKSPACE','/workspace/runpod-slim'))
+                        args_path=ws/'comfyui_args.txt'
+                        if args_path.is_file():
+                            lines=args_path.read_text(encoding='utf-8').splitlines()
+                            if not any(l.strip()=='--reserve-vram 8' for l in lines):
+                                text=args_path.read_text(encoding='utf-8')
+                                if text and not text.endswith('\n'): text+='\n'
+                                args_path.write_text(text+'--reserve-vram 8\n',encoding='utf-8')
+                                logs.append('Appended --reserve-vram 8 to '+str(args_path)+'. Restart ComfyUI for the flag to take effect.')
+                            else:
+                                logs.append('--reserve-vram 8 already present in '+str(args_path)+'. Restart ComfyUI if you just added it.')
+                        else:
+                            logs.append('comfyui_args.txt not found at '+str(args_path)+'; skipped --reserve-vram 8 (soft-fail).')
+                    except Exception as exc:
+                        logs.append('Could not update comfyui_args.txt for --reserve-vram 8: '+str(exc))
                 if profile in ('simple','aio','reference','carousel','full'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
@@ -381,6 +407,10 @@ def register(host):
             # MiniMax H3 R2V Swap Low-VRAM: pruned Ref2VA INT8 + NVFP4 encoder + FP16/audio VAEs + turbo LoRA; rgthree + VHS only.
             file_keys=catalog['r2v_swap_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_nodes']]
+        elif profile=='minimax_r2v_swap_highres':
+            # MiniMax H3 R2V Swap High-Res: same models as Low-VRAM + KJNodes (Chunk FeedForward / Low VRAM Attention).
+            file_keys=catalog['r2v_swap_highres_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_highres_nodes']]
         elif profile=='extras': file_keys=catalog['extra_files']
         elif profile=='model':
             if request.item not in catalog['files']: raise HTTPException(404,'Unknown model.')
@@ -420,7 +450,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres'): raise HTTPException(404)
+        if profile=='minimax_r2v_swap_highres':
+            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_highres.json',filename=MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME)
         if profile=='minimax_r2v_swap_lowvram':
             return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json',filename=MINIMAX_R2V_SWAP_WORKFLOW_NAME)
         if profile=='minimax_r2v':

@@ -472,3 +472,171 @@ def test_swap_workflow_download_and_install_are_byte_identical_and_nondestructiv
     saved.write_text('{"user_edited":true}')
     asyncio.run(ctrl._install_workflow(wf))
     assert json.loads(saved.read_text()) == {'user_edited': True}
+
+
+# ---- MiniMax H3 R2V Swap High-Res (Hearmeman) card -------------------------------------------------------------
+HIGHRES_WF = ROOT/'selfism_workflows/minimax_h3_r2v_swap_highres.json'
+HIGHRES_IDS = ['mm-ref2va', 'mm-enc-nvfp4', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo']
+HIGHRES_NODES = ['rgthree-comfy', 'ComfyUI-VideoHelperSuite', 'ComfyUI-KJNodes']
+# Low-VRAM and R2V Turbo workflows must stay byte-identical after the High-Res card lands
+SWAP_SHIPPED_SHA256 = '752961044d48a695d4a2dfb218ee45d43a9ef81bdde02428023d67194340b3ad'
+HIGHRES_PROMPT_START = 'subject_definitions:\n<Subject 1> is the woman whose appearance comes only from <Picture 2>'
+
+
+def highres_nodes():
+    w = json.loads(HIGHRES_WF.read_bytes())
+    return w, {n['id']: n for n in w['nodes']}
+
+
+def test_highres_catalog_files_nodes_and_unchanged_siblings():
+    files = CATALOG['files']
+    assert CATALOG['r2v_swap_highres_files'] == HIGHRES_IDS
+    assert CATALOG['r2v_swap_highres_nodes'] == HIGHRES_NODES
+    assert CATALOG['r2v_swap_highres_files'] == CATALOG['r2v_swap_files']
+    for k in HIGHRES_IDS:
+        f = files[k]
+        assert re.fullmatch(r'[0-9a-f]{64}', f['sha256']) and f['size_bytes'] > 0 and f['auth'] == 'none', k
+        assert f['destination'].startswith('models/') and f['url'].startswith('https://huggingface.co/'), k
+    names = {n['name']: n for n in CATALOG['nodes']}
+    assert set(HIGHRES_NODES) <= set(names)
+    assert names['ComfyUI-KJNodes']['ref'] == 'd3cfe21625e5170126ce06fbfcfe1d88108688c3'
+    assert names['ComfyUI-VideoHelperSuite']['ref'] == VHS_REF
+    # sibling cards unchanged
+    assert CATALOG['r2v_swap_files'] == SWAP_IDS and CATALOG['r2v_swap_nodes'] == SWAP_NODES
+    assert CATALOG['r2v_files'] == R2V_IDS and CATALOG['r2v_nodes'] == R2V_NODES
+    assert hashlib.sha256(R2V_WF.read_bytes()).hexdigest() == R2V_SHIPPED_SHA256
+    assert hashlib.sha256(SWAP_WF.read_bytes()).hexdigest() == SWAP_SHIPPED_SHA256
+
+
+def test_highres_install_selects_the_workflow_files_and_kjnodes(monkeypatch):
+    r, captured, html = start_install(monkeypatch, {'profile': 'minimax_r2v_swap_highres'})
+    assert r.status_code == 200
+    assert [f['id'] for f in captured['files']] == HIGHRES_IDS
+    assert captured['selfism_profile'] == 'minimax_r2v_swap_highres' and captured['selfism_repair'] is False
+    assert captured['pip_packages'] == []
+    assert {n['name'] for n in captured['custom_nodes']} == set(HIGHRES_NODES)
+    total = sum(CATALOG['files'][k]['size_bytes'] for k in HIGHRES_IDS)
+    scripts = (ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')
+    for page in (html, scripts):
+        assert 'data-sf-action="minimax_r2v_swap_highres"' in page
+        assert 'MiniMax H3 R2V Swap High-Res (Hearmeman)' in page
+        assert f'{total/1e9:.1f}'.replace('.', ',') + ' GB' in page
+        assert 'data-sf-action="minimax_r2v_swap_lowvram"' in page
+        assert 'data-sf-action="minimax_r2v"' in page
+
+
+def test_highres_workflow_graph_chunk_lowvram_chain_and_defaults():
+    w, N = highres_nodes()
+    assert 'definitions' not in w and w['last_node_id'] >= max(N)
+    types = {n['type'] for n in w['nodes']}
+    assert not types & {'MiniMaxH3ReferencePack', 'Display Any (rgthree)', 'ModelPreviewOverrideKJ', 'ResizeImageMaskNode'}
+    assert 'PathchSageAttentionKJ' not in types and 'SageAttention' not in ''.join(types)
+    assert 'taeh3' not in HIGHRES_WF.read_text(encoding='utf-8') and 'hmmotion' not in HIGHRES_WF.read_text(encoding='utf-8')
+    L = {l[0]: l for l in w['links']}
+    assert len(L) == len(w['links']) and w['last_link_id'] >= max(L)
+    for lid, src, ss, dst, ds, typ in w['links']:
+        assert lid in N[src]['outputs'][ss]['links'] and N[dst]['inputs'][ds]['link'] == lid, lid
+    for n in w['nodes']:
+        for i in n.get('inputs', []):
+            assert i['link'] is None or L[i['link']][3] == n['id'], (n['id'], i['name'])
+
+    def src(nid, name):
+        i = next(x for x in N[nid]['inputs'] if x['name'] == name)
+        l = L[i['link']]
+        return N[l[1]], l[2]
+
+    chunk = next(n for n in w['nodes'] if n['type'] == 'MiniMaxChunkFeedForward')
+    low = next(n for n in w['nodes'] if n['type'] == 'MiniMaxLowVRAMAttention')
+    assert chunk['widgets_values'] == [4, 2048] and chunk['title'] == 'Chunk FeedForward'
+    assert low['widgets_values'] == [4] and low['title'] == 'Low VRAM Attention'
+    assert (chunk.get('properties') or {}).get('cnr_id') == 'comfyui-kjnodes'
+    assert (low.get('properties') or {}).get('cnr_id') == 'comfyui-kjnodes'
+    turbo, _ = src(chunk['id'], 'model')
+    assert turbo['type'] == 'LoraLoaderModelOnly'
+    mid, _ = src(low['id'], 'model')
+    assert mid is chunk
+    guider = next(n for n in w['nodes'] if n['type'] == 'BasicGuider')
+    sched = next(n for n in w['nodes'] if n['type'] == 'BetaSamplingScheduler')
+    assert src(guider['id'], 'model')[0] is low
+    assert src(sched['id'], 'model')[0] is low
+
+    r2v = next(n for n in w['nodes'] if n['type'] == 'MiniMaxH3ReferenceToVideo')
+    p1, _ = src(r2v['id'], 'ref_images.ref_image_0'); p2, _ = src(r2v['id'], 'ref_images.ref_image_1')
+    v1, vs = src(r2v['id'], 'ref_videos.ref_video_0'); va, vas = src(r2v['id'], 'ref_video_audios.ref_video_audio_0')
+    assert (p1['type'], p1['title']) == ('LoadImage', 'Picture 1 (original woman from video)')
+    assert (p2['type'], p2['title']) == ('LoadImage', 'Picture 2 (Millie / new person)')
+    assert v1['type'] == 'VHS_LoadVideo' and v1['title'] == 'Video 1 (source reel)' and vs == 0
+    assert va is v1 and vas == 2
+    vv = v1['widgets_values']
+    assert (vv['custom_width'], vv['custom_height'], vv['force_rate'], vv['format']) == (512, 0, 24, 'H3')
+    math, ms = src(r2v['id'], 'length')
+    assert math['type'] == 'ComfyMathExpression' and src(v1['id'], 'frame_load_cap') == (math, ms)
+    dur, _ = src(math['id'], 'values.a')
+    assert dur['type'] == 'PrimitiveFloat' and dur['widgets_values'] == [5]
+    res, _ = src(r2v['id'], 'width')
+    assert res['type'] == 'ResolutionSelector' and res['widgets_values'] == ['9:16 (Portrait Widescreen)', 0.98, 32]
+    assert src(r2v['id'], 'height')[0] is res
+    prompt, _ = src(r2v['id'], 'prompt')
+    assert prompt['type'] == 'PrimitiveStringMultiline'
+    assert prompt['widgets_values'][0].startswith(HIGHRES_PROMPT_START)
+    assert prompt['widgets_values'][0].rstrip().endswith('non_diegetic_music:\nN/A')
+    assert r2v['widgets_values'][0] == prompt['widgets_values'][0] and r2v['widgets_values'][4] == 'max'
+    assert r2v['widgets_values'][1:4] == [768, 1344, 124]
+    combine = next(n for n in w['nodes'] if n['type'] == 'VHS_VideoCombine')
+    assert combine['widgets_values']['filename_prefix'] == 'MiniMax_R2V_Swap_HighRes'
+
+    installed = {Path(CATALOG['files'][k]['destination']).name for k in CATALOG['r2v_swap_highres_files']}
+    used = {}
+    for n in w['nodes']:
+        v = n.get('widgets_values')
+        if n['type'] in ('UNETLoader', 'CLIPLoader', 'VAELoader', 'LoraLoaderModelOnly'): used[n['id']] = v[0]
+        if n['type'] == 'UNETLoader': assert v == ['minimax_h3_ref2va_pruned_int8_convrot.safetensors', 'default']
+        if n['type'] == 'CLIPLoader': assert v == ['qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors', 'minimax', 'default']
+        if n['type'] == 'LoraLoaderModelOnly': assert v == ['minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors', 0.85]
+        if n['type'] == 'BetaSamplingScheduler': assert v[0] == 4
+        if n['type'] == 'Power Lora Loader (rgthree)':
+            assert not [x for x in v if isinstance(x, dict) and x.get('on')]
+        for mdl in (n.get('properties') or {}).get('models', []):
+            assert mdl['name'] in installed, mdl
+    assert set(used.values()) == installed and len(used) == 5, set(used.values()) ^ installed
+    cnr = {(n.get('properties') or {}).get('cnr_id') for n in w['nodes']} - {None, 'comfy-core'}
+    assert {R2V_CNR_TO_PACK[c] for c in cnr} == set(CATALOG['r2v_swap_highres_nodes'])
+    assert cnr <= set(R2V_CNR_TO_PACK)
+
+
+def test_highres_workflow_download_and_install_are_byte_identical_and_nondestructive(monkeypatch, tmp_path):
+    with TestClient(m.app) as client:
+        r = client.get('/api/selfism/workflow/minimax_r2v_swap_highres')
+    assert r.status_code == 200 and r.content == HIGHRES_WF.read_bytes()
+    assert s.MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME in r.headers['content-disposition']
+    monkeypatch.setattr(m, 'COMFYUI_DIR', tmp_path)
+    monkeypatch.setattr(m, 'COMFYUI_VENV', tmp_path/'.venv')
+    python = m.COMFYUI_VENV/'bin/python'
+    python.parent.mkdir(parents=True); python.touch()
+    # workspace args file: install should append --reserve-vram 8
+    work = tmp_path/'runpod-slim'
+    work.mkdir()
+    args = work/'comfyui_args.txt'
+    args.write_text('# keep\n--preview-method none\n', encoding='utf-8')
+    monkeypatch.setenv('SELFISM_WORKSPACE', str(work))
+    ctrl = type(m.selfism_controller)()
+    async def ready(*args): pass
+    async def run(*args, **kwargs): return 0, 'torch==2.8.0'
+    async def sources(host, files): return files, []
+    monkeypatch.setattr(ctrl, '_wait_for_comfyui', ready)
+    monkeypatch.setattr(ctrl, '_run_process', run)
+    monkeypatch.setattr(m.JobController, '_install_workflow', ready)
+    monkeypatch.setattr(s, 'resolve_sources', sources)
+    saved = tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME
+    wf = {'selfism_profile': 'minimax_r2v_swap_highres', 'precision': 'fp8', 'files': [{'id': 'x'}], 'pip_packages': []}
+    asyncio.run(ctrl._install_workflow(wf))
+    assert saved.read_bytes() == HIGHRES_WF.read_bytes()
+    assert '--reserve-vram 8' in args.read_text(encoding='utf-8')
+    assert '--preview-method none' in args.read_text(encoding='utf-8')
+    assert not (tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_SWAP_WORKFLOW_NAME).exists()
+    assert not (tmp_path/'user/default/workflows/Selfism'/s.MINIMAX_R2V_WORKFLOW_NAME).exists()
+    saved.write_text('{"user_edited":true}')
+    before = args.read_text(encoding='utf-8')
+    asyncio.run(ctrl._install_workflow(wf))
+    assert json.loads(saved.read_text()) == {'user_edited': True}
+    assert args.read_text(encoding='utf-8') == before  # do not duplicate --reserve-vram 8
