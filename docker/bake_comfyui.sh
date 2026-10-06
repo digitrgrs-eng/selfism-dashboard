@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # Build-time step: bake ComfyUI at a pinned release into the 10sorLabs/RunPod base image.
 #
-# Runs inside the base image (root, python3.12 + system site-packages already hold the
-# CUDA PyTorch stack).  Result:
+# Runs inside the base image (root, python3.12 + system site-packages already hold a
+# CUDA PyTorch stack — typically cu128).  We OVERRIDE torch/torchvision/torchaudio to
+# the cu130 wheels so ComfyUI v0.38.1 can enable comfy_kitchen's CUDA backend
+# (disabled when torch.version.cuda < 13.0).  Result:
 #   * /opt/comfyui-baked      = git checkout of $COMFYUI_TAG (commit $COMFYUI_SHA),
 #                               origin -> upstream, existing custom_nodes/ and user/ kept
-#   * system site-packages    = ComfyUI's requirements, installed with the protected
-#                               packages (torch & co.) pinned to what is already there
+#   * system site-packages    = torch 2.10.0+cu130 (+ matching vision/audio), then
+#                               ComfyUI's requirements with those packages constrained
 #   * /opt/comfyui-baked/.runpod-bundle-version updated (RunPod bundle marker)
 # Nothing is written to /workspace here: the base start.sh copies the baked tree on first boot.
+# Note: the runtime venv path may still be named .venv-cu128 (historical); torch itself is cu130.
 set -Eeuo pipefail
 
 : "${COMFYUI_TAG:=v0.38.1}"
@@ -24,7 +27,17 @@ PIP=("$PYTHON" -m pip)
 site="$("$PYTHON" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
 log "python: $("$PYTHON" --version); site-packages: $site"
 
-# 1. Constraints: hold every package that ties ComfyUI to the image's CUDA build.
+# 1. Override the base CUDA PyTorch stack (usually cu128) with cu130, then pin it.
+# ComfyUI v0.38.1 disables comfy_kitchen CUDA when torch.version.cuda < 13.0.
+torch_base="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
+[ -n "$torch_base" ] || { echo "no torch found"; exit 1; }
+log "base torch: $torch_base — upgrading to 2.10.0+cu130"
+"${PIP[@]}" install --no-cache-dir --disable-pip-version-check --break-system-packages \
+  --upgrade \
+  torch==2.10.0+cu130 torchvision==0.25.0+cu130 torchaudio==2.10.0+cu130 \
+  --index-url https://download.pytorch.org/whl/cu130
+
+# Constraints: hold every package that ties ComfyUI to the (now cu130) CUDA build.
 constraints=/tmp/bake-constraints.txt
 "${PIP[@]}" freeze --disable-pip-version-check \
   | grep -iE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' > "$constraints"
@@ -34,7 +47,16 @@ fi
 sort -u "$constraints" -o "$constraints"
 log "holding:"; sed 's/^/  /' "$constraints"
 torch_before="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
-[ -n "$torch_before" ] || { echo "no torch found"; exit 1; }
+case "$torch_before" in
+  *cu130*) ;;
+  *) echo "expected cu130 torch after upgrade, got: $torch_before" >&2; exit 1 ;;
+esac
+cuda_meta="$("$PYTHON" -c 'import torch; print(torch.version.cuda or "")')"
+case "$cuda_meta" in
+  13*) ;;
+  *) echo "expected torch.version.cuda starting with 13 after upgrade, got: $cuda_meta" >&2; exit 1 ;;
+esac
+log "cu130 torch ready: $torch_before (cuda $cuda_meta)"
 "${PIP[@]}" freeze --disable-pip-version-check > /tmp/bake-freeze-before.txt
 
 # 2. ComfyUI source: a real git checkout of the tag, remote = upstream.
@@ -68,19 +90,28 @@ log "checked out $COMFYUI_TAG ($COMFYUI_SHA)"
 PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir --disable-pip-version-check \
   --break-system-packages -c "$constraints" -r "$BAKED/requirements.txt"
 
-# 4. Guard rails: the CUDA stack must be untouched and the pins must hold.
+# 4. Guard rails: the cu130 CUDA stack must be untouched and the pins must hold.
 torch_after="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
 if [ "$torch_after" != "$torch_before" ]; then
   echo "torch changed during the ComfyUI requirements install: $torch_before -> $torch_after" >&2
   exit 1
 fi
+case "$torch_after" in
+  *cu130*) ;;
+  *) echo "expected cu130 torch after requirements, got: $torch_after" >&2; exit 1 ;;
+esac
+cuda_after="$("$PYTHON" -c 'import torch; print(torch.version.cuda or "")')"
+case "$cuda_after" in
+  13*) ;;
+  *) echo "expected torch.version.cuda starting with 13, got: $cuda_after" >&2; exit 1 ;;
+esac
 "${PIP[@]}" freeze --disable-pip-version-check > /tmp/bake-freeze-after.txt
 changed_protected="$(diff <(grep -iE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' /tmp/bake-freeze-before.txt) \
                           <(grep -iE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' /tmp/bake-freeze-after.txt) || true)"
 if [ -n "$changed_protected" ]; then
   echo "protected packages changed:" >&2; echo "$changed_protected" >&2; exit 1
 fi
-log "torch intact: $torch_after"
+log "torch intact: $torch_after (cuda $cuda_after)"
 log "package changes (freeze diff):"
 diff /tmp/bake-freeze-before.txt /tmp/bake-freeze-after.txt | grep '^[<>]' | sed 's/^/  /' || true
 

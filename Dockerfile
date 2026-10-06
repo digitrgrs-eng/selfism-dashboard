@@ -7,11 +7,13 @@ RUN pip install --no-cache-dir --no-compile --target=/r2deps boto3==1.43.104
 # existing cleanup (frees ~114 GiB on the hosted runner) is required. Every other step stays COPY --link.
 FROM 10sorllabs/comfyui-workflow-launcher@sha256:d01908958aa33cc9117b478d81845d14ed53c135f173e3db3eafe14e780e8846
 
-# Bake ComfyUI v0.38.1 (git checkout, origin = upstream) into /opt/comfyui-baked and install
-# its requirements into the system site-packages with torch/torchvision/torchaudio/numpy/
-# transformers/pillow/opencv pinned to what the base already has. RunPod's start.sh copies
-# /opt/comfyui-baked to /workspace/runpod-slim/ComfyUI on first boot and its venv
-# (--system-site-packages) sees these packages, so the boot hook (selfism_boot ->
+# Bake ComfyUI v0.38.1 (git checkout, origin = upstream) into /opt/comfyui-baked.
+# bake_comfyui.sh first upgrades the base cu128 torch stack to 2.10.0+cu130 (matching
+# torchvision/torchaudio) so comfy_kitchen CUDA is not disabled, then installs ComfyUI
+# requirements with torch/torchvision/torchaudio/numpy/transformers/pillow/opencv pinned
+# to that cu130 freeze. RunPod's start.sh copies /opt/comfyui-baked to
+# /workspace/runpod-slim/ComfyUI on first boot and its venv (--system-site-packages; path
+# may still be named .venv-cu128) sees these packages, so the boot hook (selfism_boot ->
 # selfism_int8.py) finds INT8 support and comfy-kitchen >= 0.2.16 and does nothing.
 # Keep COMFYUI_TAG/COMFYUI_SHA identical to TARGET_TAG/TARGET_SHA in launcher/selfism_int8.py
 # (tests/test_bake.py checks this). Launcher files are untouched.

@@ -56,6 +56,22 @@ def test_script_protects_the_cuda_stack_and_verifies_it():
     assert '0, 2, 16' in text                     # same comfy-kitchen floor as selfism_int8
 
 
+def test_script_upgrades_torch_to_cu130_and_asserts_metadata():
+    text = SCRIPT.read_text()
+    assert 'https://download.pytorch.org/whl/cu130' in text
+    assert 'torch==2.10.0+cu130' in text
+    assert 'torchvision==0.25.0+cu130' in text
+    assert 'torchaudio==2.10.0+cu130' in text
+    assert '--break-system-packages' in text
+    assert '*cu130*' in text                      # version string check after upgrade + after reqs
+    assert 'torch.version.cuda' in text
+    assert 'expected torch.version.cuda starting with 13' in text
+    # constraints are rebuilt from the freeze AFTER the cu130 upgrade
+    upgrade_at = text.index('whl/cu130')
+    constraints_at = text.index('hold every package that ties ComfyUI to the (now cu130)')
+    assert upgrade_at < constraints_at
+
+
 def test_script_keeps_git_checkout_with_upstream_remote():
     text = SCRIPT.read_text()
     assert 'git init' in text and 'remote add origin' in text
