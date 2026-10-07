@@ -717,6 +717,15 @@
       "sha256": "e55fd00f3cc184e3c65961f4bb827a9da022e78eed36b055242c0ac30000d533",
       "auth": "none",
       "id": "rife49"
+    },
+    "mm-lora-charswap": {
+      "name": "MiniMax H3 Character Swap LoRA (akatz-ai pro4500_1000)",
+      "url": "https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA/resolve/62407e0cc8089c363abd9ce4b0b27662abb237af/h3_character_swap_pro4500_1000.safetensors",
+      "destination": "models/loras/h3_character_swap_pro4500_1000.safetensors",
+      "size_bytes": 155110320,
+      "sha256": "4b2a3f420ae804c0aa3422761ff84dbd1bf52eef6900ffab6d2e66df63cb4e79",
+      "auth": "none",
+      "id": "mm-lora-charswap"
     }
   },
   "nodes": [
@@ -1216,5 +1225,18 @@
       "source": "models/rife/rife49.pth",
       "destination": "custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
     }
+  ],
+  "minimax_swap_1_files": [
+    "mm-ref2va",
+    "mm-enc-nvfp4",
+    "mm-vae-fp16",
+    "mm-vae-audio",
+    "r2v-lora-turbo-8step",
+    "mm-lora-charswap",
+    "mm-latent-up"
+  ],
+  "minimax_swap_1_nodes": [
+    "ComfyUI-VideoHelperSuite",
+    "Comfyui_Minimax_h3_latent_Upscaler"
   ]
 }

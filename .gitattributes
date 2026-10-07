@@ -5,3 +5,4 @@ Dockerfile text eol=lf
 *.py text eol=lf
 # Third-party workflow shipped byte-for-byte (CRLF line endings must not be normalised).
 selfism_workflows/minimax_h3_simply_advanced.json -text
+selfism_workflows/minimax_swap_1.json -text
