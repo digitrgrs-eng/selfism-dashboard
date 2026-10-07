@@ -1159,6 +1159,20 @@
   "reel_recreation_v2_nodes": [
     "ComfyUI-VideoHelperSuite"
   ],
+  "r2v_hearmeman_full_files": [
+    "mm-ref2va",
+    "r2v-enc",
+    "mm-vae-fp16",
+    "mm-vae-audio",
+    "r2v-lora-turbo-8step",
+    "r2v-taeh3"
+  ],
+  "r2v_hearmeman_full_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-KJNodes",
+    "ComfyUI-VideoHelperSuite",
+    "ComfyUI-MiniMaxRefPack"
+  ],
   "reel_recreation_v3_files": [
     "mm-ref2va",
     "r2v-enc",
