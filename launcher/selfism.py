@@ -31,9 +31,10 @@ MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_FirstFram
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME = 'MiniMax_H3_R2V_Hearmeman_Full.json'
 MINIMAX_SWAP_1_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_OriginalAudio_v1.json'
+MINIMAX_SWAP_2_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_AuthorSettings_OriginalAudio.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -351,6 +352,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_1.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Load Millie photo in 01, source reel in 02 (73 frames @24 fps by default; frame_load_cap 0 = whole short clip), prompt in 03. Run 07 PREVIEW first; then unmute 08 FINAL OUTPUT (Ctrl+M) for ~1 MP latent-upscaled output. Original reel audio goes straight to both exports. Character Swap LoRA @ 1.0.')
+                if profile=='minimax_swap_2':
+                    # minimax swap 2: LBH author settings (full Ref2VA INT8 + FL2V LightX2V 4-step v0.1 + character swap + 3D upscaler + KJ preview).
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_SWAP_2_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_2.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('LBH author settings: load Millie photo in 01, source reel in 02 (73 frames @24 fps), prompt in 03. Run 07 PREVIEW (0.2 MP) first; then unmute 08 FINAL OUTPUT (Ctrl+M) for 1 MP with 3-step latent-upscaled refine. Full Ref2VA INT8 + FL2V LightX2V 4-step v0.1, euler 8 steps split at 4, comfy kitchen attention, KJ taeh3 live preview. Original reel audio goes straight to both exports.')
                 if profile=='god_mode':
                     # GOD Mode: Wan 2.2 Animate character replacement / animation (Kijai WanVideoWrapper + preprocess + SAM2 + RIFE).
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
@@ -473,6 +482,10 @@ def register(host):
             # minimax swap 1: LBH Millie original audio; VHS + LBH latent upscaler.
             file_keys=catalog['minimax_swap_1_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_1_nodes']]
+        elif profile=='minimax_swap_2':
+            # minimax swap 2: LBH author settings; VHS + KJNodes + LBH latent upscaler.
+            file_keys=catalog['minimax_swap_2_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_2_nodes']]
         elif profile=='god_mode':
             # GOD Mode: Wan 2.2 Animate 14B bf16 + VAE/UMT5/CLIP/SAM2/ViTPose/YOLO + LoRAs + RIFE; WanVideoWrapper stack.
             file_keys=catalog['god_mode_files']
@@ -516,7 +529,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2'): raise HTTPException(404)
+        if profile=='minimax_swap_2':
+            return FileResponse(root/'selfism_workflows/minimax_swap_2.json',filename=MINIMAX_SWAP_2_WORKFLOW_NAME)
         if profile=='minimax_swap_1':
             return FileResponse(root/'selfism_workflows/minimax_swap_1.json',filename=MINIMAX_SWAP_1_WORKFLOW_NAME)
         if profile=='minimax_r2v_hearmeman_full':

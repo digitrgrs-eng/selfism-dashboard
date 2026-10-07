@@ -726,6 +726,24 @@
       "sha256": "4b2a3f420ae804c0aa3422761ff84dbd1bf52eef6900ffab6d2e66df63cb4e79",
       "auth": "none",
       "id": "mm-lora-charswap"
+    },
+    "mm-lora-fl2v-4step-v01": {
+      "name": "MiniMax H3 FL2V LightX2V turbo 4-step v0.1 LoRA (Kijai comfy)",
+      "url": "https://huggingface.co/Kijai/MiniMax-H3_comfy/resolve/098f8c48fccead9a93191c166ca31a130659d3bd/loras/minimax_h3_fl2v_lightx2v_turbo_4step_v0.1_comfy.safetensors",
+      "destination": "models/loras/minimax_h3_fl2v_lightx2v_turbo_4step_v0.1_comfy.safetensors",
+      "size_bytes": 1956171984,
+      "sha256": "fc9b6500f0331fe925b004738baaa31bd34104741c8bf9334816f9ac3005c8c1",
+      "auth": "none",
+      "id": "mm-lora-fl2v-4step-v01"
+    },
+    "mm-latent-up-3d": {
+      "name": "MiniMax H3 latent upscaler 3D FP16 (original LBH name)",
+      "url": "https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler/resolve/671ecf0f1d0a4dd0855f0cb6664bfb6f65c7e491/minimax_h3_latent_upscaler_3d_fp16.safetensors",
+      "destination": "models/latent_upscale_models/minimax_h3_latent_upscaler_3d_fp16.safetensors",
+      "size_bytes": 690592672,
+      "sha256": "043e5a48e161610ef6c3ea974645220354d06fa618abca15f76d084812eb55c2",
+      "auth": "none",
+      "id": "mm-latent-up-3d"
     }
   },
   "nodes": [
@@ -1237,6 +1255,21 @@
   ],
   "minimax_swap_1_nodes": [
     "ComfyUI-VideoHelperSuite",
+    "Comfyui_Minimax_h3_latent_Upscaler"
+  ],
+  "minimax_swap_2_files": [
+    "r2v-unet",
+    "mm-lora-fl2v-4step-v01",
+    "mm-lora-charswap",
+    "mm-enc-nvfp4",
+    "mm-vae-fp16",
+    "mm-vae-audio",
+    "mm-latent-up-3d",
+    "r2v-taeh3"
+  ],
+  "minimax_swap_2_nodes": [
+    "ComfyUI-VideoHelperSuite",
+    "ComfyUI-KJNodes",
     "Comfyui_Minimax_h3_latent_Upscaler"
   ]
 }
