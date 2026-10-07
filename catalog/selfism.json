@@ -1303,5 +1303,14 @@
   "minimax_swap_3_bundled_nodes": [
     "ComfyUI-H3-Studio",
     "ComfyUI-H3-Studio-Support"
-  ]
+  ],
+  "akatz_character_swap_files": [
+    "mm-ref2va",
+    "mm-lora-charswap",
+    "r2v-lora-turbo",
+    "mm-enc-nvfp4",
+    "mm-vae-int8",
+    "mm-vae-audio"
+  ],
+  "akatz_character_swap_nodes": []
 }

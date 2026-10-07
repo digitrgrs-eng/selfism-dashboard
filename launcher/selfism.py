@@ -33,9 +33,10 @@ MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME = 'MiniMax_H3_R2V_Hearmeman_Full.json'
 MINIMAX_SWAP_1_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_OriginalAudio_v1.json'
 MINIMAX_SWAP_2_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_AuthorSettings_OriginalAudio.json'
 MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
+AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -395,6 +396,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_3.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('MiniMax H3 Studio: in the Media card upload the reference photo and the source reel (trim start/end), keep mode "Video inpainting", set the SAM3 target (e.g. "the woman driving") and the prompt, then Run. Output keeps the original reel audio (trimmed). Turbo V4 Step 600 pruned LoRA @ 1.0, 8 steps. The example owl inputs are not installed; select your own media first.')
+                if profile=='akatz_character_swap':
+                    # akatz character swap: official H3 Ref2VA template + akatz-ai Character Swap LoRA (core nodes only).
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/AKATZ_CHARACTER_SWAP_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/akatz_character_swap.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('akatz character swap: load the Millie photo (<Picture 1>) and one 4-5 s shot at 24 fps (<Video 1>), short prompt "Swap the woman in <Video 1> with the character in <Picture 1>.", set duration to the shot length. Ref2VA INT8 pruned + Character Swap LoRA @ 1.0, 20 steps res_multistep, turbo off. Original reel audio switch is on by default (trimmed to the output).')
                 if profile=='god_mode':
                     # GOD Mode: Wan 2.2 Animate character replacement / animation (Kijai WanVideoWrapper + preprocess + SAM2 + RIFE).
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
@@ -525,6 +534,10 @@ def register(host):
             # minimax swap 3: MiniMax H3 Studio; nodes are bundled (installed by _install_h3_studio_nodes), no git packs.
             file_keys=catalog['minimax_swap_3_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_3_nodes']]
+        elif profile=='akatz_character_swap':
+            # akatz character swap: pruned Ref2VA INT8 + Character Swap LoRA + optional Ref2V 4-step turbo + NVFP4 encoder + INT8/audio VAEs; core nodes only.
+            file_keys=catalog['akatz_character_swap_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['akatz_character_swap_nodes']]
         elif profile=='god_mode':
             # GOD Mode: Wan 2.2 Animate 14B bf16 + VAE/UMT5/CLIP/SAM2/ViTPose/YOLO + LoRAs + RIFE; WanVideoWrapper stack.
             file_keys=catalog['god_mode_files']
@@ -568,7 +581,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap'): raise HTTPException(404)
+        if profile=='akatz_character_swap':
+            return FileResponse(root/'selfism_workflows/akatz_character_swap.json',filename=AKATZ_CHARACTER_SWAP_WORKFLOW_NAME)
         if profile=='minimax_swap_3':
             return FileResponse(root/'selfism_workflows/minimax_swap_3.json',filename=MINIMAX_SWAP_3_WORKFLOW_NAME)
         if profile=='minimax_swap_2':
