@@ -32,9 +32,10 @@ GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME = 'MiniMax_H3_R2V_Hearmeman_Full.json'
 MINIMAX_SWAP_1_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_OriginalAudio_v1.json'
 MINIMAX_SWAP_2_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_AuthorSettings_OriginalAudio.json'
+MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -174,6 +175,30 @@ def register(host):
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
             logs.append('Bundled AIO Qwen Carousel helper installed in the ComfyUI environment.')
 
+        async def _install_h3_studio_nodes(self, python):
+            # MiniMax H3 Studio packs are local (not on git): shipped in the image under bundled_nodes/.
+            sources=[root/'bundled_nodes'/name for name in catalog['minimax_swap_3_bundled_nodes']]
+            self.update(stage='installing', message='Installing MiniMax H3 Studio nodes…', percent=95)
+            # PIP_CONSTRAINT (torch cu130 / numpy / transformers / opencv snapshot) is active here,
+            # so these small requirements (opencv-python, imageio-ffmpeg, safetensors, packaging) cannot move the core stack.
+            rc, output=await self._run_process(python, '-m', 'pip', 'install',
+                                             '-r', sources[0]/'requirements.txt', '-r', sources[1]/'requirements.txt', timeout=900)
+            if rc: raise RuntimeError('H3 Studio dependencies failed: '+output[-1500:])
+            rc, output=await self._run_process(python, '-c',
+                'import cv2, imageio_ffmpeg, safetensors, packaging; print("H3 Studio dependencies ready")', timeout=120)
+            if rc: raise RuntimeError('H3 Studio dependency import failed: '+output[-1500:])
+            self.check_cancelled()
+            for source in sources:
+                target=host.COMFYUI_DIR/'custom_nodes'/source.name
+                if target.exists():
+                    backup=host.COMFYUI_DIR/'user/h3_studio_backups'/uuid.uuid4().hex/source.name
+                    backup.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copytree(target, backup)
+                    logs.append('Previous '+source.name+' saved: '+str(backup))
+                shutil.copytree(source, target, dirs_exist_ok=True,
+                                ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+            logs.append('MiniMax H3 Studio nodes installed: '+', '.join(s.name for s in sources)+'.')
+
         async def _run_process(self, *command, timeout=None, env=None):
             # Stream bounded, redacted output for node installers and environment repair.
             process = await asyncio.create_subprocess_exec(*map(str,command),
@@ -264,6 +289,8 @@ def register(host):
                     await self._install_python_packages(python,workflow['pip_packages'])
                 if workflow.get('selfism_profile') == 'carousel':
                     await self._install_carousel_helper(python)
+                if workflow.get('selfism_profile') == 'minimax_swap_3':
+                    await self._install_h3_studio_nodes(python)
                 if workflow.get('selfism_repair'):
                     self.update(stage='installing',message='Repairing Qwen / CUDA environment…',percent=96)
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
@@ -360,6 +387,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_2.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('LBH author settings: load Millie photo in 01, source reel in 02 (73 frames @24 fps), prompt in 03. Run 07 PREVIEW (0.2 MP) first; then unmute 08 FINAL OUTPUT (Ctrl+M) for 1 MP with 3-step latent-upscaled refine. Full Ref2VA INT8 + FL2V LightX2V 4-step v0.1, euler 8 steps split at 4, comfy kitchen attention, KJ taeh3 live preview. Original reel audio goes straight to both exports.')
+                if profile=='minimax_swap_3':
+                    # minimax swap 3: MiniMax H3 Studio (SAM3.1 masked video inpainting with a reference picture; bundled Studio nodes).
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/MINIMAX_SWAP_3_WORKFLOW_NAME
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_3.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('MiniMax H3 Studio: in the Media card upload the reference photo and the source reel (trim start/end), keep mode "Video inpainting", set the SAM3 target (e.g. "the woman driving") and the prompt, then Run. Output keeps the original reel audio (trimmed). Turbo V4 Step 600 pruned LoRA @ 1.0, 8 steps. The example owl inputs are not installed; select your own media first.')
                 if profile=='god_mode':
                     # GOD Mode: Wan 2.2 Animate character replacement / animation (Kijai WanVideoWrapper + preprocess + SAM2 + RIFE).
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
@@ -486,6 +521,10 @@ def register(host):
             # minimax swap 2: LBH author settings; VHS + KJNodes + LBH latent upscaler.
             file_keys=catalog['minimax_swap_2_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_2_nodes']]
+        elif profile=='minimax_swap_3':
+            # minimax swap 3: MiniMax H3 Studio; nodes are bundled (installed by _install_h3_studio_nodes), no git packs.
+            file_keys=catalog['minimax_swap_3_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_3_nodes']]
         elif profile=='god_mode':
             # GOD Mode: Wan 2.2 Animate 14B bf16 + VAE/UMT5/CLIP/SAM2/ViTPose/YOLO + LoRAs + RIFE; WanVideoWrapper stack.
             file_keys=catalog['god_mode_files']
@@ -529,7 +568,9 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2'): raise HTTPException(404)
+        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3'): raise HTTPException(404)
+        if profile=='minimax_swap_3':
+            return FileResponse(root/'selfism_workflows/minimax_swap_3.json',filename=MINIMAX_SWAP_3_WORKFLOW_NAME)
         if profile=='minimax_swap_2':
             return FileResponse(root/'selfism_workflows/minimax_swap_2.json',filename=MINIMAX_SWAP_2_WORKFLOW_NAME)
         if profile=='minimax_swap_1':

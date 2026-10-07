@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-01",
+  "models": [
+    {
+      "id": "ref2va",
+      "label": "MiniMax H3 · Reference and video editing",
+      "filename": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "folder": "diffusion_models",
+      "repo_id": "Comfy-Org/MiniMax-H3",
+      "revision": "e5eb578a89295337b8ff433a035929ce0279e0b6",
+      "remote_path": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/e5eb578a89295337b8ff433a035929ce0279e0b6/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/blob/e5eb578a89295337b8ff433a035929ce0279e0b6/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "modes": [
+        "Reference to video",
+        "Video inpainting"
+      ],
+      "size_bytes": 20970379616,
+      "sha256": "9255f52b6677845ad238f20dfaafa94727053694127ab7f255c048f0f9365779",
+      "manual": false,
+      "gated": false,
+      "note": "Base model for reference to video and video inpainting. Uses the workflow’s current INT8 ConvRot variant.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/MiniMax-H3?blobs=true"
+    },
+    {
+      "id": "fl2va",
+      "label": "MiniMax H3 · First and last frame",
+      "filename": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "folder": "diffusion_models",
+      "repo_id": "Comfy-Org/MiniMax-H3",
+      "revision": "e5eb578a89295337b8ff433a035929ce0279e0b6",
+      "remote_path": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/e5eb578a89295337b8ff433a035929ce0279e0b6/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/blob/e5eb578a89295337b8ff433a035929ce0279e0b6/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "modes": [
+        "First + last frame"
+      ],
+      "size_bytes": 20970379616,
+      "sha256": "e889202c41dafb67b10d67b97f0d8541508036a6090af23425a5c2615d03c47a",
+      "manual": false,
+      "gated": false,
+      "note": "Base model for first-to-last-frame generation.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/MiniMax-H3?blobs=true"
+    },
+    {
+      "id": "turbo_v4",
+      "label": "MiniMax H3 Turbo V4 · Step 600 pruned",
+      "filename": "minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "folder": "loras",
+      "repo_id": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+      "revision": "bb2bc497cbaca89dadd0bcf1856eed4f8275be20",
+      "remote_path": "minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "download_url": "https://huggingface.co/drbaph/MiniMax-H3-Turbo-Lora-ComfyUI/resolve/bb2bc497cbaca89dadd0bcf1856eed4f8275be20/minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "page_url": "https://huggingface.co/drbaph/MiniMax-H3-Turbo-Lora-ComfyUI/blob/bb2bc497cbaca89dadd0bcf1856eed4f8275be20/minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "modes": [
+        "Reference to video",
+        "Video inpainting"
+      ],
+      "size_bytes": 620285592,
+      "sha256": "4f95afb2ab503eac876ae5571f4d78b0e0fd0198b626a89f4b7727018ed198a9",
+      "manual": false,
+      "gated": false,
+      "note": "Default Turbo LoRA for reference to video and video inpainting. Exact non-EMA pruned Step 600 variant. Publisher warning: this partial conversion removes 51 incompatible AdaLN adapter pairs; it may not preserve the original full-model distillation behavior. Use one Turbo accelerator at a time.",
+      "metadata_source": "https://huggingface.co/api/models/drbaph/MiniMax-H3-Turbo-Lora-ComfyUI/revision/bb2bc497cbaca89dadd0bcf1856eed4f8275be20?blobs=true"
+    },
+    {
+      "id": "ref2va_turbo",
+      "label": "Optional Turbo 8-step · Reference and video editing",
+      "filename": "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "folder": "loras",
+      "repo_id": "lightx2v/Minimax-h3-Turbo",
+      "revision": "3ec17a324ced54151364f24f8b5fb6bf7e26414f",
+      "remote_path": "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "download_url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/3ec17a324ced54151364f24f8b5fb6bf7e26414f/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "page_url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/blob/3ec17a324ced54151364f24f8b5fb6bf7e26414f/minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "modes": [
+        "Reference to video",
+        "Video inpainting"
+      ],
+      "size_bytes": 1956193000,
+      "sha256": "6a56f41ab4229c9dd845b9501bbd475ee57e112d846cf2e819d534a1ae928c5a",
+      "manual": false,
+      "gated": false,
+      "note": "Optional alternative to Turbo V4 for reference to video and video inpainting. Select it instead of V4 if desired; do not enable both Turbo accelerators together. It is not required when using the default V4 selection.",
+      "metadata_source": "https://huggingface.co/api/models/lightx2v/Minimax-h3-Turbo?blobs=true"
+    },
+    {
+      "id": "fl2va_turbo",
+      "label": "Turbo 8-step · First and last frame",
+      "filename": "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "folder": "loras",
+      "repo_id": "lightx2v/Minimax-h3-Turbo",
+      "revision": "3ec17a324ced54151364f24f8b5fb6bf7e26414f",
+      "remote_path": "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "download_url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/resolve/3ec17a324ced54151364f24f8b5fb6bf7e26414f/minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "page_url": "https://huggingface.co/lightx2v/Minimax-h3-Turbo/blob/3ec17a324ced54151364f24f8b5fb6bf7e26414f/minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+      "modes": [
+        "First + last frame"
+      ],
+      "size_bytes": 1956193000,
+      "sha256": "08cfe946033af7d27719b964b6e0a0e50c32138daabbd6ce4137e23df6bf9980",
+      "manual": false,
+      "gated": false,
+      "note": "The matching 8-step acceleration LoRA for endpoint generation.",
+      "metadata_source": "https://huggingface.co/api/models/lightx2v/Minimax-h3-Turbo?blobs=true"
+    },
+    {
+      "id": "text_encoder",
+      "label": "Qwen3-VL 32B · H3 text and reference encoder",
+      "filename": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "folder": "text_encoders",
+      "repo_id": "Comfy-Org/MiniMax-H3",
+      "revision": "e5eb578a89295337b8ff433a035929ce0279e0b6",
+      "remote_path": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/e5eb578a89295337b8ff433a035929ce0279e0b6/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/blob/e5eb578a89295337b8ff433a035929ce0279e0b6/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "modes": [
+        "Reference to video",
+        "First + last frame",
+        "Video inpainting"
+      ],
+      "size_bytes": 15687142551,
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "manual": false,
+      "gated": false,
+      "note": "Required by every mode. This is the model’s conditioning encoder, not the optional captioning assistant. The Comfy-Org NVFP4 conversion does not require a Blackwell GPU.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/MiniMax-H3?blobs=true"
+    },
+    {
+      "id": "video_vae",
+      "label": "MiniMax H3 · Video VAE",
+      "filename": "minimax_h3_video_vae_int8_convrot.safetensors",
+      "folder": "vae",
+      "repo_id": "Comfy-Org/MiniMax-H3",
+      "revision": "e5eb578a89295337b8ff433a035929ce0279e0b6",
+      "remote_path": "vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/e5eb578a89295337b8ff433a035929ce0279e0b6/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/blob/e5eb578a89295337b8ff433a035929ce0279e0b6/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+      "modes": [
+        "Reference to video",
+        "First + last frame",
+        "Video inpainting"
+      ],
+      "size_bytes": 2811065184,
+      "sha256": "52a2c8c73583c86e4f41cdcce3a6ad0ea562987bc0bf3d60a0cef5f5c8e60c0e",
+      "manual": false,
+      "gated": false,
+      "note": "Video encoding and decoding for all modes.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/MiniMax-H3?blobs=true"
+    },
+    {
+      "id": "audio_vae",
+      "label": "MiniMax H3 · Audio VAE",
+      "filename": "minimax_h3_audio_vae_fp32.safetensors",
+      "folder": "vae",
+      "repo_id": "Comfy-Org/MiniMax-H3",
+      "revision": "e5eb578a89295337b8ff433a035929ce0279e0b6",
+      "remote_path": "vae/minimax_h3_audio_vae_fp32.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/e5eb578a89295337b8ff433a035929ce0279e0b6/vae/minimax_h3_audio_vae_fp32.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/MiniMax-H3/blob/e5eb578a89295337b8ff433a035929ce0279e0b6/vae/minimax_h3_audio_vae_fp32.safetensors",
+      "modes": [
+        "Reference to video",
+        "First + last frame"
+      ],
+      "size_bytes": 605254808,
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "manual": false,
+      "gated": false,
+      "note": "Required for generated audio in reference/endpoint modes. Video inpainting retains source audio and does not load this file.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/MiniMax-H3?blobs=true"
+    },
+    {
+      "id": "sam3",
+      "label": "SAM3.1 · Target and preserve masks",
+      "filename": "sam3.1_multiplex_fp16.safetensors",
+      "folder": "checkpoints",
+      "repo_id": "Comfy-Org/sam3.1",
+      "revision": "7bb8374780a725b4353ed31f3a9395c9742b5621",
+      "remote_path": "checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "download_url": "https://huggingface.co/Comfy-Org/sam3.1/resolve/7bb8374780a725b4353ed31f3a9395c9742b5621/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "page_url": "https://huggingface.co/Comfy-Org/sam3.1/blob/7bb8374780a725b4353ed31f3a9395c9742b5621/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "modes": [
+        "Reference to video",
+        "First + last frame",
+        "Video inpainting"
+      ],
+      "size_bytes": 1745546848,
+      "sha256": "9ba99c92703c2e8b4f47de2d34a539bb8e18923049e238b780d70dbe6368eb03",
+      "manual": false,
+      "gated": false,
+      "note": "Needed only when SAM3 target mode or a preserve description is used. This public Comfy-Org repack works with native ComfyUI SAM3; no external SAM3 node pack is required.",
+      "metadata_source": "https://huggingface.co/api/models/Comfy-Org/sam3.1?blobs=true"
+    }
+  ]
+}

@@ -744,6 +744,24 @@
       "sha256": "043e5a48e161610ef6c3ea974645220354d06fa618abca15f76d084812eb55c2",
       "auth": "none",
       "id": "mm-latent-up-3d"
+    },
+    "mm-lora-turbo-v4-600": {
+      "name": "MiniMax H3 Turbo V4 Step 600 pruned LoRA (drbaph)",
+      "url": "https://huggingface.co/drbaph/MiniMax-H3-Turbo-Lora-ComfyUI/resolve/bb2bc497cbaca89dadd0bcf1856eed4f8275be20/minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "destination": "models/loras/minimax_h3_turbo_v4_step600_pruned_comfyui.safetensors",
+      "size_bytes": 620285592,
+      "sha256": "4f95afb2ab503eac876ae5571f4d78b0e0fd0198b626a89f4b7727018ed198a9",
+      "auth": "none",
+      "id": "mm-lora-turbo-v4-600"
+    },
+    "mm-sam31": {
+      "name": "SAM3.1 multiplex FP16 (Comfy-Org, native SAM3 checkpoint)",
+      "url": "https://huggingface.co/Comfy-Org/sam3.1/resolve/7bb8374780a725b4353ed31f3a9395c9742b5621/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "destination": "models/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "size_bytes": 1745546848,
+      "sha256": "9ba99c92703c2e8b4f47de2d34a539bb8e18923049e238b780d70dbe6368eb03",
+      "auth": "none",
+      "id": "mm-sam31"
     }
   },
   "nodes": [
@@ -1271,5 +1289,19 @@
     "ComfyUI-VideoHelperSuite",
     "ComfyUI-KJNodes",
     "Comfyui_Minimax_h3_latent_Upscaler"
+  ],
+  "minimax_swap_3_files": [
+    "mm-ref2va",
+    "mm-lora-turbo-v4-600",
+    "r2v-lora-turbo-8step",
+    "mm-enc-nvfp4",
+    "mm-vae-int8",
+    "mm-vae-audio",
+    "mm-sam31"
+  ],
+  "minimax_swap_3_nodes": [],
+  "minimax_swap_3_bundled_nodes": [
+    "ComfyUI-H3-Studio",
+    "ComfyUI-H3-Studio-Support"
   ]
 }
