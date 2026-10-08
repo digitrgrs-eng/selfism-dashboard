@@ -14,6 +14,8 @@ The refine recipe is NMKD x4 -> nearest-exact x0.25 -> Qwen VAE encode -> KSampl
 
 This replaces Full's previous second sampler; it does not add a third pass. Selfora, Millie, the original Skin Tone row, base sampling and Depth remain. The baked LLM instructions match the current dashboard's Recreate_SFW_prefix preset.
 
+Both Full and Full + Refine install `krea2RealVae_v10.safetensors` and `krea2_identity_edit_v1_2.safetensors` even while Identity Edit is bypassed, so its retained loaders have their required files. This does not enable Edit or change the main Qwen VAE.
+
 ## Optional 6gsc LoRAs
 
 All eight rows are present and **OFF**. The installer includes the seven available models:
