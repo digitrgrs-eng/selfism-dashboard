@@ -19,7 +19,7 @@ jobs:
       - name: Test Selfism installers and source fallback
         run: |
           python -m pip install -r requirements-launcher.txt pytest boto3
-          python -m pytest tests/test_selfism.py tests/test_private_r2.py tests/test_carousel.py -q
+          python -m pytest tests/test_selfism.py tests/test_private_r2.py tests/test_carousel.py tests/test_full.py tests/test_full_refine.py -q
       - name: Check space for registry layer transfer
         shell: bash
         run: |

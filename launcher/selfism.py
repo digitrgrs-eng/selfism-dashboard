@@ -21,7 +21,7 @@ from pydantic import BaseModel
 from launcher.private_r2 import r2_client, select_private
 
 # Profiles that need a ComfyUI able to load Selfora INT8 (int8_tensorwise).
-INT8_PROFILES = ('simple','aio','full','repair')
+INT8_PROFILES = ('simple','aio','full','full_refine','repair')
 MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
 MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
 MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
@@ -36,7 +36,7 @@ MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
 AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -94,6 +94,9 @@ async def resolve_sources(host, files):
     except Exception:
         preferred,messages={},['Private R2 unavailable; using fallback sources.']
     remaining=[i for i in range(len(files)) if i not in preferred]
+    missing_private=[files[i]['name'] for i in remaining if files[i].get('r2_required')]
+    if missing_private:
+        raise RuntimeError('Connect private R2 and verify these files before retrying: '+', '.join(missing_private))
     fallback,notes=await resolve_rapidcache(host,[files[i] for i in remaining])
     for i, selected in preferred.items():
         selected['_selfism_source']='R2'
@@ -127,7 +130,7 @@ def register(host):
                     # Keep signed URLs out of both UI errors and transfer diagnostics.
                     message=host.redacted_for_export(str(exc))
                     host.diagnostics.fail_in_flight(message)
-                    if source == 'original':
+                    if source == 'original' or original.get('r2_required'):
                         raise RuntimeError(message) from None
                     # A corrupt partial must not be resumed against the next source.
                     # Network interruptions keep their valid partial data for resume.
@@ -412,10 +415,10 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/wan22_animate_god_mode.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('GOD Mode: load a reference image (start frame) and a driving video. Pose/face detection (ViTPose+YOLO), SAM2 mask, Wan 2.2 Animate 14B + LoRAs, RIFE 2x. Relight + LightX2V + Pusa + Fun MPS LoRAs are selected in the graph. Needs a large GPU and lots of VRAM/RAM.')
-                if profile in ('simple','aio','reference','carousel','full'):
+                if profile in ('simple','aio','reference','carousel','full','full_refine'):
                     data=json.loads((root/'selfism_workflows'/f'{profile}.json').read_text(encoding='utf-8'))
                     for n in data['nodes']:
-                        if n['type']=='UNETLoader' and profile in ('simple','aio','full'): n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
+                        if n['type']=='UNETLoader' and profile in ('simple','aio','full','full_refine'): n['widgets_values'][0]=Path(catalog['files'][workflow['precision']]['destination']).name
                         if profile in ('reference','carousel') and n['type']=='Power Lora Loader (rgthree)':
                             for row in n.get('widgets_values', []):
                                 if isinstance(row,dict) and row.get('lora')=='millie_000002750.safetensors':
@@ -427,12 +430,13 @@ def register(host):
                     # Keep the user's previously edited workflow instead of overwriting it.
                     filename={'reference':'10sorlabs_MILLIE_REFERENCE_DEPTH_v1.json',
                               'carousel':'Selfism_AIO_m1lli3_CAROUSEL_QWEN_2511_v1.json',
-                              'full':f'Selfism_FULL_{workflow["precision"]}_recreate_v1.json'}.get(profile,
+                              'full':f'Selfism_FULL_{workflow["precision"]}_recreate_v1.json',
+                              'full_refine':f'Selfism_FULL_{workflow["precision"]}_Refine_v1.json'}.get(profile,
                               f'Selfism_{profile}_{workflow["precision"]}_m1lli3.json')
                     dest=folder/filename
                     if not dest.exists(): dest.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
                     logs.append('Workflow saved: '+str(dest))
-                    if profile=='full':
+                    if profile in ('full','full_refine'):
                         # The Recreate workflow selects these LLM system presets by file name. A preset file on the pod
                         # overrides the text baked into the node, so keep the shipped files in sync with the workflow.
                         # Recreate_{SFW,NSFW}_{prefix,noprefix}.txt (v2, identity-safe) and
@@ -442,8 +446,10 @@ def register(host):
                         for preset in sorted((root/'selfism_workflows/presets').glob('Recreate_*.txt')):
                             (prompts/preset.name).write_bytes(preset.read_bytes())
                         logs.append('Recreate + Recreate FirstFrame LLM presets copied to '+str(prompts)+'. Restart ComfyUI if the prompter does not list them.')
-                    if profile=='full': logs.append('Upload your reference image. Millie LoRA is installed (first row of the Power Lora Loader).')
+                    if profile in ('full','full_refine'): logs.append('Upload your reference image. Millie LoRA is installed (first row of the Power Lora Loader).')
                     else: logs.append('Upload your reference image. Add your private Millie LoRA separately and enable its row.')
+                    if profile=='full_refine':
+                        logs.append('Refine uses Euler/simple, 6 steps, CFG 1, denoise 0.18. The REFINE switch selects base/refined output. All imported 6gsc LoRAs are OFF; Mystic v3 replaces v1. Yumi is an unavailable disabled placeholder. OpenPose row requires its separate control path before use.')
             finally:
                 if previous is None: os.environ.pop('PIP_CONSTRAINT',None)
                 else: os.environ['PIP_CONSTRAINT']=previous
@@ -486,14 +492,14 @@ def register(host):
         elif profile=='carousel':
             file_keys=catalog['carousel_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['carousel_nodes']]
-        elif profile=='full':
+        elif profile in ('full','full_refine'):
             # Kompletan workflow: only INT8 (default) or FP8; BF16 is intentionally not offered.
             precision=request.precision if 'precision' in request.model_fields_set else 'int8'
             if precision not in ('int8','fp8'):
                 raise HTTPException(400,'Kompletan workflow podržava samo Selfora INT8 ili FP8.')
             request=request.model_copy(update={'precision':precision})
-            file_keys=[precision]+catalog['full_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['full_nodes']]
+            file_keys=[precision]+catalog[profile+'_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='minimax':
             # MiniMax H3 Simply Advanced: exactly the default-active models of the workflow (R2 first, HF fallback).
             file_keys=catalog['minimax_files']
@@ -553,6 +559,10 @@ def register(host):
         # Resolve exact Civitai metadata before accepting a multi-GB transfer.
         async with httpx.AsyncClient(timeout=30,follow_redirects=True) as client:
             for f in files:
+                # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
+                # Do not require Civitai access merely to install verified private-R2 copies.
+                if profile=='full_refine' and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                    continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
                 if not token:
@@ -571,9 +581,9 @@ def register(host):
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile=='carousel' else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','carousel','full','repair','node'),
+                  'selfism_repair':profile in ('simple','aio','reference','carousel','full','full_refine','repair','node'),
                   'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
-                  'model_links':(copy.deepcopy(catalog['god_mode_links']) if profile=='god_mode' else (copy.deepcopy(catalog['full_links']) if profile=='full' else copy.deepcopy(catalog['reference_links']))) if profile in ('reference','carousel','full','god_mode') else []}
+                  'model_links':copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -581,6 +591,8 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
+        if profile=='full_refine':
+            return FileResponse(root/'selfism_workflows/full_refine.json',filename='Selfism_FULL_int8_Refine_v1.json')
         if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap'): raise HTTPException(404)
         if profile=='akatz_character_swap':
             return FileResponse(root/'selfism_workflows/akatz_character_swap.json',filename=AKATZ_CHARACTER_SWAP_WORKFLOW_NAME)
