@@ -1093,6 +1093,12 @@
       "repo": "https://github.com/evanspearman/ComfyMath.git",
       "ref": "c01177221c31b8e5fbc062778fc8254aeb541638",
       "install_requirements": true
+    },
+    {
+      "name": "comfyui-krea2-ostris-edit",
+      "repo": "https://github.com/ostris/ComfyUI-Krea2-Ostris-Edit.git",
+      "ref": "7756566160c4a1b24bb1bd9f0ff3ced1a83d7547",
+      "install_requirements": false
     }
   ],
   "simple_files": [
@@ -1477,6 +1483,42 @@
     {
       "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
+  ],
+  "6gsc_files": [
+    "krea-turbo",
+    "encoder",
+    "qwen-vae",
+    "nmkd",
+    "face",
+    "sam",
+    "dwpose-det",
+    "dwpose-pose",
+    "pose-lora",
+    "famegrid",
+    "6gsc-smartphone",
+    "6gsc-coherence",
+    "bloom",
+    "6gsc-snofs",
+    "lora-mystic-xxx"
+  ],
+  "6gsc_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit"
+  ],
+  "6gsc_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
   ]
 }
