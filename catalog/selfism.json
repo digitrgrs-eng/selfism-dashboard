@@ -832,6 +832,37 @@
       "sha256": "9ba99c92703c2e8b4f47de2d34a539bb8e18923049e238b780d70dbe6368eb03",
       "auth": "none",
       "id": "mm-sam31"
+    },
+    "6gsc-smartphone": {
+      "id": "6gsc-smartphone",
+      "name": "krea-smartphone-photo-slider.safetensors",
+      "destination": "models/loras/krea-smartphone-photo-slider.safetensors",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/loras/krea-smartphone-photo-slider.safetensors",
+      "size_bytes": 28627768,
+      "sha256": "6468a57747ee8953036aedc28eba2034ad6355789151f4f85ef63260ed3fa2ce",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 model. Requires the dashboard R2 connection. Optional in Full + Refine; default OFF."
+    },
+    "6gsc-coherence": {
+      "id": "6gsc-coherence",
+      "name": "Photografic Scene Coherence V1.5.safetensors",
+      "destination": "models/loras/Photografic Scene Coherence V1.5.safetensors",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/loras/Photografic%20Scene%20Coherence%20V1.5.safetensors",
+      "size_bytes": 228588976,
+      "sha256": "8281eb4a5d30beacfbf849d7b6f64bab57f72e7c79b6464faf60740625a2fed5",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 model. Requires the dashboard R2 connection. Optional in Full + Refine; default OFF."
+    },
+    "6gsc-snofs": {
+      "id": "6gsc-snofs",
+      "name": "SNOFS Krea v1.4 LoRA",
+      "url": "https://huggingface.co/gravedigga/loras/resolve/main/snofs_krea_v1_4.safetensors",
+      "destination": "models/loras/snofs_krea_v1_4.safetensors",
+      "size_bytes": 1562410296,
+      "sha256": "767888edde83003f14cf930f13f174fe2a7431e252a515ddf04bd93d382a8932",
+      "auth": "none"
     }
   },
   "nodes": [
@@ -1382,5 +1413,70 @@
     "mm-vae-int8",
     "mm-vae-audio"
   ],
-  "akatz_character_swap_nodes": []
+  "akatz_character_swap_nodes": [],
+  "full_refine_files": [
+    "encoder",
+    "qwen-vae",
+    "llm",
+    "mmproj",
+    "nomos",
+    "upscale",
+    "span",
+    "skin",
+    "sam",
+    "face-v9",
+    "eyes",
+    "hair",
+    "depth",
+    "depth-anything",
+    "millie",
+    "lora-skin-tone",
+    "lora-peephole",
+    "lora-light",
+    "lora-lowres",
+    "lora-detail",
+    "lora-warmlight",
+    "lora-amateur",
+    "lora-waist",
+    "lora-pantyhose",
+    "lora-wetness",
+    "nmkd",
+    "lora-mystic-xxx",
+    "famegrid",
+    "bloom",
+    "pose-lora",
+    "6gsc-smartphone",
+    "6gsc-coherence",
+    "6gsc-snofs"
+  ],
+  "full_refine_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI_tinyterraNodes",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-Custom-Scripts",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Face-Style-Preset-for-FaceDetailer-",
+    "ComfyUI-Krea2-Projector-Tuner",
+    "comfyui-krea2-controlnet",
+    "ComfyUI-OlmLUT",
+    "ComfyUI-VAE-Utils",
+    "comfyui-krea2edit",
+    "ComfyUI-Easy-Use",
+    "ComfyUI-post-processing-nodes",
+    "ComfyUI-RvTools_v2",
+    "comfyui_controlnet_aux",
+    "ComfyUI_essentials",
+    "ComfyUI_LayerStyle",
+    "ComfyUI_UltimateSDUpscale",
+    "ComfyUI-Artfat-Resolution"
+  ],
+  "full_refine_links": [
+    {
+      "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
+  ]
 }

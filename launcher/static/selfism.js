@@ -23,7 +23,7 @@
     for (const [id, f] of Object.entries(data.files)) {
       const row = document.createElement('div'); row.className = 'sf-row';
       const label = document.createElement('div');
-      label.append(link(f.name, f.url));
+      label.append(f.r2_required ? document.createTextNode(f.name) : link(f.name, f.url));
       const small = document.createElement('small'); small.textContent = f.destination;
       label.append(small);
       if (f.description) { const note = document.createElement('small'); note.textContent = f.description; label.append(note); }
@@ -60,7 +60,7 @@
     error.textContent = ''; b.disabled = true;
     try {
       await json('/api/selfism/install', {method:'POST', body:JSON.stringify({
-        profile:b.dataset.sfAction, item:b.dataset.sfItem || '', precision:(b.dataset.sfAction === 'full' ? panel.querySelector('#sf-full-precision') : panel.querySelector('#sf-precision')).value
+        profile:b.dataset.sfAction, item:b.dataset.sfItem || '', precision:(b.dataset.sfAction === 'full_refine' ? panel.querySelector('#sf-refine-precision') : b.dataset.sfAction === 'full' ? panel.querySelector('#sf-full-precision') : panel.querySelector('#sf-precision')).value
       })});
       await refresh();
     } catch (e) { error.textContent = e.message; b.disabled = false; }
