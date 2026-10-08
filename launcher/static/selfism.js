@@ -25,7 +25,9 @@
       const label = document.createElement('div');
       label.append(link(f.name, f.url));
       const small = document.createElement('small'); small.textContent = f.destination;
-      label.append(small); row.append(label, button('Download', 'model', id)); models.append(row);
+      label.append(small);
+      if (f.description) { const note = document.createElement('small'); note.textContent = f.description; label.append(note); }
+      row.append(label, button('Download', 'model', id)); models.append(row);
     }
     for (const n of data.nodes) {
       const row = document.createElement('div'); row.className = 'sf-row';

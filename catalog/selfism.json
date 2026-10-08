@@ -428,6 +428,76 @@
       "civitai_version": 3079282,
       "civitai_file": 2960993
     },
+    "lora-krea2-realism-gokay": {
+      "name": "Krea 2 Realism LoRA (gokaygokay)",
+      "url": "https://huggingface.co/gokaygokay/Krea-2-Realism-LoRA/resolve/32f0436ac10e985134364e7555898c9f121a46ce/krea2_realism_lora.safetensors",
+      "destination": "models/loras/krea2_realism_lora.safetensors",
+      "size_bytes": 469288512,
+      "sha256": "6c38a7934c54a56e0f67753660a4500a094d6dce28a0ee4a0d1dc9f4975d32d2",
+      "auth": "none",
+      "description": "Krea 2 LoRA · Opšti realizam za Krea 2 Turbo, običan opisni prompt. Jačina 0.7–1.0 (autor ~1.0, 0.7–0.8 za blaži efekat). Trigger: nema.",
+      "id": "lora-krea2-realism-gokay"
+    },
+    "lora-krea2-realism-v2": {
+      "name": "Krea2-realism-V2 (RudySen)",
+      "url": "https://civitai.com/api/download/models/3090634?fileId=2970148",
+      "destination": "models/loras/Krea2-realism-V2.safetensors",
+      "size_bytes": 1562410344,
+      "sha256": "fb0048ce3340adc2842ccfcc1a9a61a9773b6628b01ae5a2e139ca9c679e715d",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · Realističnije teksture, svetlo i lica, radi i za NSFW; kosa ume da bude šumna. Jačina 1.0–2.0 (autor 1.0 opšte, 1.5–2.0 za NSFW). Trigger: nema.",
+      "id": "lora-krea2-realism-v2"
+    },
+    "lora-candid-snap": {
+      "name": "Casual Snapshot Realism krea2 V2",
+      "url": "https://civitai.com/api/download/models/3371956?fileId=3263556",
+      "destination": "models/loras/candid_snap_krea2_v2.safetensors",
+      "size_bytes": 234702976,
+      "sha256": "cca51103c5183ecf229df990aad7f4031c63990d1a271e5f774bee53c56f172e",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · Nesavršene amaterske fotke s telefona: blic, loš balans belog, meki fokus, šum. Jačina 1.0–1.5. Trigger: candid_snap.",
+      "id": "lora-candid-snap"
+    },
+    "lora-summervibes-skin": {
+      "name": "Realism Enhancer Krea2 (SummerVibesHM)",
+      "url": "https://civitai.com/api/download/models/3065628?fileId=2944265",
+      "destination": "models/loras/SummerVibesHM_krea2_epoch8.safetensors",
+      "size_bytes": 228587200,
+      "sha256": "c6677a265f3e469a6e1521cf46ae66c9ae3b0f1569dfee13394a22f3cafcf791",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · Samo koža: tekstura i realističnost kože. Jačina 0.4–0.6. Trigger: nema.",
+      "id": "lora-summervibes-skin"
+    },
+    "lora-mystic-xxx": {
+      "name": "[KREA 2] Mystic XXX v3",
+      "url": "https://civitai.com/api/download/models/3116175?fileId=2996388",
+      "destination": "models/loras/MysticXXX_KREA2_v3.safetensors",
+      "size_bytes": 228587304,
+      "sha256": "3437fb03a86c0a3be180b3da67f6a042a13d928d79d46b8835c3d04be6ec4382",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · NSFW. Jačina 0.55–0.6 uz Millie 1.0; autor preporučuje euler/beta, 12 koraka na turbo. Trigger: nema.",
+      "id": "lora-mystic-xxx"
+    },
+    "lora-better-pussy": {
+      "name": "Krea2 – Better Pussy v4.2.1",
+      "url": "https://civitai.com/api/download/models/3288922?fileId=3173333",
+      "destination": "models/loras/krea2_better_pussy_poses_v4.2.1.safetensors",
+      "size_bytes": 228587784,
+      "sha256": "35d7a9a858c12d806ea42bc38a31751610e38c0b9c54f634a4ac13f66ebe5968",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · Anatomski detalj (NSFW), uključi samo kad scena to traži. Jačina 0.7 (autor 0.7–0.95). Trigger: anatomy_detail.",
+      "id": "lora-better-pussy"
+    },
+    "krea2-stable-yogi-realism": {
+      "name": "Realism by Stable Yogi Krea2 v3.0 Extended (FP8 scaled)",
+      "url": "https://civitai.com/api/download/models/3329215?fileId=3218460",
+      "destination": "models/diffusion_models/realismByStableYogi_v30INT8FP8Extended_3218460.safetensors",
+      "size_bytes": 14128290360,
+      "sha256": "3ec3c673d467e0832ad1324fafa8eed5cde9e9f2e250b399d07245e63c904191",
+      "auth": "civitai",
+      "description": "Krea 2 checkpoint (nije LoRA) · Biraš ga u Load Diffusion Model umesto Krea 2 Turbo; isti Qwen3-VL encoder i Qwen-Image VAE. 8 koraka CFG 1 (brzo) ili 12 koraka CFG 1.5 (najbolje), CFG najviše 2.5, euler/simple. Trigger: nema (reč \"asian\" daje azijsko lice).",
+      "id": "krea2-stable-yogi-realism"
+    },
     "millie": {
       "name": "Millie LoRA (millie_000002750)",
       "url": "https://huggingface.co/daneheh/millie/resolve/b5cf56c415179eb9bb056e8bcbf4597da838b213/millie_000002750.safetensors",
