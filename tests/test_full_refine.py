@@ -71,10 +71,12 @@ def test_all_eight_6gsc_loras_are_retained_off_with_latest_mystic():
     for name,strength in expected.items():
         assert rows[name]['on'] is False and rows[name]['strength']==strength
     assert rows['millie_000002750.safetensors']['on'] is True
-    names={Path(CATALOG['files'][k]['destination']).name for k in CATALOG['full_refine_files']}
+    names={Path(CATALOG['files'][k]['destination']).name for k in CATALOG['full_refine_files'] + ['int8', 'fp8']}
     assert set(rows)-names=={'Yumi_000002250.safetensors'}
     for n in all_nodes(WORKFLOW):
-        if n['type'] in ('UpscaleModelLoader','SAMLoader','Krea2ControlLoRALoader','CLIPLoader'):
+        if n['type'] in ('UNETLoader','VAELoader','LoraLoaderModelOnly','UpscaleModelLoader','SAMLoader',
+                         'Krea2ControlLoRALoader','CLIPLoader','UltralyticsDetectorProvider',
+                         'DepthAnythingV2Preprocessor'):
             assert Path(n['widgets_values'][0]).name in names
 
 
@@ -85,6 +87,7 @@ def test_new_card_installs_full_dependencies_without_civitai_lookup(monkeypatch,
     r, captured, html=start_install(monkeypatch,body)
     assert r.status_code==200
     assert captured['precision']==(precision or 'int8')
+    assert {'edit', 'edit-vae'} <= {f['id'] for f in captured['files']}
     assert {f['id'] for f in captured['files']}==set(CATALOG['full_refine_files'])|{precision or 'int8'}
     assert {n['name'] for n in captured['custom_nodes']}==set(CATALOG['full_nodes'])
     assert captured['model_links']==CATALOG['full_links']

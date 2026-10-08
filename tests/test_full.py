@@ -92,10 +92,8 @@ def test_full_card_size_matches_catalog():
     assert f'{(base+files["fp8"]["size_bytes"])/1e9:.1f}'.replace('.', ',') + ' GB (FP8)' in html
 
 
-# Refs that exist only in the bypassed (mode 4) Identity-Edit branch of the Recreate workflow. Nothing downstream of them
-# reaches an output, so "Instaliraj sve" intentionally does not download them (still available via single-model install).
-EDIT_MODE_ONLY = {'krea2_identity_edit_v1_2.safetensors', 'krea2RealVae_v10.safetensors'}
-REMOVED_FROM_FULL = {'edit', 'edit-vae', 'llm-fable', 'mmproj-fable', 'pose-lora', 'hand', 'dwpose-det', 'dwpose-pose'}
+# Include model references even in bypassed Edit branches: the UI still validates them.
+REMOVED_FROM_FULL = {'llm-fable', 'mmproj-fable', 'pose-lora', 'hand', 'dwpose-det', 'dwpose-pose'}
 RECREATE_PRESETS = [f'Recreate_{a}_{b}.txt' for a in ('SFW', 'NSFW') for b in ('prefix', 'noprefix')]
 FIRSTFRAME_PRESETS = [f'Recreate_FirstFrame_{a}_{b}.txt' for a in ('SFW', 'NSFW') for b in ('prefix', 'noprefix')]
 ALL_PRESETS = RECREATE_PRESETS + FIRSTFRAME_PRESETS
@@ -104,7 +102,7 @@ ALL_PRESETS = RECREATE_PRESETS + FIRSTFRAME_PRESETS
 def test_full_is_exactly_the_recreate_file_set():
     full = set(CATALOG['full_files'])
     assert not REMOVED_FROM_FULL & full
-    assert {'millie', 'llm', 'mmproj'} <= full
+    assert {'millie', 'llm', 'mmproj', 'edit', 'edit-vae'} <= full
     files = CATALOG['files']
     assert files['llm']['destination'] == 'models/LLM/RVN-Q4_K_M-multilingual-mtp.gguf'
     assert files['mmproj']['destination'] == 'models/LLM/mmproj-Qwen3.8-27B-Q8_0.gguf'
@@ -131,7 +129,7 @@ def test_full_workflow_download_and_static_model_coverage():
         t, v = n['type'], n.get('widgets_values')
         if t in ('UNETLoader', 'VAELoader', 'CLIPLoader', 'UpscaleModelLoader', 'SAMLoader',
                  'Krea2ControlLoRALoader', 'DepthAnythingV2Preprocessor', 'LoraLoaderModelOnly'):
-            assert Path(v[0]).name in names | EDIT_MODE_ONLY, (t, v[0])
+            assert Path(v[0]).name in names, (t, v[0])
         if t == 'UltralyticsDetectorProvider':
             assert Path(v[0]).name in names, v[0]
         if t == 'ArtfatLLMPrompter':

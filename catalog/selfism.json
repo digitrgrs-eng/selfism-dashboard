@@ -1187,6 +1187,8 @@
   "full_files": [
     "encoder",
     "qwen-vae",
+    "edit-vae",
+    "edit",
     "llm",
     "mmproj",
     "nomos",
@@ -1423,6 +1425,8 @@
   "full_refine_files": [
     "encoder",
     "qwen-vae",
+    "edit-vae",
+    "edit",
     "llm",
     "mmproj",
     "nomos",
