@@ -8,6 +8,7 @@ selfism_workflows/minimax_h3_simply_advanced.json -text
 selfism_workflows/minimax_swap_1.json -text
 selfism_workflows/minimax_swap_2.json -text
 selfism_workflows/minimax_swap_3.json -text
+selfism_workflows/sources/6gsc_original.json -text
 # MiniMax H3 Studio node packs (local, non-git) shipped byte-for-byte; mixed CRLF/LF must not be normalised.
 bundled_nodes/ComfyUI-H3-Studio/** -text
 bundled_nodes/ComfyUI-H3-Studio-Support/** -text
