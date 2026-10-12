@@ -555,6 +555,126 @@ def normalized_git_remote(url: str) -> str:
     return normalized
 
 
+# --- Git for custom nodes -------------------------------------------------------------
+#
+# A pod installing the Hearmeman ImageToImage card failed every node pack with
+#   fatal: could not read Username for 'https://github.com': No such device or address
+#   fatal: could not fetch <sha> from promisor remote
+#   warning: Clone succeeded, but checkout failed
+# The clones were partial (--filter=blob:none), so checkout had to go back to GitHub for
+# every blob. GitHub answers bursts of anonymous requests from one IP (six node packs at
+# once, from a shared RunPod egress) with 401/429, and a 401 makes git ask for a username
+# on a terminal the pod does not have. The clone itself had succeeded; only the lazy
+# blob fetch was refused.
+#
+# So: full clones (one request, no lazy fetches), git never prompts, no credential helper
+# can intercept, transient refusals are retried with backoff, and when GitHub still says
+# no the pinned commit is downloaded as a codeload tarball. A tarball install is not a
+# Git repository; SOURCE_MARKER records where it came from so the next run recognises it.
+
+GIT_RETRY_DELAYS: tuple[float, ...] = (5.0, 15.0, 30.0)
+SOURCE_MARKER = ".selfism-source.json"
+
+
+def git_env() -> dict[str, str]:
+    env = dict(os.environ)
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env["GCM_INTERACTIVE"] = "never"
+    return env
+
+
+def git_command(*args: str | Path) -> tuple[str | Path, ...]:
+    # An empty credential.helper resets any helper list from system or global config,
+    # so nothing can prompt or substitute a stale token for a public repository.
+    return ("git", "-c", "credential.helper=", *args)
+
+
+async def run_git(run: Any, *args: str | Path, timeout: float) -> tuple[int, str]:
+    return await run(*git_command(*args), timeout=timeout, env=git_env())
+
+
+async def run_git_with_retries(
+    run: Any,
+    *args: str | Path,
+    timeout: float,
+    before_retry: Any = None,
+) -> tuple[int, str]:
+    """Retry a git command that exited non-zero. Raises (timeout, cancel) are not retried."""
+    returncode, output = await run_git(run, *args, timeout=timeout)
+    for attempt, delay in enumerate(GIT_RETRY_DELAYS, start=2):
+        if not returncode:
+            break
+        print(
+            f"Selfism launcher: git {args[0] if args else ''} failed; retrying in "
+            f"{delay:.0f}s (attempt {attempt}). {output[-200:].strip()}",
+            flush=True,
+        )
+        await asyncio.sleep(delay)
+        if before_retry is not None:
+            before_retry()
+        returncode, output = await run_git(run, *args, timeout=timeout)
+    return returncode, output
+
+
+def github_tarball_url(repo: str, ref: str) -> str:
+    parts = urlsplit(repo).path.strip("/").removesuffix(".git").split("/")
+    if (
+        len(parts) != 2
+        or not all(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", part) for part in parts)
+        or not re.fullmatch(r"[0-9a-fA-F]{40}|HEAD", ref)
+    ):
+        raise RuntimeError(f"Cannot build an archive URL for {repo}.")
+    return f"https://codeload.github.com/{parts[0]}/{parts[1]}/tar.gz/{ref}"
+
+
+def read_source_marker(destination: Path) -> dict[str, Any] | None:
+    marker = destination / SOURCE_MARKER
+    if not marker.is_file():
+        return None
+    try:
+        data = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _extract_tarball(archive: Path, target: Path) -> None:
+    import tarfile
+
+    with tarfile.open(archive, "r:gz") as bundle:
+        bundle.extractall(target, filter="data")
+
+
+async def download_github_tarball(repo: str, ref: str, destination: Path) -> None:
+    """Replace destination with the GitHub archive of ref, plus a SOURCE_MARKER."""
+    url = github_tarball_url(repo, ref)
+    work = destination.parent / f".{destination.name}.tarball"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    try:
+        archive = work / "source.tar.gz"
+        timeout = httpx.Timeout(connect=30, read=120, write=30, pool=30)
+        async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+            async with client.stream("GET", url) as response:
+                response.raise_for_status()
+                with archive.open("wb") as handle:
+                    async for chunk in response.aiter_bytes():
+                        handle.write(chunk)
+        extracted = work / "extracted"
+        await asyncio.to_thread(_extract_tarball, archive, extracted)
+        roots = list(extracted.iterdir())
+        if len(roots) != 1 or not roots[0].is_dir():
+            raise RuntimeError(f"Unexpected archive layout from {url}.")
+        (roots[0] / SOURCE_MARKER).write_text(
+            json.dumps({"repo": repo, "ref": ref, "source": "github-tarball"}),
+            encoding="utf-8",
+        )
+        shutil.rmtree(destination, ignore_errors=True)
+        os.replace(roots[0], destination)
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
 def _validate_catalog(data: dict[str, Any]) -> None:
     workflows = data.get("workflows")
     if not isinstance(workflows, list):
@@ -2131,8 +2251,8 @@ class CustomNodeController:
 
     async def _origin_url(self, destination: Path) -> str:
         try:
-            returncode, output = await self._run_process(
-                "git",
+            returncode, output = await run_git(
+                self._run_process,
                 "-C",
                 destination,
                 "remote",
@@ -2169,7 +2289,12 @@ class CustomNodeController:
             )
 
             if destination.exists():
-                existing_origin = await self._origin_url(destination)
+                marker = read_source_marker(destination)
+                existing_origin = (
+                    str(marker.get("repo", ""))
+                    if marker is not None
+                    else await self._origin_url(destination)
+                )
                 if existing_origin and normalized_git_remote(existing_origin) == normalized_git_remote(item.url):
                     self.update(
                         item,
@@ -2193,19 +2318,26 @@ class CustomNodeController:
                 message=f"Cloning {item.name}...",
                 percent=12,
             )
-            returncode, output = await self._run_process(
-                "git",
+            # Full clone: a partial one fetches blobs lazily at checkout, and GitHub
+            # refusing those (401 -> credential prompt) is what broke pods. See git_env.
+            staging_path = staging
+            returncode, output = await run_git_with_retries(
+                self._run_process,
                 "clone",
-                "--filter=blob:none",
                 "--single-branch",
                 item.url,
                 staging,
                 timeout=600,
+                before_retry=lambda: shutil.rmtree(staging_path, ignore_errors=True),
             )
             if returncode:
-                raise RuntimeError(
-                    f"Git could not clone this custom node: {output[-500:]}"
-                )
+                try:
+                    await download_github_tarball(item.url, "HEAD", staging)
+                except Exception as exc:
+                    raise RuntimeError(
+                        f"Git could not clone this custom node: {output[-500:]} "
+                        f"(archive download also failed: {exc})"
+                    ) from exc
 
             self.update(item, percent=74, message="Repository cloned.")
             requirements = staging / "requirements.txt"
@@ -4173,30 +4305,60 @@ print(sageattention.__file__, triton.__version__)
         if not destination.is_relative_to(CUSTOM_NODES_DIR.resolve()):
             raise RuntimeError(f"Unsafe custom node destination: {name}")
 
-        if not destination.exists():
+        async def from_archive(reason: str) -> None:
+            # Last resort when GitHub keeps refusing git: the pinned commit as a tarball.
+            step("downloading the pinned version archive")
+            print(
+                f"Selfism launcher: {name}: git failed, using the commit archive. "
+                f"{reason[-300:].strip()}",
+                flush=True,
+            )
+            try:
+                await download_github_tarball(repo, ref, destination)
+            except InstallCancelled:
+                raise
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Could not install custom node {name}: {reason[-500:]} "
+                    f"(archive download also failed: {exc})"
+                ) from exc
+
+        installed = False
+        if destination.exists():
+            marker = read_source_marker(destination)
+            if marker is not None:
+                # A previous archive install: not a Git repository, identified by marker.
+                if normalized_git_remote(str(marker.get("repo", ""))) != normalized_git_remote(repo):
+                    raise RuntimeError(
+                        f"The existing {name} folder is not the expected Git repository."
+                    )
+                if str(marker.get("ref", "")).lower() == ref.lower():
+                    installed = True
+                else:
+                    # An archive of another commit cannot be fetched into; start over.
+                    shutil.rmtree(destination, ignore_errors=True)
+
+        if installed:
+            pass
+        elif not destination.exists():
             step("cloning")
             clone_started = time.monotonic()
             try:
-                returncode, output = await self._run_process(
-                    "git",
+                # No --filter: a partial clone fetches blobs lazily at checkout, and that
+                # second round of requests is what GitHub refused. See git_env.
+                returncode, output = await run_git_with_retries(
+                    self._run_process,
                     "clone",
-                    "--filter=blob:none",
                     repo,
                     destination,
                     timeout=600,
+                    before_retry=lambda: shutil.rmtree(destination, ignore_errors=True),
                 )
             except Exception:
-                # Any exit that is not a clean return leaves a partial directory here, and
-                # the cleanup below sits under `if returncode:` - which a raise never
-                # reaches. A cancel is one way in; the 600s timeout is another, and that
-                # one has been broken since the bound was added.
-                #
-                # What the partial directory costs: destination.exists() is true on the
-                # next attempt, so the clone is skipped, `git remote get-url origin` runs
-                # against a .git that never got that far, and the node fails with "The
-                # existing {name} folder is not the expected Git repository" - permanently,
-                # until somebody deletes it by hand. A cancel must not create a fault that
-                # a failure does not.
+                # Any exit that is not a clean return leaves a partial directory here,
+                # and the next attempt would find a folder it cannot identify ("not the
+                # expected Git repository") until somebody deletes it by hand. A cancel
+                # or a timeout must not create a fault that a failure does not.
                 #
                 # Only the clone needs this. A cancelled fetch or checkout leaves a valid
                 # repository that the next run recovers from on its own.
@@ -4205,12 +4367,11 @@ print(sageattention.__file__, triton.__version__)
             clone_seconds = time.monotonic() - clone_started
             if returncode:
                 shutil.rmtree(destination, ignore_errors=True)
-                raise RuntimeError(
-                    f"Could not install custom node {name}: {output[-500:]}"
-                )
+                await from_archive(output)
+                installed = True
         else:
-            returncode, origin = await self._run_process(
-                "git",
+            returncode, origin = await run_git(
+                self._run_process,
                 "-C",
                 destination,
                 "remote",
@@ -4222,53 +4383,87 @@ print(sageattention.__file__, triton.__version__)
                 raise RuntimeError(
                     f"The existing {name} folder is not the expected Git repository."
                 )
-
-        returncode, _ = await self._run_process(
-            "git",
-            "-C",
-            destination,
-            "cat-file",
-            "-e",
-            "--end-of-options",
-            f"{ref}^{{commit}}",
-            timeout=60,
-        )
-        if returncode:
-            step("fetching the pinned version")
-            returncode, output = await self._run_process(
-                "git",
+            # Repositories cloned by earlier releases are partial. Turn them into full
+            # ones so checkout never needs a lazy blob fetch again.
+            returncode, promisor = await run_git(
+                self._run_process,
                 "-C",
                 destination,
-                "fetch",
-                "--no-tags",
-                "--filter=blob:none",
+                "config",
+                "--get",
+                "remote.origin.promisor",
+                timeout=60,
+            )
+            if not returncode and promisor.strip().lower() == "true":
+                step("converting to a full clone")
+                for key in ("remote.origin.promisor", "remote.origin.partialclonefilter"):
+                    await run_git(
+                        self._run_process,
+                        "-C",
+                        destination,
+                        "config",
+                        "--unset",
+                        key,
+                        timeout=60,
+                    )
+                returncode, output = await run_git_with_retries(
+                    self._run_process,
+                    "-C",
+                    destination,
+                    "fetch",
+                    "--refetch",
+                    "--no-tags",
+                    "origin",
+                    timeout=900,
+                )
+                if returncode:
+                    await from_archive(output)
+                    installed = True
+
+        if not installed:
+            returncode, _ = await run_git(
+                self._run_process,
+                "-C",
+                destination,
+                "cat-file",
+                "-e",
                 "--end-of-options",
-                "origin",
+                f"{ref}^{{commit}}",
+                timeout=60,
+            )
+            if returncode:
+                step("fetching the pinned version")
+                returncode, output = await run_git_with_retries(
+                    self._run_process,
+                    "-C",
+                    destination,
+                    "fetch",
+                    "--no-tags",
+                    "--end-of-options",
+                    "origin",
+                    ref,
+                    timeout=600,
+                )
+                if returncode:
+                    await from_archive(output)
+                    installed = True
+
+        if not installed:
+            step("selecting the pinned version")
+            returncode, output = await run_git(
+                self._run_process,
+                "-C",
+                destination,
+                "checkout",
+                "--detach",
+                # No --end-of-options here: git checkout reads it as the argument to
+                # --detach ("does not take a path argument"). The 40-hex validation
+                # above is what keeps this ref from ever being parsed as an option.
                 ref,
                 timeout=600,
             )
             if returncode:
-                raise RuntimeError(
-                    f"Could not fetch the pinned version for {name}: {output[-500:]}"
-                )
-
-        step("selecting the pinned version")
-        returncode, output = await self._run_process(
-            "git",
-            "-C",
-            destination,
-            "checkout",
-            "--detach",
-            # No --end-of-options here: git checkout reads it as the argument to
-            # --detach ("does not take a path argument"). The 40-hex validation above
-            # is what keeps this ref from ever being parsed as an option.
-            ref,
-            timeout=600,
-        )
-        if returncode:
-            raise RuntimeError(
-                f"Could not select the pinned version for {name}: {output[-500:]}"
-            )
+                await from_archive(output)
 
         self.state.restart_required = True
         requirements = destination / "requirements.txt"

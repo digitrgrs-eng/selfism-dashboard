@@ -844,7 +844,7 @@ def test_custom_node_clone_requirements_and_existing_detection(
     first_state, second_state = asyncio.run(install_twice())
     destination = custom_nodes_dir / "Example-ComfyUI-Node"
 
-    assert first_state.status == "complete"
+    assert first_state.status == "complete", first_state.error
     assert first_state.restart_required is True
     assert second_state.status == "skipped"
     assert (destination / "__init__.py").exists()
@@ -4408,7 +4408,8 @@ def test_every_subprocess_the_custom_nodes_tab_starts_is_bounded(
     # And the branch that only runs when the folder is already there.
     recorded.clear()
     asyncio.run(controller._origin_url(custom_nodes / "Example-Node"))
-    assert recorded and recorded[0][1] == {"timeout": 60}
+    assert recorded and recorded[0][1].get("timeout") == 60
+    assert recorded[0][1]["env"]["GIT_TERMINAL_PROMPT"] == "0"
 
 
 def test_a_missing_build_backend_is_worth_a_retry() -> None:
