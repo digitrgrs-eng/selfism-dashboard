@@ -1589,5 +1589,27 @@
     "ComfyUI_essentials",
     "ComfyUI-Detail-Daemon",
     "ComfyUI-SeedVR2_VideoUpscaler"
+  ],
+  "recreate_hybrid_files": [
+    "krea-turbo-bf16",
+    "encoder",
+    "qwen35-pe-t2i-int8",
+    "qwen-vae",
+    "depth",
+    "depth-anything",
+    "millie",
+    "lora-candid-snap",
+    "lora-krea2-realism-v2",
+    "famegrid",
+    "seedvr2-7b-fp16",
+    "seedvr2-vae-fp16"
+  ],
+  "recreate_hybrid_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-KJNodes",
+    "comfyui-krea2-controlnet",
+    "comfyui_controlnet_aux",
+    "ComfyUI-Detail-Daemon",
+    "ComfyUI-SeedVR2_VideoUpscaler"
   ]
 }
