@@ -12,6 +12,12 @@ WHEEL = ('https://github.com/JamePeng/llama-cpp-python/releases/download/'
          'v0.4.1-cu128-linux-20260926/'
          'llama_cpp_python-0.4.1%2Bcu128-cp312-cp312-linux_x86_64.whl')
 
+# The wheel goes in with --no-deps (so pip cannot touch torch's cu pins), which left
+# llama_cpp's own runtime deps out: import failed on llama_cache.py with "No module named
+# 'diskcache'". Installed by bare name with no --upgrade, so anything already present
+# (numpy, jinja2, typing-extensions shipped with ComfyUI) is left exactly as it is.
+RUNTIME_DEPS = ('diskcache', 'numpy', 'jinja2', 'typing-extensions')
+
 VERIFY = '''
 import ctypes
 from pathlib import Path
@@ -68,6 +74,8 @@ def main():
     if version != '0.4.1+cu128' or probe.returncode:
         run([sys.executable, '-m', 'pip', 'install', '--disable-pip-version-check',
              '--force-reinstall', '--no-deps', '--timeout', '30', '--retries', '3', WHEEL], timeout=1800)
+    run([sys.executable, '-m', 'pip', 'install', '--disable-pip-version-check',
+         '--timeout', '30', '--retries', '3', *RUNTIME_DEPS], timeout=900)
     if importlib.metadata.version('torch') != before:
         raise SystemExit('PyTorch version changed unexpectedly.')
     run([sys.executable, '-c', VERIFY], env=env, timeout=120)
