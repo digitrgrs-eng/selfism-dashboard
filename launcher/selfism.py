@@ -36,7 +36,7 @@ MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
 AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -300,6 +300,13 @@ def register(host):
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
+                if profile=='hearmeman_i2i':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/'Hearmeman_ImageToImage.json'
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_i2i.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Hearmeman ImageToImage: load the character image and the image to recreate. Krea 2 Turbo BF16, Qwen 3.5 9B prompt writer, Detail Daemon and SeedVR2 7B upscale are installed. Add your Millie LoRA in the Power Lora Loader.')
                 if profile=='6gsc':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -499,6 +506,9 @@ def register(host):
         elif profile=='6gsc':
             file_keys=catalog['6gsc_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['6gsc_nodes']]
+        elif profile=='hearmeman_i2i':
+            file_keys=catalog['hearmeman_i2i_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['hearmeman_i2i_nodes']]
         elif profile=='carousel':
             file_keys=catalog['carousel_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['carousel_nodes']]
@@ -571,7 +581,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -590,8 +600,8 @@ def register(host):
         logs.clear()
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc') else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','6gsc','carousel','full','full_refine','repair','node'),
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i') else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','carousel','full','full_refine','repair','node'),
                   'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
         return await controller.start(workflow)
@@ -601,6 +611,8 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
+        if profile=='hearmeman_i2i':
+            return FileResponse(root/'selfism_workflows/hearmeman_i2i.json',filename='Hearmeman_ImageToImage.json')
         if profile=='6gsc':
             return FileResponse(root/'selfism_workflows/6gsc.json',filename='6gsc_dashboard_v1.json')
         if profile=='full_refine':

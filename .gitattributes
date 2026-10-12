@@ -12,3 +12,4 @@ selfism_workflows/sources/6gsc_original.json -text
 # MiniMax H3 Studio node packs (local, non-git) shipped byte-for-byte; mixed CRLF/LF must not be normalised.
 bundled_nodes/ComfyUI-H3-Studio/** -text
 bundled_nodes/ComfyUI-H3-Studio-Support/** -text
+selfism_workflows/hearmeman_i2i.json -text

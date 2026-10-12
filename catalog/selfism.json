@@ -863,6 +863,44 @@
       "size_bytes": 1562410296,
       "sha256": "767888edde83003f14cf930f13f174fe2a7431e252a515ddf04bd93d382a8932",
       "auth": "none"
+    },
+    "krea-turbo-bf16": {
+      "id": "krea-turbo-bf16",
+      "name": "Krea 2 Turbo BF16",
+      "url": "https://huggingface.co/Comfy-Org/Krea-2/resolve/main/diffusion_models/krea2_turbo_bf16.safetensors",
+      "destination": "models/diffusion_models/krea2_turbo_bf16.safetensors",
+      "size_bytes": 26283332608,
+      "sha256": "78bbf8f4165eda19cea3cb06c78089221932a39e2eed8af9da741f942c47ffb3",
+      "auth": "none"
+    },
+    "qwen35-pe-t2i-int8": {
+      "id": "qwen35-pe-t2i-int8",
+      "name": "qwen3.5_9b_qwen_image_2.1_pe_t2i.int8_convrot.safetensors",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/text_encoders/qwen3.5_9b_qwen_image_2.1_pe_t2i.int8_convrot.safetensors",
+      "destination": "models/text_encoders/qwen3.5_9b_qwen_image_2.1_pe_t2i.int8_convrot.safetensors",
+      "size_bytes": 9471072252,
+      "sha256": "9182abae56fe05459840a86d22abd21f972061c92fce032630af680c8c5178d3",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 model (Qwen-Image 2.1 PE T2I prompt writer, INT8 ConvRot). Requires the dashboard R2 connection."
+    },
+    "seedvr2-7b-fp16": {
+      "id": "seedvr2-7b-fp16",
+      "name": "SeedVR2 EMA 7B FP16",
+      "url": "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/seedvr2_ema_7b_fp16.safetensors",
+      "destination": "models/SEEDVR2/seedvr2_ema_7b_fp16.safetensors",
+      "size_bytes": 16479334424,
+      "sha256": "7b8241aa957606ab6cfb66edabc96d43234f9819c5392b44d2492d9f0b0bbe4a",
+      "auth": "none"
+    },
+    "seedvr2-vae-fp16": {
+      "id": "seedvr2-vae-fp16",
+      "name": "SeedVR2 EMA VAE FP16",
+      "url": "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/ema_vae_fp16.safetensors",
+      "destination": "models/SEEDVR2/ema_vae_fp16.safetensors",
+      "size_bytes": 501324814,
+      "sha256": "20678548f420d98d26f11442d3528f8b8c94e57ee046ef93dbb7633da8612ca1",
+      "auth": "none"
     }
   },
   "nodes": [
@@ -1098,6 +1136,18 @@
       "name": "comfyui-krea2-ostris-edit",
       "repo": "https://github.com/ostris/ComfyUI-Krea2-Ostris-Edit.git",
       "ref": "7756566160c4a1b24bb1bd9f0ff3ced1a83d7547",
+      "install_requirements": false
+    },
+    {
+      "name": "ComfyUI-Detail-Daemon",
+      "repo": "https://github.com/Jonseed/ComfyUI-Detail-Daemon.git",
+      "ref": "3394e44afea04ed0188fb37b21f0d9952469766b",
+      "install_requirements": false
+    },
+    {
+      "name": "ComfyUI-SeedVR2_VideoUpscaler",
+      "repo": "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git",
+      "ref": "4490bd1f482e026674543386bb2a4d176da245b9",
       "install_requirements": false
     }
   ],
@@ -1524,5 +1574,20 @@
       "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
+  ],
+  "hearmeman_i2i_files": [
+    "krea-turbo-bf16",
+    "encoder",
+    "qwen35-pe-t2i-int8",
+    "vae",
+    "seedvr2-7b-fp16",
+    "seedvr2-vae-fp16"
+  ],
+  "hearmeman_i2i_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-KJNodes",
+    "ComfyUI_essentials",
+    "ComfyUI-Detail-Daemon",
+    "ComfyUI-SeedVR2_VideoUpscaler"
   ]
 }
