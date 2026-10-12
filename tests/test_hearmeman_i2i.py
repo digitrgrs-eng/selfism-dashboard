@@ -9,9 +9,9 @@ from test_full import ROOT, CATALOG, start_install, m
 PATH=ROOT/'selfism_workflows/hearmeman_i2i.json'
 WORKFLOW=json.loads(PATH.read_text(encoding='utf-8'))
 CORE={'BasicGuider','BasicScheduler','CLIPLoader','CLIPTextEncode','LoadImage','PrimitiveStringMultiline','RandomNoise',
-      'RegexExtract','RegexReplace','ResolutionSelector','SamplerCustomAdvanced','SamplerEulerAncestral','SaveImage','String',
+      'RegexExtract','RegexReplace','ResolutionSelector','SamplerCustomAdvanced','SamplerEulerAncestral','SaveImage',
       'StringConcatenate','StringReplace','TextGenerate','UNETLoader','VAEDecode','VAEEncode','VAELoader'}
-PACKS={'Display Any (rgthree)':'rgthree-comfy','Power Lora Loader (rgthree)':'rgthree-comfy','ImageResizeKJv2':'ComfyUI-KJNodes',
+PACKS={'String':'ComfyLiterals','Display Any (rgthree)':'rgthree-comfy','Power Lora Loader (rgthree)':'rgthree-comfy','ImageResizeKJv2':'ComfyUI-KJNodes',
        'SimpleMathSlider+':'ComfyUI_essentials','DetailDaemonSamplerNode':'ComfyUI-Detail-Daemon',
        'SeedVR2LoadDiTModel':'ComfyUI-SeedVR2_VideoUpscaler','SeedVR2LoadVAEModel':'ComfyUI-SeedVR2_VideoUpscaler',
        'SeedVR2VideoUpscaler':'ComfyUI-SeedVR2_VideoUpscaler'}

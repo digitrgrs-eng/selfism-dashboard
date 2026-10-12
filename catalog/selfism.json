@@ -935,6 +935,12 @@
       "install_requirements": true
     },
     {
+      "name": "ComfyLiterals",
+      "repo": "https://github.com/M1kep/ComfyLiterals.git",
+      "ref": "bdddb08ca82d90d75d97b1d437a652e0284a32ac",
+      "install_requirements": false
+    },
+    {
       "name": "ComfyUI-KJNodes",
       "repo": "https://github.com/kijai/ComfyUI-KJNodes.git",
       "ref": "d3cfe21625e5170126ce06fbfcfe1d88108688c3",
@@ -1584,6 +1590,7 @@
     "seedvr2-vae-fp16"
   ],
   "hearmeman_i2i_nodes": [
+    "ComfyLiterals",
     "rgthree-comfy",
     "ComfyUI-KJNodes",
     "ComfyUI_essentials",
@@ -1605,6 +1612,7 @@
     "seedvr2-vae-fp16"
   ],
   "recreate_hybrid_nodes": [
+    "ComfyLiterals",
     "rgthree-comfy",
     "ComfyUI-KJNodes",
     "comfyui-krea2-controlnet",

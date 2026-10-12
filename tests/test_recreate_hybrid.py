@@ -11,7 +11,7 @@ WORKFLOW=json.loads(PATH.read_text(encoding='utf-8'))
 CORE={'BasicGuider','BasicScheduler','CLIPLoader','CLIPTextEncode','LoadImage','PrimitiveStringMultiline','RandomNoise',
       'RegexReplace','ImageScaleToTotalPixels','SamplerCustomAdvanced','SamplerEulerAncestral','SaveImage',
       'StringConcatenate','TextGenerate','UNETLoader','VAEDecode','VAEEncode','VAELoader','Note'}
-PACKS={'Display Any (rgthree)':'rgthree-comfy','Power Lora Loader (rgthree)':'rgthree-comfy','LazySwitchKJ':'ComfyUI-KJNodes',
+PACKS={'String':'ComfyLiterals','Display Any (rgthree)':'rgthree-comfy','Power Lora Loader (rgthree)':'rgthree-comfy','LazySwitchKJ':'ComfyUI-KJNodes',
        'DepthAnythingV2Preprocessor':'comfyui_controlnet_aux','Krea2ControlImageEncode':'comfyui-krea2-controlnet',
        'Krea2ControlLoRALoader':'comfyui-krea2-controlnet','Krea2ControlApply':'comfyui-krea2-controlnet',
        'DetailDaemonSamplerNode':'ComfyUI-Detail-Daemon',
