@@ -36,7 +36,7 @@ MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
 AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -203,6 +203,16 @@ def register(host):
                                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
             logs.append('MiniMax H3 Studio nodes installed: '+', '.join(s.name for s in sources)+'.')
 
+        async def _install_krast_nodes(self):
+            # KRASTv3 Carousel grid node is local (not on git): shipped in the image under bundled_nodes/.
+            self.update(stage='installing', message='Installing KRASTv3 Carousel node…', percent=95)
+            for name in catalog['krast_bundled_nodes']:
+                source=root/'bundled_nodes'/name
+                target=host.COMFYUI_DIR/'custom_nodes'/name
+                shutil.copytree(source, target, dirs_exist_ok=True,
+                                ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+            logs.append('KRASTv3 Carousel node installed: '+', '.join(catalog['krast_bundled_nodes'])+'.')
+
         async def _run_process(self, *command, timeout=None, env=None):
             # Stream bounded, redacted output for node installers and environment repair.
             process = await asyncio.create_subprocess_exec(*map(str,command),
@@ -295,6 +305,8 @@ def register(host):
                     await self._install_carousel_helper(python)
                 if workflow.get('selfism_profile') == 'minimax_swap_3':
                     await self._install_h3_studio_nodes(python)
+                if workflow.get('selfism_profile') == 'krast':
+                    await self._install_krast_nodes()
                 if workflow.get('selfism_repair'):
                     self.update(stage='installing',message='Repairing Qwen / CUDA environment…',percent=96)
                     rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
@@ -307,6 +319,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/recreate_hybrid.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Selfism Recreate Hybrid: load the reference scene image. Krea 2 Turbo BF16 + Millie LoRA, Qwen 3.5 9B scene prompt writer, Depth control (Depth Anything V2), Detail Daemon and optional SeedVR2 7B upscale are installed.')
+                if profile=='krast':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    for src,name in (('krast_recreate.json','KRAST_Recreate.json'),('krast_carousel.json','KRAST_Carousel.json')):
+                        dest=folder/name
+                        if not dest.exists(): dest.write_bytes((root/'selfism_workflows'/src).read_bytes())
+                        logs.append('Workflow saved: '+str(dest))
+                    logs.append('KRAST Recreate + Carousel: KRAST-V2 + Millie LoRA, Artfat RVN prompter, Depth control, res_2s (RES4LYF), KRASTv3 Carousel grid node and optional SeedVR2 7B upscale are installed. Not GPU-validated yet.')
                 if profile=='hearmeman_i2i':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -519,6 +539,9 @@ def register(host):
         elif profile=='recreate_hybrid':
             file_keys=catalog['recreate_hybrid_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['recreate_hybrid_nodes']]
+        elif profile=='krast':
+            file_keys=catalog['krast_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['krast_nodes']]
         elif profile=='carousel':
             file_keys=catalog['carousel_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['carousel_nodes']]
@@ -591,7 +614,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','recreate_hybrid') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','recreate_hybrid','krast') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -610,8 +633,8 @@ def register(host):
         logs.clear()
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid') else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','carousel','full','full_refine','repair','node'),
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast') else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','carousel','full','full_refine','repair','node'),
                   'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
         return await controller.start(workflow)
@@ -621,6 +644,10 @@ def register(host):
 
     @host.app.get('/api/selfism/workflow/{profile}')
     async def workflow_file(profile:str):
+        if profile=='krast_recreate':
+            return FileResponse(root/'selfism_workflows/krast_recreate.json',filename='KRAST_Recreate.json')
+        if profile=='krast_carousel':
+            return FileResponse(root/'selfism_workflows/krast_carousel.json',filename='KRAST_Carousel.json')
         if profile=='recreate_hybrid':
             return FileResponse(root/'selfism_workflows/recreate_hybrid.json',filename='Selfism_Recreate_Hybrid.json')
         if profile=='hearmeman_i2i':

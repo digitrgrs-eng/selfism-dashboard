@@ -901,6 +901,24 @@
       "size_bytes": 501324814,
       "sha256": "20678548f420d98d26f11442d3528f8b8c94e57ee046ef93dbb7633da8612ca1",
       "auth": "none"
+    },
+    "krast-v20": {
+      "name": "KRAST-V2 (krast_v20, Krea 2 finetune)",
+      "url": "https://huggingface.co/cusiman/Krea2_Collection/resolve/89b5fab22a93b2e10c1ff8a34b73cf6e037cec93/krast_v20.safetensors",
+      "destination": "models/diffusion_models/krast_v20.safetensors",
+      "size_bytes": 12829331808,
+      "sha256": "26546f02a3c4eeba130dd1c7f67de63a97eeb951f30b85c6d49cf67b10c27a4b",
+      "auth": "none",
+      "id": "krast-v20"
+    },
+    "lora-krea-amateur-v4": {
+      "name": "Aesthetic Amateur Photo Krea V4 LoRA",
+      "url": "https://huggingface.co/darken144/krea2assets/resolve/main/Krea_Amateur_V4.safetensors",
+      "destination": "models/loras/Krea_Amateur_V4.safetensors",
+      "size_bytes": 228588912,
+      "sha256": "0ad3b5092c99b4a1696df4ab07407775309da6c21d36c9a506f6b5ff153552ec",
+      "auth": "none",
+      "id": "lora-krea-amateur-v4"
     }
   },
   "nodes": [
@@ -1619,5 +1637,33 @@
     "comfyui_controlnet_aux",
     "ComfyUI-Detail-Daemon",
     "ComfyUI-SeedVR2_VideoUpscaler"
+  ],
+  "krast_files": [
+    "krast-v20",
+    "encoder",
+    "qwen-vae",
+    "millie",
+    "depth",
+    "depth-anything",
+    "llm",
+    "mmproj",
+    "seedvr2-7b-fp16",
+    "seedvr2-vae-fp16",
+    "lora-candid-snap",
+    "lora-krea-amateur-v4",
+    "6gsc-snofs",
+    "lora-krea2-realism-v2"
+  ],
+  "krast_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-KJNodes",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-controlnet",
+    "ComfyUI-SeedVR2_VideoUpscaler"
+  ],
+  "krast_bundled_nodes": [
+    "ComfyUI-KRASTv3-Carousel"
   ]
 }

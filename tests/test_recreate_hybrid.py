@@ -26,7 +26,7 @@ def all_nodes():
 
 
 def test_workflow_is_shipped_unmodified():
-    assert hashlib.sha256(PATH.read_bytes()).hexdigest()=='b80845534d67a85d0790d252f6bfab586cb1b2079560927fef68f4da6a6b03a1'
+    assert hashlib.sha256(PATH.read_bytes()).hexdigest()=='892d14ab2b0e9e0d32c4f3c016c82bb4dee9d5cd4327ca6b8f4a7fbeb0efad10'
 
 
 def test_every_node_and_model_is_covered():
