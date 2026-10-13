@@ -919,6 +919,53 @@
       "sha256": "0ad3b5092c99b4a1696df4ab07407775309da6c21d36c9a506f6b5ff153552ec",
       "auth": "none",
       "id": "lora-krea-amateur-v4"
+    },
+    "flux2-klein-9b": {
+      "id": "flux2-klein-9b",
+      "name": "FLUX.2 Klein 9B (bf16)",
+      "url": "https://huggingface.co/Kiro930/flux-2-klein-9b/resolve/3d330f1019c246d9989b1858936ba5d262b5ac9c/flux-2-klein-9b.safetensors",
+      "destination": "models/diffusion_models/flux-2-klein-9b.safetensors",
+      "size_bytes": 18157185168,
+      "sha256": "0975d6b77b5f510b99547d6724a208e36527df654e8f6134f59ece3f9f30da58",
+      "auth": "none"
+    },
+    "qwen3-8b-klein": {
+      "id": "qwen3-8b-klein",
+      "name": "Qwen 3 8B text encoder (Flux 2 Klein, bf16)",
+      "url": "https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b.safetensors",
+      "destination": "models/text_encoders/qwen_3_8b.safetensors",
+      "size_bytes": 16381517176,
+      "sha256": "f0ff9239d56269ca1d05e5f86da6a79fac111af464955681f11c7ab0ec5ef6c1",
+      "auth": "none"
+    },
+    "flux2-vae": {
+      "id": "flux2-vae",
+      "name": "flux2-vae.safetensors",
+      "url": "https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b/resolve/main/split_files/vae/flux2-vae.safetensors",
+      "destination": "models/vae/flux2-vae.safetensors",
+      "size_bytes": 336211292,
+      "sha256": "868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3",
+      "auth": "none"
+    },
+    "lora-famegrid-standard": {
+      "id": "lora-famegrid-standard",
+      "name": "Famegrid Standard Krea 2 LoRA",
+      "url": "https://civitai.com/api/download/models/3154245?type=Model&format=SafeTensor",
+      "destination": "models/loras/Famegrid Standard Krea 2.safetensors",
+      "size_bytes": 228587744,
+      "sha256": "40ce4ebd8af41f985ef7ff0b15c4989eacec155b9975c9649dbce00ba31fed46",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · Famegrid Standard v1 (influencer realizam). Trigger: famegrid."
+    },
+    "lora-ultra-real-krea2-v1": {
+      "id": "lora-ultra-real-krea2-v1",
+      "name": "UltraReal Krea 2 KR2_V1 LoRA",
+      "url": "https://civitai.com/api/download/models/3091374?type=Model&format=SafeTensor",
+      "destination": "models/loras/ultra_real_krea2_v1.safetensors",
+      "size_bytes": 228588920,
+      "sha256": "083edc5bf8b333dc1859dfd5ff937ead86f2977a4167e3bafd0c761ad3b24108",
+      "auth": "civitai",
+      "description": "Krea 2 LoRA · UltraReal KR2_V1 (bypassovan u workflow-u)."
     }
   },
   "nodes": [
@@ -1173,6 +1220,12 @@
       "repo": "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git",
       "ref": "4490bd1f482e026674543386bb2a4d176da245b9",
       "install_requirements": false
+    },
+    {
+      "name": "ComfyUI_Comfyroll_CustomNodes",
+      "repo": "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git",
+      "ref": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca",
+      "install_requirements": true
     }
   ],
   "simple_files": [
@@ -1665,5 +1718,28 @@
   ],
   "krast_bundled_nodes": [
     "ComfyUI-KRASTv3-Carousel"
+  ],
+  "krea_klein_files": [
+    "krea-turbo-bf16",
+    "encoder",
+    "qwen-vae",
+    "flux2-klein-9b",
+    "qwen3-8b-klein",
+    "flux2-vae",
+    "lora-famegrid-standard",
+    "lora-ultra-real-krea2-v1",
+    "sam",
+    "face",
+    "llm",
+    "mmproj"
+  ],
+  "krea_klein_nodes": [
+    "rgthree-comfy",
+    "artfat-comfyui-llm-prompter",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Detail-Daemon",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI_Comfyroll_CustomNodes"
   ]
 }
