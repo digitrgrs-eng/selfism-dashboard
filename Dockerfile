@@ -19,8 +19,14 @@ FROM 10sorllabs/comfyui-workflow-launcher@sha256:d01908958aa33cc9117b478d81845d1
 # (tests/test_bake.py checks this). Launcher files are untouched.
 ARG COMFYUI_TAG=v0.38.1
 ARG COMFYUI_SHA=20ca544ee0436721d8eb5f544665e490609f72c8
+# The same RUN first installs OpenGL/EGL/GLES userspace for ComfyUI core GLSLShader
+# (Artfat Colorgrade grain); with it GLSLShader initializes via ANGLE on NVIDIA Vulkan.
 RUN --mount=type=bind,source=docker/bake_comfyui.sh,target=/tmp/bake_comfyui.sh \
-    COMFYUI_TAG="${COMFYUI_TAG}" COMFYUI_SHA="${COMFYUI_SHA}" bash /tmp/bake_comfyui.sh
+    apt-get update \
+    && apt-get install -y --no-install-recommends \
+       libgl1 libopengl0 libglu1-mesa libegl1 libegl-mesa0 libgl1-mesa-dri libgles2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && COMFYUI_TAG="${COMFYUI_TAG}" COMFYUI_SHA="${COMFYUI_SHA}" bash /tmp/bake_comfyui.sh
 
 ARG IMAGE_VERSION=dev
 LABEL org.opencontainers.image.title="Selfora / Selfism dashboard" \
