@@ -37,6 +37,15 @@
       "auth": "none",
       "id": "edit"
     },
+    "edit-v2": {
+      "name": "Krea 2 Identity Edit V2 LoRA",
+      "url": "https://huggingface.co/conradlocke/krea2-identity-edit/resolve/main/krea2_identity_edit_v2.safetensors",
+      "destination": "models/loras/krea2_identity_edit_v2.safetensors",
+      "size_bytes": 1828285728,
+      "sha256": "c53843f9451963a6cb3c22dc4975205056b93a6575fb9347dd2bc6e055ef9877",
+      "auth": "none",
+      "id": "edit-v2"
+    },
     "vae": {
       "name": "Wan2_1_VAE_fp32.safetensors",
       "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/8260d429d19fd7a72304cad059160b95d843913f/Wan2_1_VAE_fp32.safetensors",
@@ -1690,7 +1699,7 @@
     {
       "name": "comfyui-krea2edit",
       "repo": "https://github.com/lbouaraba/comfyui-krea2edit.git",
-      "ref": "86f886dac23013d88996e3a2e99093ba44d322fb",
+      "ref": "13ef60f20828949becada815d3cbc371eb5ccaab",
       "install_requirements": true
     },
     {
@@ -2012,7 +2021,8 @@
     "outfit",
     "skin-contrast",
     "llm-qwen35-9b",
-    "mmproj-qwen35-9b"
+    "mmproj-qwen35-9b",
+    "edit-v2"
   ],
   "selfism_lut_files": [
     "lut-apple-log-lut",

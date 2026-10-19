@@ -6,7 +6,7 @@ import pytest
 
 from tests.test_full import CATALOG, ROOT, s, start_install
 
-ADDONS = ['outfit', 'skin-contrast', 'llm-qwen35-9b', 'mmproj-qwen35-9b']
+ADDONS = ['outfit', 'skin-contrast', 'llm-qwen35-9b', 'mmproj-qwen35-9b', 'edit-v2']
 
 
 def test_addon_and_lut_metadata():
@@ -59,3 +59,12 @@ def test_full_refine_unchanged(monkeypatch):
     ids = {f['id'] for f in captured['files']}
     assert not (set(ADDONS) | set(CATALOG['selfism_lut_files'])) & ids
     assert captured['model_links'] == CATALOG['full_links']
+
+
+def test_identity_edit_v2_and_krea2edit_pin():
+    files = CATALOG['files']
+    assert files['edit-v2']['destination'] == 'models/loras/krea2_identity_edit_v2.safetensors'
+    assert files['edit-v2']['size_bytes'] == 1828285728
+    assert files['edit']['destination'] == 'models/loras/krea2_identity_edit_v1_2.safetensors'
+    pin = {n['name']: n['ref'] for n in CATALOG['nodes']}['comfyui-krea2edit']
+    assert pin == '13ef60f20828949becada815d3cbc371eb5ccaab'
