@@ -154,8 +154,8 @@
       "name": "Selfora v2.1 BF16",
       "url": "https://civitai.com/api/download/models/3231887?fileId=3114599",
       "destination": "models/diffusion_models/Selfora_v2_1_bf16.safetensors",
-      "size_bytes": 0,
-      "sha256": "",
+      "size_bytes": 25640190264,
+      "sha256": "eaa190215290367ad134267f5ae7422cde813fa1b4cfcfae946cd5869907fb6b",
       "auth": "civitai",
       "civitai_version": 3231887,
       "civitai_file": 3114599,
@@ -977,6 +977,629 @@
       "auth": "none",
       "r2_required": true,
       "description": "Private R2 model. Requires the dashboard R2 connection. Krea 2 refusal reduction LoRA; default OFF."
+    },
+    "outfit": {
+      "name": "krea_outfittransfer.safetensors",
+      "url": "https://huggingface.co/AliveAi/Krea-2-Edit-Outfit-Transfer/resolve/827dab8588b6cb261cf9ae580c417bc068740b7f/krea_outfittransfer.safetensors",
+      "destination": "models/loras/krea_outfittransfer.safetensors",
+      "size_bytes": 1142684152,
+      "sha256": "4d1033032a1a24bb9b09c44b44514c6791241ebc7b91ffe4f5edd70830a8804d",
+      "auth": "none",
+      "description": "Krea 2 Edit outfit transfer LoRA (AliveAi). Trigger: \"transfer the outfit\". Optional in the AIO / Full Edit branch.",
+      "id": "outfit"
+    },
+    "skin-contrast": {
+      "name": "1xSkinContrast-SuperUltraCompact.pth",
+      "url": "https://huggingface.co/risunobushi/1xSkinContrast/resolve/ff8d2620154c11eedd4e03c1c15b38bf330aaa71/1xSkinContrast-SuperUltraCompact.pth",
+      "destination": "models/upscale_models/1xSkinContrast-SuperUltraCompact.pth",
+      "size_bytes": 181474,
+      "sha256": "2713e618f12995f243aafd1963e1fcc23d49b5ae6f151c14e12b6ce65e711663",
+      "auth": "none",
+      "description": "Alternative skin-contrast model for the Skin Contrast | Detailer pass.",
+      "id": "skin-contrast"
+    },
+    "llm-qwen35-9b": {
+      "name": "Qwen3.5-9B-Claude-4.6-OS-AV-H-UNCENSORED-THINK-D_AU-Q5_K_S-imat.gguf",
+      "url": "https://huggingface.co/DavidAU/Qwen3.5-9B-Claude-4.6-OS-Auto-Variable-HERETIC-UNCENSORED-THINKING-MAX-NEOCODE-Imatrix-GGUF/resolve/fe8f15260575b0fbc324682a1556ca60169bec00/Qwen3.5-9B-Claude-4.6-OS-AV-H-UNCENSORED-THINK-D_AU-Q5_K_S-imat.gguf",
+      "destination": "models/LLM/Qwen3.5-9B-Claude-4.6-OS-AV-H-UNCENSORED-THINK-D_AU-Q5_K_S-imat.gguf",
+      "size_bytes": 7513449408,
+      "sha256": "dd9cd539ba94c693bb5657a606e20691d5726999e325ac88e3270b855f1275d5",
+      "auth": "none",
+      "description": "Artfat LLM Prompter alternative (~12 GB VRAM, the model Artfat uses in Selfism). Pair with its mmproj.",
+      "id": "llm-qwen35-9b"
+    },
+    "mmproj-qwen35-9b": {
+      "name": "Qwen3.5-9B-Claude-4.6-OS-AV-H-UNCENSORED-THINK-D_AU-mmproj-BF16.gguf",
+      "url": "https://huggingface.co/DavidAU/Qwen3.5-9B-Claude-4.6-OS-Auto-Variable-HERETIC-UNCENSORED-THINKING-MAX-NEOCODE-Imatrix-GGUF/resolve/fe8f15260575b0fbc324682a1556ca60169bec00/mmproj-BF16.gguf",
+      "destination": "models/LLM/Qwen3.5-9B-Claude-4.6-OS-AV-H-UNCENSORED-THINK-D_AU-mmproj-BF16.gguf",
+      "size_bytes": 921705024,
+      "sha256": "853698ce7aa6c7ba732478bad280240969ddf7b0fcbf93900046f63903a83383",
+      "auth": "none",
+      "description": "Vision mmproj for the Qwen3.5-9B prompter model (upstream file mmproj-BF16.gguf, renamed).",
+      "id": "mmproj-qwen35-9b"
+    },
+    "lut-apple-log-lut": {
+      "id": "lut-apple-log-lut",
+      "name": "Apple Log Lut.cube",
+      "destination": "models/luts/Apple Log Lut.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Apple%20Log%20Lut.cube",
+      "size_bytes": 116180,
+      "sha256": "7f4db18ef1aade563b05508938f04f916753b90e564c34ac5fec9f7570e7fad9",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-blue-inversion-curve-fun": {
+      "id": "lut-blue-inversion-curve-fun",
+      "name": "blue_inversion_curve_fun.cube",
+      "destination": "models/luts/blue_inversion_curve_fun.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/blue_inversion_curve_fun.cube",
+      "size_bytes": 137648,
+      "sha256": "ddb59a07c01e1647b402a51b33371f5d175ea1a7381afcc8c377a941c6d87654",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-bubblegum-dream": {
+      "id": "lut-bubblegum-dream",
+      "name": "bubblegum_dream.cube",
+      "destination": "models/luts/bubblegum_dream.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/bubblegum_dream.cube",
+      "size_bytes": 137648,
+      "sha256": "0d4d6d45823b7eb539a1109aea59d6a52e3719d3cb6dd57e053d29d3c4d3d517",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-cool-bright-65": {
+      "id": "lut-cool-bright-65",
+      "name": "Cool_Bright_65.cube",
+      "destination": "models/luts/Cool_Bright_65.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Cool_Bright_65.cube",
+      "size_bytes": 7414943,
+      "sha256": "2307ebfd793cf00fa47537e06d84e4ec3a96c88f98938a15bf5fb286e18365b1",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-curve-bump": {
+      "id": "lut-curve-bump",
+      "name": "curve_bump.cube",
+      "destination": "models/luts/curve_bump.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/curve_bump.cube",
+      "size_bytes": 137648,
+      "sha256": "12fdeef00c82ac075bb44915e2799b8ff7eb8267c023072b0b34789e2eac9af7",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-dynamic-saturated": {
+      "id": "lut-dynamic-saturated",
+      "name": "dynamic_saturated.cube",
+      "destination": "models/luts/dynamic_saturated.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/dynamic_saturated.cube",
+      "size_bytes": 137648,
+      "sha256": "6cf58c6fc8d73756188d6d1fc55fe6a9b47cf54836baadc73db1ea2868ecbc3f",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-fgcinebright": {
+      "id": "lut-fgcinebright",
+      "name": "FGCineBright.cube",
+      "destination": "models/luts/FGCineBright.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/FGCineBright.cube",
+      "size_bytes": 422012,
+      "sha256": "2576b0601be4d2932060e89a6e0b95d4913645d86b99555f631bdabdfda4fbe6",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-fgcinedrama": {
+      "id": "lut-fgcinedrama",
+      "name": "FGCineDrama.cube",
+      "destination": "models/luts/FGCineDrama.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/FGCineDrama.cube",
+      "size_bytes": 422011,
+      "sha256": "7f2310f219b9d7fc54f11284ae470c6467d9050da1a9840627117bc3756d2a60",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-fgcinewarm": {
+      "id": "lut-fgcinewarm",
+      "name": "FGCineWarm.cube",
+      "destination": "models/luts/FGCineWarm.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/FGCineWarm.cube",
+      "size_bytes": 422010,
+      "sha256": "8207f20f3da93f9234a4ecad4d7999b603a47fa7e45a90051aa15663b8cb32d6",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-filmic-bright-65": {
+      "id": "lut-filmic-bright-65",
+      "name": "Filmic_Bright_65.cube",
+      "destination": "models/luts/Filmic_Bright_65.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Filmic_Bright_65.cube",
+      "size_bytes": 7414945,
+      "sha256": "f40ae36a67bdbe583df485d115f6f5e890af25fa3c72e0d0687e3e52bdf3d1f3",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-filmic-dark-65": {
+      "id": "lut-filmic-dark-65",
+      "name": "Filmic_Dark_65.cube",
+      "destination": "models/luts/Filmic_Dark_65.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Filmic_Dark_65.cube",
+      "size_bytes": 7414943,
+      "sha256": "884fe6507f8cca5052f956a4df22f10104f09bb613e4e5ff1052df26354e8add",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-high-contrast": {
+      "id": "lut-high-contrast",
+      "name": "high_contrast.cube",
+      "destination": "models/luts/high_contrast.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/high_contrast.cube",
+      "size_bytes": 137648,
+      "sha256": "366e50629ca05c4a07f3aae93eb1372258f3741c94c21c0020fc7983eab153b5",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-life-is-a-lemon": {
+      "id": "lut-life-is-a-lemon",
+      "name": "life_is_a_lemon.cube",
+      "destination": "models/luts/life_is_a_lemon.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/life_is_a_lemon.cube",
+      "size_bytes": 137648,
+      "sha256": "df03b7aeff797618871b312d93048ff6d1e5d789709f0208281083cd01993407",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-only-blue": {
+      "id": "lut-only-blue",
+      "name": "only_blue.cube",
+      "destination": "models/luts/only_blue.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/only_blue.cube",
+      "size_bytes": 137648,
+      "sha256": "de933f1f79e954254bcd32be459d5616e1486a2ec34b80dc57ac776aa71fe3ab",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-only-green": {
+      "id": "lut-only-green",
+      "name": "only_green.cube",
+      "destination": "models/luts/only_green.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/only_green.cube",
+      "size_bytes": 137648,
+      "sha256": "07e007ae1a032f48e06e0fc5cf6f72a8dc0126763b5c05c672f70e89d34042c7",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-only-red": {
+      "id": "lut-only-red",
+      "name": "only_red.cube",
+      "destination": "models/luts/only_red.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/only_red.cube",
+      "size_bytes": 137648,
+      "sha256": "1b28bfb604466a54dece7dd4e7d3569d75de81091aa3f21cbbd24548afa7901b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-presetpro-fuji-provia": {
+      "id": "lut-presetpro-fuji-provia",
+      "name": "Presetpro  - Fuji Provia.cube",
+      "destination": "models/luts/Presetpro  - Fuji Provia.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Presetpro%20%20-%20Fuji%20Provia.cube",
+      "size_bytes": 884994,
+      "sha256": "b1af5684f72917e2a44e4b20bcb85f711880458e2ee6bae0f99b969549dd7275",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-presetpro-cine-grade": {
+      "id": "lut-presetpro-cine-grade",
+      "name": "Presetpro - Cine Grade .cube",
+      "destination": "models/luts/Presetpro - Cine Grade .cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Presetpro%20-%20Cine%20Grade%20.cube",
+      "size_bytes": 7078010,
+      "sha256": "711dab7eb826e7255b1eb1a317fef682a7776396b7c509e933c943e6d98bb76e",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-presetpro-ektachrome-1": {
+      "id": "lut-presetpro-ektachrome-1",
+      "name": "Presetpro - Ektachrome (1).cube",
+      "destination": "models/luts/Presetpro - Ektachrome (1).cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Presetpro%20-%20Ektachrome%20%281%29.cube",
+      "size_bytes": 884991,
+      "sha256": "39ef9ce4b57d1f4023d815fd2e0c62a0c47eea2879ee056964492e1f4bb354b6",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-presetpro-ektachrome": {
+      "id": "lut-presetpro-ektachrome",
+      "name": "Presetpro - Ektachrome.cube",
+      "destination": "models/luts/Presetpro - Ektachrome.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Presetpro%20-%20Ektachrome.cube",
+      "size_bytes": 884991,
+      "sha256": "39ef9ce4b57d1f4023d815fd2e0c62a0c47eea2879ee056964492e1f4bb354b6",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-presetpro-moody-grade": {
+      "id": "lut-presetpro-moody-grade",
+      "name": "Presetpro - Moody Grade.cube",
+      "destination": "models/luts/Presetpro - Moody Grade.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Presetpro%20-%20Moody%20Grade.cube",
+      "size_bytes": 884988,
+      "sha256": "26ea4d07032368ac14c40a5563e13411b6cd34c7119e53e7777381352bc01b9c",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-retro-vibes": {
+      "id": "lut-retro-vibes",
+      "name": "retro_vibes.cube",
+      "destination": "models/luts/retro_vibes.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/retro_vibes.cube",
+      "size_bytes": 7340116,
+      "sha256": "cfdb5aea31ba95070364dfe0a9768736d27e6a41762815b0049658d0c5cc327b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-1": {
+      "id": "lut-smartphone-1",
+      "name": "Smartphone_1.cube",
+      "destination": "models/luts/Smartphone_1.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_1.cube",
+      "size_bytes": 6768875,
+      "sha256": "fd5ceaa5ba1152ad4ad1b38597e8db6e5d1e3bd7e923b6368be70ead5d9140ba",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-10": {
+      "id": "lut-smartphone-10",
+      "name": "Smartphone_10.cube",
+      "destination": "models/luts/Smartphone_10.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_10.cube",
+      "size_bytes": 7484740,
+      "sha256": "9447e7b8ef76acc8b58bdcad87d0bfe44f2e6fcdcb051fc3d9601f1dbd6bdb46",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-11": {
+      "id": "lut-smartphone-11",
+      "name": "Smartphone_11.cube",
+      "destination": "models/luts/Smartphone_11.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_11.cube",
+      "size_bytes": 7519516,
+      "sha256": "44051accb6618a959a35a841c5f8b488a0be7dd5e547a741139c09a467917c06",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-12": {
+      "id": "lut-smartphone-12",
+      "name": "Smartphone_12.cube",
+      "destination": "models/luts/Smartphone_12.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_12.cube",
+      "size_bytes": 7263465,
+      "sha256": "64616a44047526fa9e60bc5aa6ff4148a6775ee27ba1404778375241b8537b69",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-13": {
+      "id": "lut-smartphone-13",
+      "name": "Smartphone_13.cube",
+      "destination": "models/luts/Smartphone_13.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_13.cube",
+      "size_bytes": 6699861,
+      "sha256": "5b8b6207509cf6bfba11e4f4e2b18b6fafe05ac6c85915c147a45f537575d5b8",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-14": {
+      "id": "lut-smartphone-14",
+      "name": "Smartphone_14.cube",
+      "destination": "models/luts/Smartphone_14.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_14.cube",
+      "size_bytes": 6716769,
+      "sha256": "c166a8fd3aaf86aa8d7c90fc9ef48ba8fe2be4a48121f458abceb2c4bbde211f",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-15": {
+      "id": "lut-smartphone-15",
+      "name": "Smartphone_15.cube",
+      "destination": "models/luts/Smartphone_15.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_15.cube",
+      "size_bytes": 6239506,
+      "sha256": "05d96f3988833f73e7bf26fe4c975a7cb9c8cc2d879612642b177e764024920e",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-16": {
+      "id": "lut-smartphone-16",
+      "name": "Smartphone_16.cube",
+      "destination": "models/luts/Smartphone_16.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_16.cube",
+      "size_bytes": 6974860,
+      "sha256": "e1f6070e0b13b6071ac7722becef52e892d8c782fde1a1085dcd1b13e624b789",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-17": {
+      "id": "lut-smartphone-17",
+      "name": "Smartphone_17.cube",
+      "destination": "models/luts/Smartphone_17.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_17.cube",
+      "size_bytes": 6880287,
+      "sha256": "876f5d3de10866dcfd7a5dd1de90504ac6ebe8370b41acdb81df3260c5fe7d4c",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-18": {
+      "id": "lut-smartphone-18",
+      "name": "Smartphone_18.cube",
+      "destination": "models/luts/Smartphone_18.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_18.cube",
+      "size_bytes": 7394660,
+      "sha256": "9e045ddd2dbf79eaed66daac397a9a5a547c967ebcac51285ba374739f0e533f",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-19": {
+      "id": "lut-smartphone-19",
+      "name": "Smartphone_19.cube",
+      "destination": "models/luts/Smartphone_19.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_19.cube",
+      "size_bytes": 7592292,
+      "sha256": "df24ad945386ae08f79bef1d8dcae935a5ddce0c3176cd8d4b743d227e1dc902",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-2": {
+      "id": "lut-smartphone-2",
+      "name": "Smartphone_2.cube",
+      "destination": "models/luts/Smartphone_2.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_2.cube",
+      "size_bytes": 6886642,
+      "sha256": "9bbc850a0bccb76bbd2e1dbd34e75229e641cbbd0c803acea8c1e44862d4381b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-20": {
+      "id": "lut-smartphone-20",
+      "name": "Smartphone_20.cube",
+      "destination": "models/luts/Smartphone_20.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_20.cube",
+      "size_bytes": 7456569,
+      "sha256": "65d7cd93b5ffb03231c9aea32e5d7edc3fb0c1fa9d9d3b095d35957fbe42fa5b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-21": {
+      "id": "lut-smartphone-21",
+      "name": "Smartphone_21.cube",
+      "destination": "models/luts/Smartphone_21.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_21.cube",
+      "size_bytes": 7551661,
+      "sha256": "3fa7185b1936ed213fb19a0ad56fd521856e4211d4f6b60145eb3d6444b0bd01",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-22": {
+      "id": "lut-smartphone-22",
+      "name": "Smartphone_22.cube",
+      "destination": "models/luts/Smartphone_22.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_22.cube",
+      "size_bytes": 5885248,
+      "sha256": "a9fe8ef491530c7a13433a0801dba78961c392fceab3f8023c09e860402c12ad",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-23": {
+      "id": "lut-smartphone-23",
+      "name": "Smartphone_23.cube",
+      "destination": "models/luts/Smartphone_23.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_23.cube",
+      "size_bytes": 5705849,
+      "sha256": "f3b5ce35958a9b181ce2bd60536f6648ab849d149e3c4b06b946eb568a7473dc",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-24": {
+      "id": "lut-smartphone-24",
+      "name": "Smartphone_24.cube",
+      "destination": "models/luts/Smartphone_24.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_24.cube",
+      "size_bytes": 6003705,
+      "sha256": "0e82f2a8ce6777a690186c1d85c284490cd237071882f563e6101c84e67d40ed",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-25": {
+      "id": "lut-smartphone-25",
+      "name": "Smartphone_25.cube",
+      "destination": "models/luts/Smartphone_25.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_25.cube",
+      "size_bytes": 6465030,
+      "sha256": "1bb1e916af485172ab0ad222d0d780950fccfee8a1588e7881125b4b097cb44f",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-26": {
+      "id": "lut-smartphone-26",
+      "name": "Smartphone_26.cube",
+      "destination": "models/luts/Smartphone_26.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_26.cube",
+      "size_bytes": 6652513,
+      "sha256": "1330c260d9c0ad9592324c57718115690e7fcba240be5cfaba01aa34ec39e1c8",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-27": {
+      "id": "lut-smartphone-27",
+      "name": "Smartphone_27.cube",
+      "destination": "models/luts/Smartphone_27.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_27.cube",
+      "size_bytes": 6576655,
+      "sha256": "18915ae244d1386ae8d7a5de9f45913951cf47678b7f043ed7df886b2b2e22d8",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-3": {
+      "id": "lut-smartphone-3",
+      "name": "Smartphone_3.cube",
+      "destination": "models/luts/Smartphone_3.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_3.cube",
+      "size_bytes": 6965302,
+      "sha256": "9f7b0c92c361f9ef8eb51ecab787ae4c267e76fd1676427e3871b37629ad2c15",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-5": {
+      "id": "lut-smartphone-5",
+      "name": "Smartphone_5.cube",
+      "destination": "models/luts/Smartphone_5.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_5.cube",
+      "size_bytes": 6043691,
+      "sha256": "77661beaf6587eaf3a918255d4d2bedf52b59345f4e7e795ed466c685276c112",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-6": {
+      "id": "lut-smartphone-6",
+      "name": "Smartphone_6.cube",
+      "destination": "models/luts/Smartphone_6.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_6.cube",
+      "size_bytes": 6256552,
+      "sha256": "a6d562cf39b338dedf3cac89f0bf2acdd8c82da3723d7a7bc6a67e7f56e78f0b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-7": {
+      "id": "lut-smartphone-7",
+      "name": "Smartphone_7.cube",
+      "destination": "models/luts/Smartphone_7.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_7.cube",
+      "size_bytes": 6781829,
+      "sha256": "ff3f16813180e31010b9fab3c9655605549b2e30ee484f75b5148b26aa931228",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-8": {
+      "id": "lut-smartphone-8",
+      "name": "Smartphone_8.cube",
+      "destination": "models/luts/Smartphone_8.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_8.cube",
+      "size_bytes": 6608796,
+      "sha256": "32a1ea1137ec9ff73bb49289ad969f742500942e677287e573f5ba704a3a359c",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-smartphone-9": {
+      "id": "lut-smartphone-9",
+      "name": "Smartphone_9.cube",
+      "destination": "models/luts/Smartphone_9.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Smartphone_9.cube",
+      "size_bytes": 7291506,
+      "sha256": "3e2f894cb11de1ec61a82baf6ffc02db82f9cb807043924f18a4f9594d2a32af",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-stylized-monochrome": {
+      "id": "lut-stylized-monochrome",
+      "name": "stylized_monochrome.cube",
+      "destination": "models/luts/stylized_monochrome.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/stylized_monochrome.cube",
+      "size_bytes": 7340116,
+      "sha256": "8672b54bbd9d49712bf243b3fbee9e5eedc51cc51d40e42fadb8f1b758c8ba1b",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-sunset-warm-soft": {
+      "id": "lut-sunset-warm-soft",
+      "name": "Sunset_Warm_Soft.cube",
+      "destination": "models/luts/Sunset_Warm_Soft.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Sunset_Warm_Soft.cube",
+      "size_bytes": 5663618,
+      "sha256": "da17b5df3f87c0f59b5323f4a16854ef7c02ef673c5923d8745f929857c3bbc9",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-toxic-sludge": {
+      "id": "lut-toxic-sludge",
+      "name": "toxic_sludge.cube",
+      "destination": "models/luts/toxic_sludge.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/toxic_sludge.cube",
+      "size_bytes": 7340116,
+      "sha256": "40759b64969eff1a7b71f1d0cd13fec8bc391d6e1cc5342de6e15efe1ec5e7e5",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-vibrant-candy": {
+      "id": "lut-vibrant-candy",
+      "name": "vibrant_candy.cube",
+      "destination": "models/luts/vibrant_candy.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/vibrant_candy.cube",
+      "size_bytes": 7340116,
+      "sha256": "da1fad0dfc1f50bb8f1e50970280265f5d4a092f9f9d0b1d21b0d9e2d0f62962",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "lut-vintage-fade-65": {
+      "id": "lut-vintage-fade-65",
+      "name": "Vintage_Fade_65.cube",
+      "destination": "models/luts/Vintage_Fade_65.cube",
+      "url": "https://58b03040f369a1ae324ceac0da1dacb6.r2.cloudflarestorage.com/selfism-models/luts/Vintage_Fade_65.cube",
+      "size_bytes": 7414944,
+      "sha256": "196f4b4f53b98355f59c2db45ef1e36b673597696eb3b6780ee8ebaec481de29",
+      "auth": "none",
+      "r2_required": true,
+      "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
     }
   },
   "nodes": [
@@ -1379,6 +2002,285 @@
     {
       "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
+  ],
+  "selfism_simple_addon_files": [
+    "llm-qwen35-9b",
+    "mmproj-qwen35-9b"
+  ],
+  "selfism_addon_files": [
+    "outfit",
+    "skin-contrast",
+    "llm-qwen35-9b",
+    "mmproj-qwen35-9b"
+  ],
+  "selfism_lut_files": [
+    "lut-apple-log-lut",
+    "lut-blue-inversion-curve-fun",
+    "lut-bubblegum-dream",
+    "lut-cool-bright-65",
+    "lut-curve-bump",
+    "lut-dynamic-saturated",
+    "lut-fgcinebright",
+    "lut-fgcinedrama",
+    "lut-fgcinewarm",
+    "lut-filmic-bright-65",
+    "lut-filmic-dark-65",
+    "lut-high-contrast",
+    "lut-life-is-a-lemon",
+    "lut-only-blue",
+    "lut-only-green",
+    "lut-only-red",
+    "lut-presetpro-fuji-provia",
+    "lut-presetpro-cine-grade",
+    "lut-presetpro-ektachrome-1",
+    "lut-presetpro-ektachrome",
+    "lut-presetpro-moody-grade",
+    "lut-retro-vibes",
+    "lut-smartphone-1",
+    "lut-smartphone-10",
+    "lut-smartphone-11",
+    "lut-smartphone-12",
+    "lut-smartphone-13",
+    "lut-smartphone-14",
+    "lut-smartphone-15",
+    "lut-smartphone-16",
+    "lut-smartphone-17",
+    "lut-smartphone-18",
+    "lut-smartphone-19",
+    "lut-smartphone-2",
+    "lut-smartphone-20",
+    "lut-smartphone-21",
+    "lut-smartphone-22",
+    "lut-smartphone-23",
+    "lut-smartphone-24",
+    "lut-smartphone-25",
+    "lut-smartphone-26",
+    "lut-smartphone-27",
+    "lut-smartphone-3",
+    "lut-smartphone-5",
+    "lut-smartphone-6",
+    "lut-smartphone-7",
+    "lut-smartphone-8",
+    "lut-smartphone-9",
+    "lut-stylized-monochrome",
+    "lut-sunset-warm-soft",
+    "lut-toxic-sludge",
+    "lut-vibrant-candy",
+    "lut-vintage-fade-65"
+  ],
+  "selfism_lut_links": [
+    {
+      "source": "models/luts/Apple Log Lut.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Apple Log Lut.cube"
+    },
+    {
+      "source": "models/luts/blue_inversion_curve_fun.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/blue_inversion_curve_fun.cube"
+    },
+    {
+      "source": "models/luts/bubblegum_dream.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/bubblegum_dream.cube"
+    },
+    {
+      "source": "models/luts/Cool_Bright_65.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Cool_Bright_65.cube"
+    },
+    {
+      "source": "models/luts/curve_bump.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/curve_bump.cube"
+    },
+    {
+      "source": "models/luts/dynamic_saturated.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/dynamic_saturated.cube"
+    },
+    {
+      "source": "models/luts/FGCineBright.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/FGCineBright.cube"
+    },
+    {
+      "source": "models/luts/FGCineDrama.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/FGCineDrama.cube"
+    },
+    {
+      "source": "models/luts/FGCineWarm.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/FGCineWarm.cube"
+    },
+    {
+      "source": "models/luts/Filmic_Bright_65.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Filmic_Bright_65.cube"
+    },
+    {
+      "source": "models/luts/Filmic_Dark_65.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Filmic_Dark_65.cube"
+    },
+    {
+      "source": "models/luts/high_contrast.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/high_contrast.cube"
+    },
+    {
+      "source": "models/luts/life_is_a_lemon.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/life_is_a_lemon.cube"
+    },
+    {
+      "source": "models/luts/only_blue.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/only_blue.cube"
+    },
+    {
+      "source": "models/luts/only_green.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/only_green.cube"
+    },
+    {
+      "source": "models/luts/only_red.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/only_red.cube"
+    },
+    {
+      "source": "models/luts/Presetpro  - Fuji Provia.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Presetpro  - Fuji Provia.cube"
+    },
+    {
+      "source": "models/luts/Presetpro - Cine Grade .cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Presetpro - Cine Grade .cube"
+    },
+    {
+      "source": "models/luts/Presetpro - Ektachrome (1).cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Presetpro - Ektachrome (1).cube"
+    },
+    {
+      "source": "models/luts/Presetpro - Ektachrome.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Presetpro - Ektachrome.cube"
+    },
+    {
+      "source": "models/luts/Presetpro - Moody Grade.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Presetpro - Moody Grade.cube"
+    },
+    {
+      "source": "models/luts/retro_vibes.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/retro_vibes.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_1.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_1.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_10.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_10.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_11.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_11.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_12.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_12.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_13.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_13.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_14.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_14.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_15.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_15.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_16.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_16.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_17.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_17.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_18.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_18.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_19.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_19.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_2.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_2.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_20.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_20.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_21.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_21.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_22.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_22.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_23.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_23.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_24.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_24.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_25.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_25.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_26.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_26.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_27.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_27.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_3.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_3.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_5.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_5.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_6.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_6.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_7.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_7.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_8.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_8.cube"
+    },
+    {
+      "source": "models/luts/Smartphone_9.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Smartphone_9.cube"
+    },
+    {
+      "source": "models/luts/stylized_monochrome.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/stylized_monochrome.cube"
+    },
+    {
+      "source": "models/luts/Sunset_Warm_Soft.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Sunset_Warm_Soft.cube"
+    },
+    {
+      "source": "models/luts/toxic_sludge.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/toxic_sludge.cube"
+    },
+    {
+      "source": "models/luts/vibrant_candy.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/vibrant_candy.cube"
+    },
+    {
+      "source": "models/luts/Vintage_Fade_65.cube",
+      "destination": "custom_nodes/ComfyUI-OlmLUT/luts/Vintage_Fade_65.cube"
     }
   ],
   "minimax_files": [

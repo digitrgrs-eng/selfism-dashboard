@@ -637,6 +637,21 @@ def register(host):
         elif profile=='node':
             nodes=[n for n in catalog['nodes'] if n['name']==request.item]
             if not nodes: raise HTTPException(404,'Unknown node.')
+        # Selfism Simple / AIO / Full add-ons (R2 first, HF fallback). The OlmLUT .cube files exist
+        # only on private R2, so they are added (and hard-linked into ComfyUI-OlmLUT/luts) only when
+        # the R2 connection is configured; without it the install stays as before.
+        lut_links=[]; lut_note=''
+        if profile in ('simple','aio','full'):
+            file_keys=file_keys+[k for k in catalog['selfism_simple_addon_files' if profile=='simple' else 'selfism_addon_files'] if k not in file_keys]
+            if profile in ('aio','full'):
+                try: r2_ready=(await asyncio.to_thread(r2_client))[0] is not None
+                except Exception: r2_ready=False
+                if r2_ready:
+                    file_keys=file_keys+catalog['selfism_lut_files']
+                    lut_links=copy.deepcopy(catalog['selfism_lut_links'])
+                    lut_note=f"OlmLUT: {len(lut_links)} LUT files from private R2 are linked into custom_nodes/ComfyUI-OlmLUT/luts/."
+                else:
+                    lut_note='OlmLUT: private R2 not configured, so the extra LUT files were skipped.'
         files=[copy.deepcopy(catalog['files'][k]) for k in file_keys]
         # Resolve exact Civitai metadata before accepting a multi-GB transfer.
         async with httpx.AsyncClient(timeout=30,follow_redirects=True) as client:
@@ -660,12 +675,13 @@ def register(host):
         # Recheck after the network await so two simultaneous clicks cannot race.
         if busy(): raise HTTPException(409,'Another installation started; retry later.')
         logs.clear()
+        if lut_note: logs.append(lut_note)
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5') else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','carousel','full','full_refine','repair','node'),
                   'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
-                  'model_links':copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else []}
+                  'model_links':(copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else [])+lut_links}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
