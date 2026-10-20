@@ -18,3 +18,44 @@ def test_krast_org_catalog_and_workflow():
     assert used
     for m in used:
         assert any(d.endswith(m) for d in dests), m
+
+
+def test_krast_org_node_packs_install_only_what_the_workflow_uses():
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    nodes={n['name']:n for n in c['nodes']}
+    # Verified by loading each pack alone in ComfyUI v0.38.1 with only these packages:
+    # the used nodes (Resolution, 1hew_AnySwitchBool, Eclipse toggles, Switch latent) register.
+    expected={'CRT-Nodes':['opencv-python-headless','soundfile'],
+              'ComfyUI-1hewNodes':[],
+              'ComfyUI_Eclipse':['opencv-python-headless','pilgram'],
+              'ComfyUI-Crystools':['deepdiff','pynvml','py-cpuinfo','piexif']}
+    for name,packages in expected.items():
+        assert nodes[name]['requirements_packages']==packages
+    heavy={'openai-whisper','omnivoice','librosa','pedalboard','rembg','transparent-background','onnxruntime','torchaudio','torch','torchvision'}
+    for name in c['krast_org_nodes']:
+        assert not heavy & set(nodes[name].get('requirements_packages',[])), name
+    w=json.loads((ROOT/'selfism_workflows/krast_org.json').read_text())
+    used={n['type'] for n in list(w['nodes'])+[n for s in w['definitions']['subgraphs'] for n in s['nodes']]}
+    for cls in ('Resolution','1hew_AnySwitchBool','Switch latent [Crystools]','Fast Mode Toggle [Eclipse]','Mute / Bypass Repeater [Eclipse]'):
+        assert cls in used
+
+
+def test_rawgirl_millie_card():
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    files=[c['files'][k] for k in c['rawgirl_millie_files']]
+    dests={f['destination'] for f in files}
+    assert dests=={'models/diffusion_models/rawgirlKrea2_v20Fp8.safetensors','models/text_encoders/qwen3vl_4b_fp8_scaled.safetensors','models/vae/qwen_image_vae.safetensors','models/loras/millie_000002750.safetensors'}
+    for f in files:
+        assert re.fullmatch(r'[0-9a-f]{64}',f['sha256']) and f['size_bytes']>0
+    assert c['rawgirl_millie_nodes']==['RES4LYF']
+    w=json.loads((ROOT/'selfism_workflows/rawgirl_millie.json').read_text())
+    core={'CLIPLoader','ConditioningZeroOut','EmptyLatentImage','VAEDecode','UNETLoader','VAELoader','PreviewImage','CLIPTextEncode','LoraLoaderModelOnly','Note'}
+    types={n['type'] for n in w['nodes']}
+    assert types-core=={'ClownsharKSampler_Beta'}
+    used={v for n in w['nodes'] for v in (n.get('widgets_values') or []) if isinstance(v,str) and v.endswith('.safetensors')}
+    assert used=={d.rsplit('/',1)[1] for d in dests}
+    src=(ROOT/'launcher/selfism.py').read_text()
+    assert "'rawgirl_millie'" in src and 'rawgirl_millie.json' in src
+    for html in ('launcher/static/index.html','scripts/selfism-section.html'):
+        page=(ROOT/html).read_text()
+        assert 'data-sf-action="rawgirl_millie"' in page and '96 GB' not in page.split('sf-card-rawgirl-millie')[1].split('</article>')[0]

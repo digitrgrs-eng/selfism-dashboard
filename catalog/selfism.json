@@ -1676,6 +1676,17 @@
       "sha256": "3184e40847c4eae53e9bb17d8adc07e81e13bca5c0c4c9c6f258a872db41251c",
       "auth": "none",
       "id": "krast-org-cockandball"
+    },
+    "rawgirl-krea2-v20-fp8": {
+      "name": "RawGirl Krea2 v2.0 FP8 (Kyphix0, Krea 2 finetune)",
+      "url": "https://civitai.com/api/download/models/3338923?fileId=3286313",
+      "destination": "models/diffusion_models/rawgirlKrea2_v20Fp8.safetensors",
+      "size_bytes": 12820334764,
+      "sha256": "79fcb451f3d1c89e6c559ebfac03d8eceff989ba9e9c3da6e630053edae0971b",
+      "auth": "civitai",
+      "civitai_version": 3338923,
+      "civitai_file": 3286313,
+      "id": "rawgirl-krea2-v20-fp8"
     }
   },
   "nodes": [
@@ -1953,25 +1964,40 @@
       "name": "ComfyUI-Crystools",
       "repo": "https://github.com/crystian/ComfyUI-Crystools.git",
       "ref": "2f18256c5b5063937106f29a8e0a7db3ae3869b7",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "deepdiff",
+        "pynvml",
+        "py-cpuinfo",
+        "piexif"
+      ]
     },
     {
       "name": "ComfyUI-1hewNodes",
       "repo": "https://github.com/1hew/ComfyUI-1hewNodes.git",
       "ref": "69af06a7a04ac2d88c87bc03bbdbe70555acd476",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": []
     },
     {
       "name": "CRT-Nodes",
       "repo": "https://github.com/PGCRT/CRT-Nodes.git",
       "ref": "c0798d356bc3294d0479b50308acca219b3d5854",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "opencv-python-headless",
+        "soundfile"
+      ]
     },
     {
       "name": "ComfyUI_Eclipse",
       "repo": "https://github.com/r-vage/ComfyUI_Eclipse.git",
       "ref": "bf874fbdf12b2c9ed2d1bc6d21d14694b84fd2df",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "opencv-python-headless",
+        "pilgram"
+      ]
     },
     {
       "name": "sd-perturbed-attention",
@@ -2935,5 +2961,14 @@
     "CRT-Nodes",
     "ComfyUI_Eclipse",
     "sd-perturbed-attention"
+  ],
+  "rawgirl_millie_files": [
+    "rawgirl-krea2-v20-fp8",
+    "encoder",
+    "qwen-vae",
+    "millie"
+  ],
+  "rawgirl_millie_nodes": [
+    "RES4LYF"
   ]
 }

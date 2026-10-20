@@ -6813,3 +6813,27 @@ def test_docs_is_a_real_view_that_the_switcher_accepts() -> None:
     js = static_file("app.js")
     declared = re.search(r"const VIEW_NAMES\s*=\s*\[([^\]]*)\]", js).group(1)
     assert '"docs"' in declared
+
+
+def test_explicit_requirement_packages_replace_requirements_txt(tmp_path, monkeypatch) -> None:
+    """A pack's requirements_packages is installed instead of its requirements.txt."""
+    pip_runs, failure = custom_node_pip_argv(
+        tmp_path, monkeypatch, [(0, "")],
+        node_overrides={"requirements_packages": ["soundfile", "opencv-python-headless"]},
+    )
+    assert failure is None and len(pip_runs) == 1
+    assert "-r" not in pip_runs[0]
+    assert pip_runs[0][-2:] == ("soundfile", "opencv-python-headless")
+
+
+def test_empty_requirement_packages_skip_pip(tmp_path, monkeypatch) -> None:
+    pip_runs, failure = custom_node_pip_argv(
+        tmp_path, monkeypatch, [], node_overrides={"requirements_packages": []},
+    )
+    assert failure is None and pip_runs == []
+
+
+@pytest.mark.parametrize("bad", ["torch", "torchvision==0.25", "TorchAudio", "-r x.txt", "git+https://x/y", "--index-url=x"])
+def test_requirement_packages_never_touch_torch_or_pass_options(bad) -> None:
+    with pytest.raises(RuntimeError):
+        launcher_app.validated_requirement_packages("X", [bad])

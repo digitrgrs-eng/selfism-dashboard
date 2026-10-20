@@ -2520,6 +2520,31 @@ class ComfyServiceController:
             )
 
 
+PROTECTED_TORCH_PACKAGES = frozenset({"torch", "torchvision", "torchaudio"})
+_REQUIREMENT_PACKAGE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9,._-]+\])?([<>=!~]=?[A-Za-z0-9.*+!_-]+)?")
+
+
+def validated_requirement_packages(name: str, packages: Any) -> list[str]:
+    """Check a node pack's explicit pip package list before it reaches pip.
+
+    Plain PyPI requirement specifiers only (no options, URLs or files), and never the
+    torch stack: the pod's cu130 torch is pinned by PIP_CONSTRAINT, and a pack that
+    names torch here would be asking for exactly what that pin exists to prevent.
+    """
+    if not isinstance(packages, list) or not all(isinstance(p, str) for p in packages):
+        raise RuntimeError(f"requirements_packages for {name} must be a list of strings")
+    checked = []
+    for package in packages:
+        package = package.strip()
+        if not _REQUIREMENT_PACKAGE.fullmatch(package):
+            raise RuntimeError(f"Unsupported requirement for {name}: {package!r}")
+        base = re.split(r"[\[<>=!~]", package, maxsplit=1)[0].lower().replace("_", "-")
+        if base in PROTECTED_TORCH_PACKAGES:
+            raise RuntimeError(f"{name} may not install {base}; torch is pinned by the image")
+        checked.append(package)
+    return checked
+
+
 class JobController:
     def __init__(self) -> None:
         self.state = JobState(comfy_url=comfy_public_url())
@@ -4467,7 +4492,17 @@ print(sageattention.__file__, triton.__version__)
 
         self.state.restart_required = True
         requirements = destination / "requirements.txt"
-        if node.get("install_requirements", True) and requirements.exists():
+        # A pack may name the exact packages its used nodes import instead of its whole
+        # requirements.txt. CRT-Nodes is why: its file pulls whisper, omnivoice, librosa
+        # and pedalboard for nodes no Selfism workflow loads, which kept a Krast ORG
+        # install on one pack for 5+ minutes. An empty list installs nothing.
+        explicit_packages = node.get("requirements_packages")
+        pip_targets: list[Any] = ["-r", requirements]
+        if explicit_packages is not None:
+            pip_targets = validated_requirement_packages(name, explicit_packages)
+        if node.get("install_requirements", True) and (
+            pip_targets if explicit_packages is not None else requirements.exists()
+        ):
             step("installing dependencies")
             dependencies_started = time.monotonic()
             pip = COMFYUI_VENV / "bin" / "python"
@@ -4502,8 +4537,7 @@ print(sageattention.__file__, triton.__version__)
                 # by pip resolving torch out of /usr/local/lib/python3.12/dist-packages
                 # from inside it - so the image's preinstalled packages are visible here.
                 *network_args,
-                "-r",
-                requirements,
+                *pip_targets,
                 timeout=1800,
             )
             if returncode and needs_build_isolation(output):
@@ -4522,8 +4556,7 @@ print(sageattention.__file__, triton.__version__)
                     "pip",
                     "install",
                     *network_args,
-                    "-r",
-                    requirements,
+                    *pip_targets,
                     timeout=1800,
                 )
             if returncode:
