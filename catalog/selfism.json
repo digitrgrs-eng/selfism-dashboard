@@ -1609,6 +1609,73 @@
       "auth": "none",
       "r2_required": true,
       "description": "Private R2 LUT for ComfyUI-OlmLUT (linked into custom_nodes/ComfyUI-OlmLUT/luts/). Installed only when the dashboard R2 connection is configured."
+    },
+    "krast-org-heretic-te": {
+      "name": "Qwen3-VL-4B Instruct Heretic INT8 ConvRot (Krea 2 text encoder)",
+      "url": "https://civitai.com/api/download/models/3099765?fileId=2979509",
+      "destination": "models/text_encoders/Qwen3-VL-4B-Instruct-Heretic-int8-convrot.safetensors",
+      "size_bytes": 5246908680,
+      "sha256": "e2ec7cf7f166ee6927144787a153ef02ea41f1f56c62878af68d7b5db59eae36",
+      "auth": "civitai",
+      "civitai_version": 3099765,
+      "civitai_file": 2979509,
+      "id": "krast-org-heretic-te"
+    },
+    "krast-org-lustify": {
+      "name": "MoP Mix Lustify SDXL (MOP-MIX-LUSTIFY)",
+      "url": "https://civitai.com/api/download/models/3050038?fileId=2928935",
+      "destination": "models/checkpoints/MOP-MIX-LUSTIFY.safetensors",
+      "size_bytes": 6938082978,
+      "sha256": "f92af610ae5dbbb94d326ac1b8b4828113028b3810387ab85246e6a278bb2236",
+      "auth": "civitai",
+      "civitai_version": 3050038,
+      "civitai_file": 2928935,
+      "id": "krast-org-lustify"
+    },
+    "krast-org-hands-seg": {
+      "name": "Hands.pt (segm)",
+      "url": "https://huggingface.co/nello224/pidor/resolve/388e84c1a79a1421883d8929ba024aa9f3250933/Hands.pt",
+      "destination": "models/ultralytics/segm/Hands.pt",
+      "size_bytes": 23835427,
+      "sha256": "2d8bf517ee9b9aeb043f21a0876d360768e11613e029d6ee76d0fdab7557eded",
+      "auth": "none",
+      "id": "krast-org-hands-seg"
+    },
+    "krast-org-nipples-seg": {
+      "name": "Nipples.pt (segm)",
+      "url": "https://huggingface.co/nello224/pidor/resolve/388e84c1a79a1421883d8929ba024aa9f3250933/Nipples.pt",
+      "destination": "models/ultralytics/segm/Nipples.pt",
+      "size_bytes": 36613559,
+      "sha256": "67e04f8d23cb3e56f94a2b892657e500184a9cceabd7cfad2adeb313c19c5b5c",
+      "auth": "none",
+      "id": "krast-org-nipples-seg"
+    },
+    "krast-org-pussy-bbox": {
+      "name": "pussy.pt (bbox)",
+      "url": "https://huggingface.co/nello224/pidor/resolve/388e84c1a79a1421883d8929ba024aa9f3250933/Pussy.pt",
+      "destination": "models/ultralytics/bbox/pussy.pt",
+      "size_bytes": 6211374,
+      "sha256": "b7c38d3ecf1c743e99a0d42d64d658c203e63b39b824706c1522ebde57533a8b",
+      "auth": "none",
+      "id": "krast-org-pussy-bbox"
+    },
+    "krast-org-eyeful": {
+      "name": "Eyeful_v2-Paired.pt (bbox)",
+      "url": "https://huggingface.co/ashllay/YOLO_Models/resolve/e07b01219ff1807e1885015f439d788b038f49bd/bbox/Eyeful_v2-Paired.pt",
+      "destination": "models/ultralytics/bbox/Eyeful_v2-Paired.pt",
+      "size_bytes": 22559956,
+      "sha256": "0d574fd6b4f5d5f1310294ae375059369f850e80ea7a628e98e6e2dae2963152",
+      "auth": "none",
+      "id": "krast-org-eyeful"
+    },
+    "krast-org-cockandball": {
+      "name": "CockAndBallYolo8x.pt (segm)",
+      "url": "https://huggingface.co/ashllay/YOLO_Models/resolve/e07b01219ff1807e1885015f439d788b038f49bd/segm/CockAndBallYolo8x.pt",
+      "destination": "models/ultralytics/segm/CockAndBallYolo8x.pt",
+      "size_bytes": 143940851,
+      "sha256": "3184e40847c4eae53e9bb17d8adc07e81e13bca5c0c4c9c6f258a872db41251c",
+      "auth": "none",
+      "id": "krast-org-cockandball"
     }
   },
   "nodes": [
@@ -1868,6 +1935,48 @@
       "name": "ComfyUI_Comfyroll_CustomNodes",
       "repo": "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git",
       "ref": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Pixaroma",
+      "repo": "https://github.com/pixaroma/ComfyUI-Pixaroma.git",
+      "ref": "27cc07ec889560b07c4c58379e4d8cd289eb936a",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Adaptive-Guidance",
+      "repo": "https://github.com/asagi4/ComfyUI-Adaptive-Guidance.git",
+      "ref": "181641ca04ac524992f40e8717f5da01eb82ea79",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-Crystools",
+      "repo": "https://github.com/crystian/ComfyUI-Crystools.git",
+      "ref": "2f18256c5b5063937106f29a8e0a7db3ae3869b7",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-1hewNodes",
+      "repo": "https://github.com/1hew/ComfyUI-1hewNodes.git",
+      "ref": "69af06a7a04ac2d88c87bc03bbdbe70555acd476",
+      "install_requirements": true
+    },
+    {
+      "name": "CRT-Nodes",
+      "repo": "https://github.com/PGCRT/CRT-Nodes.git",
+      "ref": "c0798d356bc3294d0479b50308acca219b3d5854",
+      "install_requirements": true
+    },
+    {
+      "name": "ComfyUI_Eclipse",
+      "repo": "https://github.com/r-vage/ComfyUI_Eclipse.git",
+      "ref": "bf874fbdf12b2c9ed2d1bc6d21d14694b84fd2df",
+      "install_requirements": true
+    },
+    {
+      "name": "sd-perturbed-attention",
+      "repo": "https://github.com/pamparamm/sd-perturbed-attention.git",
+      "ref": "2be8d83fa44dc0f28baf7be8122e57ed5d7165c3",
       "install_requirements": true
     }
   ],
@@ -2798,5 +2907,33 @@
     "comfyui_controlnet_aux",
     "comfyui-krea2-controlnet",
     "ComfyUI-post-processing-nodes"
+  ],
+  "krast_org_files": [
+    "krast-v20",
+    "krast-org-heretic-te",
+    "edit-vae",
+    "krast-org-lustify",
+    "millie",
+    "face",
+    "sam",
+    "krast-org-hands-seg",
+    "krast-org-nipples-seg",
+    "krast-org-pussy-bbox",
+    "krast-org-eyeful",
+    "krast-org-cockandball"
+  ],
+  "krast_org_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Pixaroma",
+    "ComfyUI-Adaptive-Guidance",
+    "ComfyUI-Crystools",
+    "ComfyUI-1hewNodes",
+    "CRT-Nodes",
+    "ComfyUI_Eclipse",
+    "sd-perturbed-attention"
   ]
 }
