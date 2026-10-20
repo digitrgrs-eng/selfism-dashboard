@@ -82,3 +82,40 @@ def test_krast_org_load_image_and_saves():
             assert (i in io['outputs'][ts]['linkIds']) if t==-20 else N[t]['inputs'][ts].get('link')==i
     ok(w['nodes'],w['links'])
     for s in w['definitions']['subgraphs']: ok(s['nodes'],s['links'],s)
+
+
+def _models(w):
+    ns=list(w['nodes'])+[n for s in (w.get('definitions') or {}).get('subgraphs',[]) for n in s['nodes']]
+    out=set()
+    def sc(v):
+        if isinstance(v,str) and re.search(r'\.(safetensors|pth|pt)$',v): out.add(v.rsplit('/',1)[-1])
+        elif isinstance(v,list):
+            for x in v: sc(x)
+        elif isinstance(v,dict):
+            for x in v.values(): sc(x)
+    for n in ns: sc(n.get('widgets_values'))
+    return out
+
+
+def test_krast_org_depth_and_rawgirl_cards():
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    names={n['name'] for n in c['nodes']}
+    ag=[n for n in c['nodes'] if n['name']=='ComfyUI-AutoGrid'][0]
+    assert re.fullmatch(r'[0-9a-f]{40}',ag['ref'])
+    kj=[n for n in c['nodes'] if n['name']=='ComfyUI-KJNodes'][0]
+    assert kj.get('install_requirements',True) and 'requirements_packages' not in kj  # full requirements.txt -> color-matcher
+    for prof,count in (('krast_org_depth',14),('rawgirl',7)):
+        files=[c['files'][k] for k in c[prof+'_files']]
+        assert len(files)==count and set(c[prof+'_nodes'])<=names
+        for f in files: assert re.fullmatch(r'[0-9a-f]{64}',f['sha256']) and f['size_bytes']>0
+        base={f['destination'].rsplit('/',1)[1] for f in files}
+        wfs=list((ROOT/'selfism_workflows'/prof).glob('*.json'))
+        used=set().union(*[_models(json.loads(p.read_text())) for p in wfs])
+        assert used==base, (prof,used^base)
+        assert "'"+prof+"'" in (ROOT/'launcher/selfism.py').read_text()
+        for html in ('launcher/static/index.html','scripts/selfism-section.html'):
+            assert f'data-sf-action="{prof}"' in (ROOT/html).read_text()
+    enc=c['files']['encoder']
+    assert enc['destination']=='models/text_encoders/qwen3vl_4b_fp8_scaled.safetensors' and enc['size_bytes']==6020316384
+    assert len(list((ROOT/'selfism_workflows/krast_org_depth').glob('*.json')))==8
+    assert len(list((ROOT/'selfism_workflows/rawgirl').glob('*.json')))==4

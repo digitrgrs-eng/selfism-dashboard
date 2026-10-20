@@ -1,0 +1,1988 @@
+{
+  "id": "4aeb7d72-1c1c-4b2e-b855-e360180ab29a",
+  "revision": 0,
+  "last_node_id": 55,
+  "last_link_id": 82,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        5430.772306936218,
+        2153.268483134067
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "CLIPLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "qwen3vl_4b_fp8_scaled.safetensors",
+        "krea2",
+        "default"
+      ],
+      "widgets_values_named": {
+        "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+        "type": "krea2",
+        "device": "default"
+      }
+    },
+    {
+      "id": 4,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        5799.17603814786,
+        2732.669797292625
+      ],
+      "size": [
+        262.341796875,
+        246
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "ConditioningZeroOut",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        5776.386248052003,
+        2031.3474788114893
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            28,
+            63
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "EmptyLatentImage",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "width": true,
+            "height": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        1080,
+        1920,
+        1
+      ],
+      "widgets_values_named": {
+        "width": 1080,
+        "height": 1920,
+        "batch_size": 1
+      }
+    },
+    {
+      "id": 6,
+      "type": "VAEDecode",
+      "pos": [
+        6396.854544734637,
+        2644.8344903733323
+      ],
+      "size": [
+        157.869140625,
+        46
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 29
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1,
+            51,
+            53,
+            55,
+            58
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "VAEDecode",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "UNETLoader",
+      "pos": [
+        5433.87980499496,
+        2016.5314234889654
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "UNETLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "rawgirlKrea2_v20Fp8.safetensors",
+        "default"
+      ],
+      "widgets_values_named": {
+        "unet_name": "RawGirlKreaV2.safetensors",
+        "weight_dtype": "default"
+      }
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        5431.254718110601,
+        2313.896354897765
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            4,
+            62
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "VAELoader",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "qwen_image_vae.safetensors"
+      ],
+      "widgets_values_named": {
+        "vae_name": "qwen_image_vae.safetensors"
+      }
+    },
+    {
+      "id": 1,
+      "type": "PreviewImage",
+      "pos": [
+        6854.982550306983,
+        2031.2010084522988
+      ],
+      "size": [
+        403.38019394982257,
+        747.0081688394787
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "Base",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "PreviewImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "CLIPTextEncode",
+      "pos": [
+        6175.704783429706,
+        2037.1020938752101
+      ],
+      "size": [
+        603.5237214429444,
+        530.4527066999726
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            2,
+            26
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.26.0",
+        "Node name for S&R": "CLIPTextEncode",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        "Photograph of m1lli3, an adult 22-year-old woman with an oval face, large almond-shaped dark-brown eyes, thick dark arched eyebrows, light freckles across her nose and upper cheeks, fair-to-medium warm skin, long dark-brown center-parted soft waves falling past her shoulders, and a slim hourglass figure with a fuller bust, narrow waist, and rounded hips, sitting cross-legged on an unmade bed in a small bedroom, wearing an oversized grey t-shirt, smiling softly at the camera. Warm lamp light from the left, a wooden nightstand with a phone and a glass of water beside her. Amateur smartphone snapshot, slight grain, natural skin texture."
+      ],
+      "widgets_values_named": {
+        "text": "Photograph of a nude adult woman with olive skin and medium-length, tousled, dark brown hair, lying on her belly on an unmade bed indoors, viewed from the front at mattress level. She is propping herself up on her elbows with her hips raised slightly, her bare buttocks visible behind her. Her breasts are pressed together against the sheets, and her left hand is squeezing her right breast firmly. Extensive black and grey tattoo work covers her right arm, shoulder, and extends across her upper chest, including what appears to be floral linework near her collarbone. A faded tan line crosses her lower back. Her right hand rests flat on the fitted sheet, fingers slightly spread. A thin woven anklet is visible on her left ankle. She is looking directly at the camera with slightly parted lips and a neutral, steady gaze. To the left, a wooden nightstand holds a half-empty plastic water bottle and a phone with a cracked screen protector. To the right, a crumpled grey pillowcase bunches against the headboard. The lighting is warm and even, with a slight yellow cast. The photograph has a shallow depth of field, focusing on the woman's face and upper body. The color palette is muted with warm skin tones and neutral beige bedding tones."
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 17,
+      "type": "ClownsharKSampler_Beta",
+      "pos": [
+        5784.741437565877,
+        2214.148720515351
+      ],
+      "size": [
+        302.677209775311,
+        438
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "shape": 7,
+          "type": "MODEL",
+          "link": 70
+        },
+        {
+          "name": "positive",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": 26
+        },
+        {
+          "name": "negative",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": 27
+        },
+        {
+          "name": "latent_image",
+          "shape": 7,
+          "type": "LATENT",
+          "link": 28
+        },
+        {
+          "name": "sigmas",
+          "shape": 7,
+          "type": "SIGMAS",
+          "link": null
+        },
+        {
+          "name": "guides",
+          "shape": 7,
+          "type": "GUIDES",
+          "link": null
+        },
+        {
+          "name": "options",
+          "shape": 7,
+          "type": "OPTIONS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised",
+          "type": "LATENT",
+          "links": [
+            29
+          ]
+        },
+        {
+          "name": "options",
+          "type": "OPTIONS",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "RES4LYF",
+        "ver": "419de2d7c78f415dde9aa352a7231820ebfc17a4",
+        "Node name for S&R": "ClownsharKSampler_Beta",
+        "ue_properties": {
+          "input_ue_unconnectable": {},
+          "version": "7.8",
+          "widget_ue_connectable": {}
+        },
+        "trix_hidden_inputs": [],
+        "trix_hidden_outputs": [],
+        "trix_wlinks_hidden": false,
+        "trix_wlinks_updated": 1784161917089
+      },
+      "widgets_values": [
+        0.5,
+        "linear/euler",
+        "beta",
+        8,
+        12,
+        1,
+        1,
+        373671147315707,
+        "fixed",
+        "standard",
+        true
+      ],
+      "widgets_values_named": {
+        "eta": 0.5,
+        "sampler_name": "linear/euler",
+        "scheduler": "beta",
+        "steps": 8,
+        "steps_to_run": 12,
+        "denoise": 1,
+        "cfg": 1,
+        "seed": 373671147315707,
+        "control_after_generate": "fixed",
+        "sampler_mode": "standard",
+        "bongmath": true
+      },
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 32,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        5433.87980499496,
+        1816.5314234889654
+      ],
+      "size": [
+        320,
+        82
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            64,
+            67
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "millie_000002750.safetensors",
+        0.8
+      ]
+    },
+    {
+      "id": 33,
+      "type": "Note",
+      "pos": [
+        5053.87980499496,
+        1816.5314234889654
+      ],
+      "size": [
+        360,
+        140
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Millie LoRA (millie_000002750) jačina 0.8 – preporučeno za RawGirl. Podesivo: 0.7–1.0 (više = jača sličnost, manje = više RawGirl realizma).\nSve ostalo je autorov originalni setup."
+      ]
+    },
+    {
+      "id": 34,
+      "type": "Note",
+      "pos": [
+        6175.704783429706,
+        1857.1020938752101
+      ],
+      "size": [
+        400,
+        120
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Ovde nalepi prompt iz rawgirl-millie-recreate skilla (mora počinjati sa m1lli3)."
+      ]
+    },
+    {
+      "type": "SaveImage",
+      "size": [
+        430,
+        660
+      ],
+      "widgets_values": [
+        "RawGirl_Millie_NMKD_Depth_ColorMatch/base"
+      ],
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 51
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core"
+      },
+      "id": 35,
+      "title": "SAVE BASE - sampler output before upscale / color",
+      "pos": [
+        7380,
+        1940
+      ],
+      "order": 24,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "id": 36,
+      "type": "UpscaleModelLoader",
+      "pos": [
+        7420,
+        2850
+      ],
+      "size": [
+        430,
+        100
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model_name",
+          "name": "model_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "model_name"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "UPSCALE_MODEL",
+          "name": "UPSCALE_MODEL",
+          "type": "UPSCALE_MODEL",
+          "links": [
+            52
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "UpscaleModelLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        "4xNMKDSuperscale_4xNMKDSuperscale.pt"
+      ],
+      "title": "NMKD UPSCALER - same model as 10sorlabs"
+    },
+    {
+      "id": 37,
+      "type": "ImageUpscaleWithModel",
+      "pos": [
+        7420,
+        3020
+      ],
+      "size": [
+        430,
+        110
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "upscale_model",
+          "name": "upscale_model",
+          "type": "UPSCALE_MODEL",
+          "link": 52
+        },
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 53
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            54
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "ImageUpscaleWithModel",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [],
+      "title": "NMKD 4x - image processing only"
+    },
+    {
+      "id": 38,
+      "type": "ImageScaleBy",
+      "pos": [
+        7920,
+        2850
+      ],
+      "size": [
+        490,
+        150
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 54
+        },
+        {
+          "localized_name": "upscale_method",
+          "name": "upscale_method",
+          "type": "COMBO",
+          "widget": {
+            "name": "upscale_method"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scale_by",
+          "name": "scale_by",
+          "type": "FLOAT",
+          "widget": {
+            "name": "scale_by"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            56
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.25.0",
+        "Node name for S&R": "ImageScaleBy",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        "lanczos",
+        0.5
+      ],
+      "title": "FINAL SIZE: 0.50 = 2x / 0.375 = 1.5x / 0.25 = 1x"
+    },
+    {
+      "id": 39,
+      "type": "LazySwitchKJ",
+      "pos": [
+        7920,
+        3090
+      ],
+      "size": [
+        490,
+        110
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "type": "*",
+          "link": 55
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "type": "*",
+          "link": 56
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "*",
+          "type": "*",
+          "links": [
+            76,
+            77,
+            81
+          ]
+        }
+      ],
+      "title": "UPSCALE - true=ON / false=BASE before upscaling",
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "1.4.7",
+        "Node name for S&R": "LazySwitchKJ",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "type": "SaveImage",
+      "size": [
+        440,
+        700
+      ],
+      "widgets_values": [
+        "RawGirl_Millie_NMKD_Depth_ColorMatch/final"
+      ],
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 79
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core"
+      },
+      "id": 40,
+      "title": "SAVE FINAL - selected Upscale + Color Match result",
+      "pos": [
+        8500,
+        2850
+      ],
+      "order": 30,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "id": 41,
+      "type": "Image Comparer (rgthree)",
+      "pos": [
+        9000,
+        2850
+      ],
+      "size": [
+        650,
+        720
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "dir": 3,
+          "name": "image_a",
+          "type": "IMAGE",
+          "link": 58
+        },
+        {
+          "dir": 3,
+          "name": "image_b",
+          "type": "IMAGE",
+          "link": 80
+        }
+      ],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "images",
+          "shape": 3,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "A = BASE before processing / B = FINAL selected result",
+      "properties": {
+        "aux_id": "rgthree/rgthree-comfy",
+        "ver": "8ff50e4521881eca1fe26aec9615fc9362474931",
+        "comparer_mode": "Slide",
+        "cnr_id": "rgthree-comfy",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        []
+      ]
+    },
+    {
+      "type": "Note",
+      "size": [
+        1000,
+        550
+      ],
+      "widgets_values": [
+        "NMKD UPSCALE\nUPSCALE = true enables 4x NMKD followed by Lanczos 0.50 = net 2x.\nFINAL SIZE factors: 0.50 = net 2x; 0.375 = net 1.5x; 0.25 = processed original size.\nUPSCALE = false bypasses NMKD and resize only. COLOR MATCH has its own switch below.\nSAVE BASE is sampler output before both operations. SAVE FINAL is the selected result after the independent switches.\nDepth changes generation conditioning; base sampler parameters remain unchanged. With DEPTH OFF, base generation uses the original model + Millie LoRA path.\nAll three switches OFF = original generation path and unprocessed final pixels.\nBASE/FINAL comparison includes color correction if enabled; there is also a separate before/after Color Match comparison below.\nDefault input canvas remains 1080x1920. NMKD net 2x gives 2160x3840 when BASE is 1080x1920.\nNo extra diffusion pass or FaceDetailer is added. x4 intermediate image still uses memory.\nSee the DEPTH + COLOR controls below and UPUTSTVO_Depth_ColorMatch_v2.txt."
+      ],
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "Note",
+        "cnr_id": "comfy-core"
+      },
+      "id": 42,
+      "title": "UPSCALING - START HERE",
+      "pos": [
+        7920,
+        3670
+      ],
+      "order": 7,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "id": 43,
+      "type": "LoadImage",
+      "pos": [
+        5415,
+        4490
+      ],
+      "size": [
+        400,
+        470
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "choose file to upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            60,
+            71,
+            75
+          ]
+        },
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.26.2",
+        "Node name for S&R": "LoadImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        },
+        "image": "clipspace/clipspace-painted-masked-1784737551745.png [input]"
+      },
+      "widgets_values": [
+        "example.png",
+        "image"
+      ],
+      "title": "REFERENCE - Depth + Color Match"
+    },
+    {
+      "id": 44,
+      "type": "DepthAnythingV2Preprocessor",
+      "pos": [
+        5900,
+        4490
+      ],
+      "size": [
+        380,
+        160
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 60
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            61
+          ]
+        }
+      ],
+      "title": "DEPTH - Anything V2 Large / 768",
+      "properties": {
+        "cnr_id": "comfyui_controlnet_aux",
+        "ver": "1.1.4",
+        "Node name for S&R": "DepthAnythingV2Preprocessor"
+      },
+      "widgets_values": [
+        "depth_anything_v2_vitl.pth",
+        768
+      ]
+    },
+    {
+      "id": 45,
+      "type": "Krea2ControlImageEncode",
+      "pos": [
+        6350,
+        4490
+      ],
+      "size": [
+        430,
+        290
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "control_image",
+          "type": "IMAGE",
+          "link": 61
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 62
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 63,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "links": [
+            66
+          ]
+        },
+        {
+          "name": "encoded_control_image",
+          "type": "IMAGE",
+          "links": [
+            72
+          ]
+        }
+      ],
+      "title": "Depth encode - match RawGirl generation size",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlImageEncode"
+      },
+      "widgets_values": [
+        "match_latent_size",
+        "bicubic",
+        "center",
+        "grayscale",
+        "per_image_minmax",
+        false,
+        "independent_images"
+      ]
+    },
+    {
+      "id": 46,
+      "type": "Krea2ControlLoRALoader",
+      "pos": [
+        6850,
+        4490
+      ],
+      "size": [
+        430,
+        140
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 64
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            65
+          ]
+        }
+      ],
+      "title": "DEPTH LoRA - strength 0.75",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlLoRALoader"
+      },
+      "widgets_values": [
+        "depth-control-lora.safetensors",
+        0.75
+      ]
+    },
+    {
+      "id": 47,
+      "type": "Krea2ControlApply",
+      "pos": [
+        7340,
+        4490
+      ],
+      "size": [
+        430,
+        100
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 65
+        },
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            68
+          ]
+        }
+      ],
+      "title": "Apply Depth - existing RawGirl sampler",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlApply"
+      },
+      "widgets_values": []
+    },
+    {
+      "type": "BOOLConstant",
+      "size": [
+        400,
+        80
+      ],
+      "widgets_values": [
+        true
+      ],
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            69,
+            73
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes"
+      },
+      "id": 48,
+      "title": "DEPTH CONTROL - true=ON / false=OFF",
+      "pos": [
+        5415,
+        5030
+      ],
+      "order": 9,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "id": 49,
+      "type": "LazySwitchKJ",
+      "pos": [
+        7340,
+        4700
+      ],
+      "size": [
+        430,
+        120
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "type": "*",
+          "link": 67
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "type": "*",
+          "link": 68
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": 69
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "*",
+          "type": "*",
+          "links": [
+            70
+          ]
+        }
+      ],
+      "title": "Depth routing - original model when OFF",
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "1.4.7",
+        "Node name for S&R": "LazySwitchKJ",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 50,
+      "type": "LazySwitchKJ",
+      "pos": [
+        5900,
+        4870
+      ],
+      "size": [
+        380,
+        120
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "type": "*",
+          "link": 71
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "type": "*",
+          "link": 72
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": 73
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "*",
+          "type": "*",
+          "links": [
+            74
+          ]
+        }
+      ],
+      "title": "Preview - encoded depth ON / reference OFF",
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "1.4.7",
+        "Node name for S&R": "LazySwitchKJ",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "type": "PreviewImage",
+      "size": [
+        430,
+        560
+      ],
+      "widgets_values": [],
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 74
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage",
+        "cnr_id": "comfy-core"
+      },
+      "id": 51,
+      "title": "ALIGNED DEPTH (original reference when OFF)",
+      "pos": [
+        6350,
+        4870
+      ],
+      "order": 20,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "ColorMatch",
+      "size": [
+        430,
+        200
+      ],
+      "widgets_values": [
+        "mkl",
+        0.3,
+        true
+      ],
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 75
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 76
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            78
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch",
+        "cnr_id": "comfyui-kjnodes"
+      },
+      "id": 52,
+      "title": "COLOR MATCH - reference palette / strength 0.30",
+      "pos": [
+        6850,
+        5000
+      ],
+      "order": 28,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "id": 53,
+      "type": "LazySwitchKJ",
+      "pos": [
+        7340,
+        5000
+      ],
+      "size": [
+        430,
+        120
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "on_false",
+          "name": "on_false",
+          "type": "*",
+          "link": 77
+        },
+        {
+          "localized_name": "on_true",
+          "name": "on_true",
+          "type": "*",
+          "link": 78
+        },
+        {
+          "localized_name": "switch",
+          "name": "switch",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "switch"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "*",
+          "type": "*",
+          "links": [
+            79,
+            80,
+            82
+          ]
+        }
+      ],
+      "title": "COLOR MATCH - true=ON / false=OFF",
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "1.4.7",
+        "Node name for S&R": "LazySwitchKJ",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.8"
+        }
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 54,
+      "type": "Image Comparer (rgthree)",
+      "pos": [
+        7840,
+        4490
+      ],
+      "size": [
+        600,
+        650
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "dir": 3,
+          "name": "image_a",
+          "type": "IMAGE",
+          "link": 81
+        },
+        {
+          "dir": 3,
+          "name": "image_b",
+          "type": "IMAGE",
+          "link": 82
+        }
+      ],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "images",
+          "shape": 3,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "A = BEFORE COLOR MATCH / B = FINAL",
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "1.0.2509092031",
+        "comparer_mode": "Slide",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.7",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        []
+      ]
+    },
+    {
+      "type": "Note",
+      "size": [
+        800,
+        690
+      ],
+      "widgets_values": [
+        "DEPTH + COLOR MATCH - INDEPENDENT SWITCHES\nUpload reference. DEPTH CONTROL = true; strength 0.75; Depth Anything V2 Large resolution 768.\nCOLOR MATCH = true; strength 0.30; method mkl.\nUPSCALE switch above stays independent. Each stage can be disabled without disabling the others.\nDepth adds guidance to the existing RawGirl model + Millie LoRA branch. Original ClownsharKSampler, prompt, seed, VAE, CFG and sampling settings are unchanged.\nThis remains TEXT TO IMAGE from an empty latent. Reference supplies depth and palette, not img2img initialization.\nGeneration resolution stays 1080x1920. No Auto Ratio was added. A different reference aspect ratio is center-cropped by the depth encoder to match the generation canvas. Use a matching 9:16 reference for full framing. ALIGNED DEPTH preview shows the actual encoded crop.\nColor Match is final processing after the selected upscale output. It changes palette/tones, not light direction, pose or facial expression.\nMain prompt is unchanged and must still describe the desired scene manually. No automatic captioning or lighting extraction.\nDependencies: comfyui-krea2-controlnet; comfyui_controlnet_aux; KJNodes; rgthree-comfy; color-matcher.\nModels: depth-control-lora.safetensors; depth_anything_v2_vitl.pth; the NMKD model used above.\nWhen Depth and Color are OFF, preview shows the reference; generation and upscaling do not need depth inference.\nNo GPU render or actual model compatibility test has been performed."
+      ],
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "Note",
+        "cnr_id": "comfy-core"
+      },
+      "id": 55,
+      "title": "DEPTH + COLOR - READ FIRST",
+      "pos": [
+        8500,
+        4490
+      ],
+      "order": 10,
+      "mode": 0,
+      "flags": {}
+    }
+  ],
+  "links": [
+    [
+      1,
+      6,
+      0,
+      1,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      9,
+      0,
+      4,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      3,
+      0,
+      6,
+      1,
+      "VAE"
+    ],
+    [
+      9,
+      2,
+      0,
+      9,
+      0,
+      "CLIP"
+    ],
+    [
+      26,
+      9,
+      0,
+      17,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      27,
+      4,
+      0,
+      17,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      28,
+      5,
+      0,
+      17,
+      3,
+      "LATENT"
+    ],
+    [
+      29,
+      17,
+      1,
+      6,
+      0,
+      "LATENT"
+    ],
+    [
+      41,
+      7,
+      0,
+      32,
+      0,
+      "MODEL"
+    ],
+    [
+      51,
+      6,
+      0,
+      35,
+      0,
+      "IMAGE"
+    ],
+    [
+      52,
+      36,
+      0,
+      37,
+      0,
+      "UPSCALE_MODEL"
+    ],
+    [
+      53,
+      6,
+      0,
+      37,
+      1,
+      "IMAGE"
+    ],
+    [
+      54,
+      37,
+      0,
+      38,
+      0,
+      "IMAGE"
+    ],
+    [
+      55,
+      6,
+      0,
+      39,
+      0,
+      "IMAGE"
+    ],
+    [
+      56,
+      38,
+      0,
+      39,
+      1,
+      "IMAGE"
+    ],
+    [
+      58,
+      6,
+      0,
+      41,
+      0,
+      "IMAGE"
+    ],
+    [
+      60,
+      43,
+      0,
+      44,
+      0,
+      "IMAGE"
+    ],
+    [
+      61,
+      44,
+      0,
+      45,
+      0,
+      "IMAGE"
+    ],
+    [
+      62,
+      3,
+      0,
+      45,
+      1,
+      "VAE"
+    ],
+    [
+      63,
+      5,
+      0,
+      45,
+      2,
+      "LATENT"
+    ],
+    [
+      64,
+      32,
+      0,
+      46,
+      0,
+      "MODEL"
+    ],
+    [
+      65,
+      46,
+      0,
+      47,
+      0,
+      "MODEL"
+    ],
+    [
+      66,
+      45,
+      0,
+      47,
+      1,
+      "LATENT"
+    ],
+    [
+      67,
+      32,
+      0,
+      49,
+      0,
+      "MODEL"
+    ],
+    [
+      68,
+      47,
+      0,
+      49,
+      1,
+      "MODEL"
+    ],
+    [
+      69,
+      48,
+      0,
+      49,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      70,
+      49,
+      0,
+      17,
+      0,
+      "MODEL"
+    ],
+    [
+      71,
+      43,
+      0,
+      50,
+      0,
+      "IMAGE"
+    ],
+    [
+      72,
+      45,
+      1,
+      50,
+      1,
+      "IMAGE"
+    ],
+    [
+      73,
+      48,
+      0,
+      50,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      74,
+      50,
+      0,
+      51,
+      0,
+      "IMAGE"
+    ],
+    [
+      75,
+      43,
+      0,
+      52,
+      0,
+      "IMAGE"
+    ],
+    [
+      76,
+      39,
+      0,
+      52,
+      1,
+      "IMAGE"
+    ],
+    [
+      77,
+      39,
+      0,
+      53,
+      0,
+      "IMAGE"
+    ],
+    [
+      78,
+      52,
+      0,
+      53,
+      1,
+      "IMAGE"
+    ],
+    [
+      79,
+      53,
+      0,
+      40,
+      0,
+      "IMAGE"
+    ],
+    [
+      80,
+      53,
+      0,
+      41,
+      1,
+      "IMAGE"
+    ],
+    [
+      81,
+      39,
+      0,
+      54,
+      0,
+      "IMAGE"
+    ],
+    [
+      82,
+      53,
+      0,
+      54,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Load models",
+      "bounding": [
+        5415.216804018399,
+        1935.1537370968947,
+        306.3928319390052,
+        452.57545360496624
+      ],
+      "color": "#b58b2a",
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Sampling",
+      "bounding": [
+        5759.9290769626905,
+        1937.0782747166463,
+        1534.4518331493182,
+        885.7498492695099
+      ],
+      "color": "#a1309b",
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "OPTIONAL NMKD UPSCALE - original RawGirl generation retained",
+      "bounding": [
+        7370,
+        2760,
+        2340,
+        1500
+      ],
+      "color": "#397e75",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "REFERENCE + DEPTH CONTROL + COLOR MATCH - separate ON/OFF switches",
+      "bounding": [
+        5360,
+        4400,
+        4000,
+        1110
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ue_links": [],
+    "ds": {
+      "scale": 0.5887367043599234,
+      "offset": [
+        -5129.31309827854,
+        -1772.565249902969
+      ]
+    },
+    "links_added_by_ue": [],
+    "frontendVersion": "1.53.6",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "extensions": {
+    "widget_idx_map": {
+      "8": {
+        "seed": 0,
+        "sampler_name": 4,
+        "scheduler": 5
+      }
+    },
+    "seed_widgets": {
+      "8": 0
+    }
+  },
+  "version": 0.4,
+  "widget_idx_map": {
+    "17": {
+      "sampler_name": 1,
+      "scheduler": 2,
+      "seed": 7
+    }
+  },
+  "seed_widgets": {
+    "17": 7
+  }
+}

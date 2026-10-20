@@ -17,3 +17,5 @@ selfism_workflows/recreate_hybrid.json -text
 selfism_workflows/krast_recreate.json -text
 selfism_workflows/krast_carousel.json -text
 bundled_nodes/ComfyUI-KRASTv3-Carousel/** -text
+selfism_workflows/krast_org_depth/*.json -text
+selfism_workflows/rawgirl/*.json -text

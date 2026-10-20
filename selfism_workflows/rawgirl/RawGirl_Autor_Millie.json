@@ -1,0 +1,712 @@
+{
+ "id": "8ef45fb3-ba92-4285-9da9-99604c777731",
+ "revision": 0,
+ "last_node_id": 34,
+ "last_link_id": 50,
+ "nodes": [
+  {
+   "id": 2,
+   "type": "CLIPLoader",
+   "pos": [
+    5430.772306936218,
+    2153.268483134067
+   ],
+   "size": [
+    270,
+    106
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      9
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "CLIPLoader",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "qwen3vl_4b_fp8_scaled.safetensors",
+    "krea2",
+    "default"
+   ],
+   "widgets_values_named": {
+    "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+    "type": "krea2",
+    "device": "default"
+   }
+  },
+  {
+   "id": 4,
+   "type": "ConditioningZeroOut",
+   "pos": [
+    5799.17603814786,
+    2732.669797292625
+   ],
+   "size": [
+    262.341796875,
+    246
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      27
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "ConditioningZeroOut",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 5,
+   "type": "EmptyLatentImage",
+   "pos": [
+    5776.386248052003,
+    2031.3474788114893
+   ],
+   "size": [
+    270,
+    106
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      28
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "EmptyLatentImage",
+    "ue_properties": {
+     "widget_ue_connectable": {
+      "width": true,
+      "height": true
+     },
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    1080,
+    1920,
+    1
+   ],
+   "widgets_values_named": {
+    "width": 1080,
+    "height": 1920,
+    "batch_size": 1
+   }
+  },
+  {
+   "id": 6,
+   "type": "VAEDecode",
+   "pos": [
+    6396.854544734637,
+    2644.8344903733323
+   ],
+   "size": [
+    157.869140625,
+    46
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 29
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      1
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "VAEDecode",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 7,
+   "type": "UNETLoader",
+   "pos": [
+    5433.87980499496,
+    2016.5314234889654
+   ],
+   "size": [
+    270,
+    82
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      41
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "UNETLoader",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "rawgirlKrea2_v20Fp8.safetensors",
+    "default"
+   ],
+   "widgets_values_named": {
+    "unet_name": "RawGirlKreaV2.safetensors",
+    "weight_dtype": "default"
+   }
+  },
+  {
+   "id": 3,
+   "type": "VAELoader",
+   "pos": [
+    5431.254718110601,
+    2313.896354897765
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      4
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "VAELoader",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   },
+   "widgets_values": [
+    "qwen_image_vae.safetensors"
+   ],
+   "widgets_values_named": {
+    "vae_name": "qwen_image_vae.safetensors"
+   }
+  },
+  {
+   "id": 1,
+   "type": "PreviewImage",
+   "pos": [
+    6854.982550306983,
+    2031.2010084522988
+   ],
+   "size": [
+    403.38019394982257,
+    747.0081688394787
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": []
+    }
+   ],
+   "title": "Base",
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.25.0",
+    "Node name for S&R": "PreviewImage",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "version": "7.8",
+     "input_ue_unconnectable": {}
+    }
+   }
+  },
+  {
+   "id": 9,
+   "type": "CLIPTextEncode",
+   "pos": [
+    6175.704783429706,
+    2037.1020938752101
+   ],
+   "size": [
+    603.5237214429444,
+    530.4527066999726
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      2,
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.26.0",
+    "Node name for S&R": "CLIPTextEncode",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "input_ue_unconnectable": {},
+     "version": "7.8"
+    }
+   },
+   "widgets_values": [
+    "Photograph of m1lli3, an adult 22-year-old woman with an oval face, large almond-shaped dark-brown eyes, thick dark arched eyebrows, light freckles across her nose and upper cheeks, fair-to-medium warm skin, long dark-brown center-parted soft waves falling past her shoulders, and a slim hourglass figure with a fuller bust, narrow waist, and rounded hips, sitting cross-legged on an unmade bed in a small bedroom, wearing an oversized grey t-shirt, smiling softly at the camera. Warm lamp light from the left, a wooden nightstand with a phone and a glass of water beside her. Amateur smartphone snapshot, slight grain, natural skin texture."
+   ],
+   "widgets_values_named": {
+    "text": "Photograph of a nude adult woman with olive skin and medium-length, tousled, dark brown hair, lying on her belly on an unmade bed indoors, viewed from the front at mattress level. She is propping herself up on her elbows with her hips raised slightly, her bare buttocks visible behind her. Her breasts are pressed together against the sheets, and her left hand is squeezing her right breast firmly. Extensive black and grey tattoo work covers her right arm, shoulder, and extends across her upper chest, including what appears to be floral linework near her collarbone. A faded tan line crosses her lower back. Her right hand rests flat on the fitted sheet, fingers slightly spread. A thin woven anklet is visible on her left ankle. She is looking directly at the camera with slightly parted lips and a neutral, steady gaze. To the left, a wooden nightstand holds a half-empty plastic water bottle and a phone with a cracked screen protector. To the right, a crumpled grey pillowcase bunches against the headboard. The lighting is warm and even, with a slight yellow cast. The photograph has a shallow depth of field, focusing on the woman's face and upper body. The color palette is muted with warm skin tones and neutral beige bedding tones."
+   },
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 17,
+   "type": "ClownsharKSampler_Beta",
+   "pos": [
+    5784.741437565877,
+    2214.148720515351
+   ],
+   "size": [
+    302.677209775311,
+    438
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "shape": 7,
+     "type": "MODEL",
+     "link": 50
+    },
+    {
+     "name": "positive",
+     "shape": 7,
+     "type": "CONDITIONING",
+     "link": 26
+    },
+    {
+     "name": "negative",
+     "shape": 7,
+     "type": "CONDITIONING",
+     "link": 27
+    },
+    {
+     "name": "latent_image",
+     "shape": 7,
+     "type": "LATENT",
+     "link": 28
+    },
+    {
+     "name": "sigmas",
+     "shape": 7,
+     "type": "SIGMAS",
+     "link": null
+    },
+    {
+     "name": "guides",
+     "shape": 7,
+     "type": "GUIDES",
+     "link": null
+    },
+    {
+     "name": "options",
+     "shape": 7,
+     "type": "OPTIONS",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "output",
+     "type": "LATENT",
+     "links": []
+    },
+    {
+     "name": "denoised",
+     "type": "LATENT",
+     "links": [
+      29
+     ]
+    },
+    {
+     "name": "options",
+     "type": "OPTIONS",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "RES4LYF",
+    "ver": "419de2d7c78f415dde9aa352a7231820ebfc17a4",
+    "Node name for S&R": "ClownsharKSampler_Beta",
+    "ue_properties": {
+     "input_ue_unconnectable": {},
+     "version": "7.8",
+     "widget_ue_connectable": {}
+    },
+    "trix_hidden_inputs": [],
+    "trix_hidden_outputs": [],
+    "trix_wlinks_hidden": false,
+    "trix_wlinks_updated": 1784161917089
+   },
+   "widgets_values": [
+    0.5,
+    "linear/euler",
+    "beta",
+    8,
+    12,
+    1,
+    1,
+    373671147315707,
+    "fixed",
+    "standard",
+    true
+   ],
+   "widgets_values_named": {
+    "eta": 0.5,
+    "sampler_name": "linear/euler",
+    "scheduler": "beta",
+    "steps": 8,
+    "steps_to_run": 12,
+    "denoise": 1,
+    "cfg": 1,
+    "seed": 373671147315707,
+    "control_after_generate": "fixed",
+    "sampler_mode": "standard",
+    "bongmath": true
+   },
+   "color": "#222",
+   "bgcolor": "#000"
+  },
+  {
+   "id": 32,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    5433.87980499496,
+    1816.5314234889654
+   ],
+   "size": [
+    320,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 41
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      50
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "millie_000002750.safetensors",
+    0.8
+   ]
+  },
+  {
+   "id": 33,
+   "type": "Note",
+   "pos": [
+    5053.87980499496,
+    1816.5314234889654
+   ],
+   "size": [
+    360,
+    140
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "Millie LoRA (millie_000002750) ja\u010dina 0.8 \u2013 preporu\u010deno za RawGirl. Podesivo: 0.7\u20131.0 (vi\u0161e = ja\u010da sli\u010dnost, manje = vi\u0161e RawGirl realizma).\nSve ostalo je autorov originalni setup."
+   ]
+  },
+  {
+   "id": 34,
+   "type": "Note",
+   "pos": [
+    6175.704783429706,
+    1857.1020938752101
+   ],
+   "size": [
+    400,
+    120
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "Ovde nalepi prompt iz rawgirl-millie-recreate skilla (mora po\u010dinjati sa m1lli3)."
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   6,
+   0,
+   1,
+   0,
+   "IMAGE"
+  ],
+  [
+   2,
+   9,
+   0,
+   4,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   4,
+   3,
+   0,
+   6,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   2,
+   0,
+   9,
+   0,
+   "CLIP"
+  ],
+  [
+   26,
+   9,
+   0,
+   17,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   27,
+   4,
+   0,
+   17,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   28,
+   5,
+   0,
+   17,
+   3,
+   "LATENT"
+  ],
+  [
+   29,
+   17,
+   1,
+   6,
+   0,
+   "LATENT"
+  ],
+  [
+   41,
+   7,
+   0,
+   32,
+   0,
+   "MODEL"
+  ],
+  [
+   50,
+   32,
+   0,
+   17,
+   0,
+   "MODEL"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "Load models",
+   "bounding": [
+    5415.216804018399,
+    1935.1537370968947,
+    306.3928319390052,
+    452.57545360496624
+   ],
+   "color": "#b58b2a",
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "Sampling",
+   "bounding": [
+    5759.9290769626905,
+    1937.0782747166463,
+    1534.4518331493182,
+    885.7498492695099
+   ],
+   "color": "#a1309b",
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ue_links": [],
+  "ds": {
+   "scale": 0.5887367043599234,
+   "offset": [
+    -5129.31309827854,
+    -1772.565249902969
+   ]
+  },
+  "links_added_by_ue": [],
+  "frontendVersion": "1.53.6",
+  "VHS_latentpreview": false,
+  "VHS_latentpreviewrate": 0,
+  "VHS_MetadataImage": true,
+  "VHS_KeepIntermediate": true
+ },
+ "extensions": {
+  "widget_idx_map": {
+   "8": {
+    "seed": 0,
+    "sampler_name": 4,
+    "scheduler": 5
+   }
+  },
+  "seed_widgets": {
+   "8": 0
+  }
+ },
+ "version": 0.4,
+ "widget_idx_map": {
+  "17": {
+   "sampler_name": 1,
+   "scheduler": 2,
+   "seed": 7
+  }
+ },
+ "seed_widgets": {
+  "17": 7
+ }
+}

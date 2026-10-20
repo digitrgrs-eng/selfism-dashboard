@@ -36,7 +36,7 @@ MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
 AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -357,6 +357,14 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/rawgirl_millie.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('RawGirl Millie: author RawGirl v2.0 FP8 workflow (qwen3vl_4b_fp8_scaled krea2 encoder, qwen_image_vae, 1080x1920, ClownsharKSampler_Beta linear/euler + beta 8 steps, eta 0.5, CFG 1) plus Millie LoRA 0.8. Not GPU-validated yet.')
+                if profile in ('krast_org_depth','rawgirl'):
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'/('KRAST_ORG_Depth' if profile=='krast_org_depth' else 'RawGirl')
+                    folder.mkdir(parents=True,exist_ok=True)
+                    for src in sorted((root/'selfism_workflows'/profile).glob('*.json')):
+                        dest=folder/src.name
+                        if not dest.exists(): dest.write_bytes(src.read_bytes())
+                        logs.append('Workflow saved: '+str(dest))
+                    logs.append(('Krast ORG + Depth: author KRAST ORG workflow, AutoRatio Depth (v1, IMG2IMG, SoftFace v2, each with ColorMatch) and KRAST Millie Carousel 2x2; Krea2 depth control LoRA + Depth Anything V2, KJNodes ColorMatch, AutoGrid.' if profile=='krast_org_depth' else 'RawGirl: author RawGirl Millie, NMKD Upscale v1, NMKD Depth ColorMatch v2 and RawGirl Millie Carousel 2x2; 4x NMKD Superscale, Krea2 depth control LoRA + Depth Anything V2, KJNodes ColorMatch, AutoGrid.')+' Not GPU-validated yet.')
                 if profile=='krast_faithful_klein_v5':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -582,7 +590,7 @@ def register(host):
         elif profile=='krea_klein':
             file_keys=catalog['krea_klein_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['krea_klein_nodes']]
-        elif profile in ('krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie'):
+        elif profile in ('krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl'):
             file_keys=catalog[profile+'_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='carousel':
@@ -672,7 +680,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -692,8 +700,8 @@ def register(host):
         if lut_note: logs.append(lut_note)
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie') else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','carousel','full','full_refine','repair','node'),
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
                   'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':(copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else [])+lut_links}
         return await controller.start(workflow)
@@ -707,6 +715,10 @@ def register(host):
             return FileResponse(root/'selfism_workflows/krea_fluxdepth_millie.json',filename='Krea2_FluxKlein_Millie_Artfat_Depth_v3.json')
         if profile=='krast_fluxdepth':
             return FileResponse(root/'selfism_workflows/krast_fluxdepth_millie.json',filename='KRAST_FluxKlein_Millie_Artfat_Depth_v3.json')
+        if profile=='krast_org_depth':
+            return FileResponse(root/'selfism_workflows/krast_org_depth/KRAST_ORG_Millie_AutoRatio_Depth_v1.json',filename='KRAST_ORG_Millie_AutoRatio_Depth_v1.json')
+        if profile=='rawgirl':
+            return FileResponse(root/'selfism_workflows/rawgirl/RawGirl_Autor_Millie_NMKD_Upscale_v1.json',filename='RawGirl_Autor_Millie_NMKD_Upscale_v1.json')
         if profile=='rawgirl_millie':
             return FileResponse(root/'selfism_workflows/rawgirl_millie.json',filename='RawGirl_Autor_Millie.json')
         if profile=='krast_org':

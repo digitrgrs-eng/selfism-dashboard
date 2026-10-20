@@ -1,0 +1,10423 @@
+{
+  "id": "64bfcad9-9f93-4695-9488-8a17b7d57c2d",
+  "revision": 0,
+  "last_node_id": 145,
+  "last_link_id": 273,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        0,
+        950
+      ],
+      "size": [
+        430,
+        110
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "localized_name": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.15.1",
+        "Node name for S&R": "UNETLoader",
+        "carousel_source_node": 182,
+        "carousel_widget_names": [
+          "unet_name",
+          "weight_dtype"
+        ]
+      },
+      "widgets_values": [
+        "krast_v20.safetensors",
+        "default"
+      ],
+      "color": "#323",
+      "bgcolor": "#535",
+      "title": "KRAST MODEL - original"
+    },
+    {
+      "id": 2,
+      "type": "CLIPLoader",
+      "pos": [
+        0,
+        1120
+      ],
+      "size": [
+        430,
+        140
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "localized_name": "CLIP",
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            2,
+            13,
+            15,
+            18,
+            22,
+            26,
+            30,
+            32,
+            33,
+            144,
+            180,
+            216,
+            252
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "CLIPLoader",
+        "carousel_source_node": 266,
+        "carousel_widget_names": [
+          "clip_name",
+          "type",
+          "device"
+        ]
+      },
+      "widgets_values": [
+        "Qwen3-VL-4B-Instruct-Heretic-int8-convrot.safetensors",
+        "krea2",
+        "default"
+      ],
+      "color": "#432",
+      "bgcolor": "#653",
+      "title": "KRAST CLIP - original"
+    },
+    {
+      "id": 3,
+      "type": "VAELoader",
+      "pos": [
+        0,
+        1320
+      ],
+      "size": [
+        430,
+        100
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "localized_name": "VAE",
+          "name": "VAE",
+          "type": "VAE",
+          "slot_index": 0,
+          "links": [
+            39,
+            54,
+            73,
+            90,
+            99,
+            105,
+            119,
+            127,
+            138,
+            145,
+            163,
+            174,
+            181,
+            199,
+            210,
+            217,
+            235,
+            246,
+            253
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "VAELoader",
+        "carousel_source_node": 111,
+        "carousel_widget_names": [
+          "vae_name"
+        ]
+      },
+      "widgets_values": [
+        "krea2RealVae_v10.safetensors"
+      ],
+      "color": "#322",
+      "bgcolor": "#533",
+      "title": "KRAST VAE - original"
+    },
+    {
+      "id": 4,
+      "type": "PixaromaLoraLoader",
+      "pos": [
+        0,
+        1480
+      ],
+      "size": [
+        430,
+        240
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "clip",
+          "shape": 7,
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            46,
+            56,
+            59,
+            107,
+            110,
+            124
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": []
+        },
+        {
+          "name": "triggers",
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-Pixaroma",
+        "ver": "27cc07ec889560b07c4c58379e4d8cd289eb936a",
+        "Node name for S&R": "PixaromaLoraLoader",
+        "carousel_source_node": 13441
+      },
+      "widgets_values": [
+        {
+          "version": 1,
+          "loras": [],
+          "sep": ", ",
+          "step": 0.05,
+          "defStrength": 1,
+          "linkStrength": true,
+          "civitai": true,
+          "thumbs": true,
+          "hideExt": true,
+          "accent": null,
+          "cacheMode": "last"
+        }
+      ],
+      "color": "#223",
+      "bgcolor": "#335",
+      "title": "KRAST LoRA loader - original list retained"
+    },
+    {
+      "type": "LoadImage",
+      "title": "01 UPLOAD YOUR APPROVED BASE PHOTO",
+      "pos": [
+        0,
+        0
+      ],
+      "size": [
+        430,
+        520
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            34,
+            52,
+            71,
+            92
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "widgets_values": [
+        "example.png",
+        "image"
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "image",
+          null
+        ]
+      },
+      "id": 5,
+      "order": 3
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "02 SOURCE: true=UPLOADED / false=GENERATE BASE",
+      "pos": [
+        490,
+        0
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            93
+          ]
+        }
+      ],
+      "widgets_values": [
+        true
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 6,
+      "order": 4
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "BASE DEPTH - only used with generated base",
+      "pos": [
+        490,
+        130
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            61,
+            69
+          ]
+        }
+      ],
+      "widgets_values": [
+        true
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 7,
+      "order": 5
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "03 CAROUSEL DEPTH - optional / default OFF",
+      "pos": [
+        490,
+        260
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            112
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 8,
+      "order": 6
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "04 COLOR MATCH - all panels / default ON",
+      "pos": [
+        490,
+        390
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            159,
+            195,
+            231,
+            267
+          ]
+        }
+      ],
+      "widgets_values": [
+        true
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 9,
+      "order": 7
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "05 KRAST FINAL REFINE 1.5x - ON",
+      "pos": [
+        490,
+        520
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            141,
+            177,
+            213,
+            249
+          ]
+        }
+      ],
+      "widgets_values": [
+        true
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 10,
+      "order": 8
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "06 SOFT FACE - default OFF",
+      "pos": [
+        490,
+        650
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            153,
+            189,
+            225,
+            261
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 11,
+      "order": 9
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "CAROUSEL DENOISE - start 0.40",
+      "pos": [
+        940,
+        0
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            113
+          ]
+        }
+      ],
+      "widgets_values": [
+        0.4
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 12,
+      "order": 10
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "GRID BUDGET - 4 x original 1.3",
+      "pos": [
+        940,
+        130
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            97,
+            103
+          ]
+        }
+      ],
+      "widgets_values": [
+        5.2
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 13,
+      "order": 11
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "COLOR MATCH STRENGTH - 0.30",
+      "pos": [
+        940,
+        260
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            156,
+            192,
+            228,
+            264
+          ]
+        }
+      ],
+      "widgets_values": [
+        0.3
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 14,
+      "order": 12
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "07 COMMON DESCRIPTION - identity / outfit / scene / lighting",
+      "pos": [
+        1400,
+        0
+      ],
+      "size": [
+        540,
+        230
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            3,
+            16,
+            20,
+            24,
+            28
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Photorealistic photograph of the same adult woman as in the source photograph. Consistent facial identity, hairstyle, outfit, location and lighting. Natural skin texture and realistic anatomy. Preserve the original photographic style.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 15,
+      "order": 13
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "PANEL 1 - TOP LEFT",
+      "pos": [
+        1400,
+        300
+      ],
+      "size": [
+        540,
+        200
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            6,
+            17
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Looking at the camera with a gentle closed-mouth smile. Keep the original framing.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 16,
+      "order": 14
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "PANEL 2 - TOP RIGHT",
+      "pos": [
+        2000,
+        300
+      ],
+      "size": [
+        540,
+        200
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            8,
+            21
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Turning her head slightly to the side, looking just past the camera with a relaxed expression.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 17,
+      "order": 15
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "PANEL 3 - BOTTOM LEFT",
+      "pos": [
+        1400,
+        560
+      ],
+      "size": [
+        540,
+        200
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            10,
+            25
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Smiling more broadly, with gently raised cheeks. Keep the original framing and outfit.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 18,
+      "order": 16
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "PANEL 4 - BOTTOM RIGHT",
+      "pos": [
+        2000,
+        560
+      ],
+      "size": [
+        540,
+        200
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            12,
+            29
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Tilting her head slightly, with a soft smile and a relaxed natural pose.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 19,
+      "order": 17
+    },
+    {
+      "type": "StringConstantMultiline",
+      "title": "GRID LAYOUT - keep fixed at 2 x 2",
+      "pos": [
+        2600,
+        0
+      ],
+      "size": [
+        520,
+        240
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "widgets_values": [
+        "Create one precise 2 by 2 photographic contact sheet with exactly four equal-sized rectangular panels. One photograph of the same woman in each panel. A straight vertical seam and a straight horizontal seam meet at the exact center. No text, labels, captions, decorative frames or additional panels. Same outfit, background and lighting in all four photographs.",
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "StringConstantMultiline",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "string",
+          "strip_newlines"
+        ]
+      },
+      "id": 20,
+      "order": 18
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Common description + 2x2 layout",
+      "pos": [
+        2600,
+        300
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 3
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            5
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\n"
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 21,
+      "order": 31
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Append panel 1",
+      "pos": [
+        2600,
+        440
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 5
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            7
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\nTop-left panel: "
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 22,
+      "order": 45
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Append panel 2",
+      "pos": [
+        2600,
+        590
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 7
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            9
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\nTop-right panel: "
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 23,
+      "order": 56
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Append panel 3",
+      "pos": [
+        2600,
+        740
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 9
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\nBottom-left panel: "
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 24,
+      "order": 59
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Append panel 4",
+      "pos": [
+        2600,
+        890
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 11
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\nBottom-right panel: "
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 25,
+      "order": 67
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "GRID POSITIVE - assembled automatically",
+      "pos": [
+        3030,
+        0
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 13
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 14,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            115
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 26,
+      "order": 70
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "NEGATIVE - original KRAST empty prompt",
+      "pos": [
+        3030,
+        270
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 15
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            116,
+            131,
+            147,
+            167,
+            183,
+            203,
+            219,
+            239,
+            255
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 27,
+      "order": 32
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Panel 1 text - no grid instruction",
+      "pos": [
+        3450,
+        450
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 16
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\n"
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 28,
+      "order": 33
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "PANEL 1 CONDITIONING",
+      "pos": [
+        3850,
+        450
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 18
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 19,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            130,
+            146
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 29,
+      "order": 46
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Panel 2 text - no grid instruction",
+      "pos": [
+        3450,
+        620
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 20
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            23
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\n"
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 30,
+      "order": 34
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "PANEL 2 CONDITIONING",
+      "pos": [
+        3850,
+        690
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 22
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 23,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            166,
+            182
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 31,
+      "order": 47
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Panel 3 text - no grid instruction",
+      "pos": [
+        3450,
+        790
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 24
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 25
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            27
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\n"
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 32,
+      "order": 35
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "PANEL 3 CONDITIONING",
+      "pos": [
+        3850,
+        930
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 26
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 27,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            202,
+            218
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 33,
+      "order": 48
+    },
+    {
+      "type": "JoinStrings",
+      "title": "Panel 4 text - no grid instruction",
+      "pos": [
+        3450,
+        960
+      ],
+      "size": [
+        300,
+        105
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "string1",
+          "type": "STRING",
+          "link": 28
+        },
+        {
+          "name": "string2",
+          "type": "STRING",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            31
+          ]
+        }
+      ],
+      "widgets_values": [
+        "\n\n"
+      ],
+      "properties": {
+        "Node name for S&R": "JoinStrings",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "delimiter"
+        ]
+      },
+      "id": 34,
+      "order": 36
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "PANEL 4 CONDITIONING",
+      "pos": [
+        3850,
+        1170
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 30
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 31,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            238,
+            254
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 35,
+      "order": 49
+    },
+    {
+      "id": 36,
+      "type": "CLIPTextEncode",
+      "pos": [
+        500,
+        1100
+      ],
+      "size": [
+        600,
+        500
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 32
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            63,
+            82
+          ]
+        }
+      ],
+      "title": "GENERATE BASE - original prompt / edit if using this mode",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "CLIPTextEncode",
+        "carousel_source_node": 112,
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "widgets_values": [
+        "{\n  \"subjects\": [\n    {\n      \"description\": \"A young woman with long dark hair sits on a brick ledge outdoors.\",\n      \"appearance_details\": \"Long wavy black hair, olive skin tone, small dark moles on her arm and thigh.\",\n      \"relationship\": \"Primary subject positioned in the foreground and midground.\",\n      \"location\": \"Center right foreground.\",\n      \"relative_size\": 65,\n      \"orientation\": \"Three quarter view facing the camera.\",\n      \"pose\": \"Sitting with legs bent and arms crossed over her chest.\",\n      \"clothing\": \"Red and black horizontal striped crop top, light blue denim shorts with frayed edges, white sneakers.\",\n      \"expression\": \"Slight smile with a direct gaze.\",\n      \"gender\": \"Female\",\n      \"age\": \"Early 20s\",\n      \"skin_tone_and_texture\": \"Smooth olive skin.\",\n      \"facial_features\": \"Dark eyes, groomed eyebrows, full lips.\",\n      \"number_of_subjects\": 1,\n      \"number_of_arms\": 2,\n      \"number_of_legs\": 2,\n      \"number_of_hands\": 0,\n      \"number_of_fingers\": 0\n    }\n  ,\n  \"subject_details\": {\n    \"hair_style\": \"Long black hair flowing down the back and over the shoulder.\",\n    \"footwear\": \"White low top sneakers with blue accents.\n  },\n  \"background_setting\": \"A scenic outdoor overlook with a brick wall and lush green trees. A distant valley features white buildings and a red flag under a blue sky with white clouds.\",\n  \"aesthetics\": {\n    \"composition\": \"Vertical portrait with the subject placed on the right side of the frame.\",\n    \"color_scheme\": \"Blue, green, red, and earthy brick tones.\",\n    \"mood_atmosphere\": \"Casual and relaxed.\",\n    \"patterns\": \"Horizontal stripes on the shirt and rectangular brick patterns.\"\n  },\n  \"cinematography\": {\n    \"framing\": \"Medium full shot.\",\n    \"camera_angle\": \"Eye level.\",\n    \"depth_of_field\": \"Deep focus with slight softening of the distant hills.\",\n    \"focus\": \"Sharp focus on the subject.\",\n    \"lens_focal_length\": \"Standard wide lens.\"\n  },\n  \"style_medium\": \"Digital Photography\",\n  \"artistic_style\": \"Contemporary outdoor portraiture.\",\n  \"context\": \"A casual lifestyle photograph of a woman at a viewpoint.\",\n  \"text_and_signage_elements\": [,\n  \"quadrant_scan\": {\n    \"top_left\": \"Blue sky with white clouds and green tree leaves.\",\n    \"top_right\": \"The woman's head and dark hair against green foliage.\",\n    \"bottom_left\": \"A brick wall and a black metal stand.\",\n    \"bottom_right\": \"The woman's denim shorts and the brick ledge she sits on.\",\n    \"absolute_center\": \"The woman's torso in a striped red and black top.\"\n  },\n  \"comprehensive_t2i_caption\": \"A digital photograph captures a young woman with long wavy black hair sitting on an old red brick ledge. She wears a red and black horizontal striped crop top and light blue denim shorts with frayed hems. Her pose is relaxed with her arms crossed and her legs bent while she looks directly at the camera with a subtle smile. The scene is set outdoors. In the background, a lush green valley stretches out with small white houses and a distant red flag visible on a hill. The camera angle is at eye level, providing a clear view of the subject against the expansive landscape.\",\n  \"resolution\": {\n    \"H\": 1600,\n    \"W\": 1000\n  },\n  \"aspect_ratio\": \"5:8\"\n}"
+      ],
+      "color": "#2f9e3f",
+      "bgcolor": "#263628"
+    },
+    {
+      "type": "CLIPTextEncode",
+      "title": "BASE negative",
+      "pos": [
+        500,
+        1700
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            64,
+            83
+          ]
+        }
+      ],
+      "widgets_values": [
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "text"
+        ]
+      },
+      "id": 37,
+      "order": 38
+    },
+    {
+      "type": "ImageScaleToTotalPixels",
+      "title": "BASE reference size - original 1.3 MP",
+      "pos": [
+        1200,
+        1100
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            35,
+            38
+          ]
+        }
+      ],
+      "widgets_values": [
+        "lanczos",
+        1.3,
+        32
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScaleToTotalPixels",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "upscale_method",
+          "megapixels",
+          "resolution_steps"
+        ]
+      },
+      "id": 38,
+      "order": 39
+    },
+    {
+      "type": "GetImageSize",
+      "title": "BASE dimensions from reference",
+      "pos": [
+        1630,
+        1100
+      ],
+      "size": [
+        340,
+        130
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            36
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            37
+          ]
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": []
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "GetImageSize",
+        "cnr_id": "comfy-core"
+      },
+      "id": 39,
+      "order": 50
+    },
+    {
+      "type": "EmptySD3LatentImage",
+      "size": [
+        350,
+        140
+      ],
+      "widgets_values": [
+        1024,
+        1024,
+        1
+      ],
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 36,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 37,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            40
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptySD3LatentImage",
+        "cnr_id": "comfy-core",
+        "carousel_source_node": 13468,
+        "carousel_widget_names": [
+          "width",
+          "height",
+          "batch_size"
+        ]
+      },
+      "id": 40,
+      "title": "BASE empty Krea2 latent",
+      "pos": [
+        2030,
+        1100
+      ],
+      "order": 57,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "VAEEncode",
+      "title": "BASE image-to-image initialization",
+      "pos": [
+        1630,
+        1320
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 38
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 39
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            41
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEEncode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 41,
+      "order": 51
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "BASE IMG2IMG - original ON / false=TEXT TO IMAGE",
+      "pos": [
+        1200,
+        1520
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            42,
+            45
+          ]
+        }
+      ],
+      "widgets_values": [
+        true
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 42,
+      "order": 19
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "BASE latent mode",
+      "pos": [
+        2030,
+        1330
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 40
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 41
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 42,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            55,
+            65
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 43,
+      "order": 60
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "BASE img2img denoise - original 0.40",
+      "pos": [
+        1630,
+        1700
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            44
+          ]
+        }
+      ],
+      "widgets_values": [
+        0.4
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 44,
+      "order": 20
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "BASE text-to-image denoise",
+      "pos": [
+        2030,
+        1700
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            43
+          ]
+        }
+      ],
+      "widgets_values": [
+        1.0
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 45,
+      "order": 21
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "BASE denoise follows mode",
+      "pos": [
+        2450,
+        1700
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 43
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 44
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 45,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            66
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 46,
+      "order": 40
+    },
+    {
+      "id": 47,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [
+        0,
+        2150
+      ],
+      "size": [
+        340,
+        85
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 46
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            47
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "ModelSamplingAuraFlow",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1628,
+        "carousel_widget_names": [
+          "shift"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "KRAST Stage 2 - original model sampling"
+    },
+    {
+      "id": 48,
+      "type": "AdaptiveProjectedGuidance",
+      "pos": [
+        400,
+        2150
+      ],
+      "size": [
+        350,
+        210
+      ],
+      "flags": {},
+      "order": 58,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 47
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            48,
+            75,
+            78,
+            129,
+            165,
+            201,
+            237
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-adaptive-guidance",
+        "ver": "181641ca04ac524992f40e8717f5da01eb82ea79",
+        "Node name for S&R": "AdaptiveProjectedGuidance",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1630
+      },
+      "widgets_values": [
+        0.4,
+        1,
+        12,
+        "normal",
+        0.18
+      ],
+      "color": "#6a3fcf",
+      "bgcolor": "#2f283e",
+      "shape": 1,
+      "title": "KRAST Stage 2 - original APG"
+    },
+    {
+      "id": 49,
+      "type": "BetaSamplingScheduler",
+      "pos": [
+        810,
+        2150
+      ],
+      "size": [
+        350,
+        140
+      ],
+      "flags": {},
+      "order": 61,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 48
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            49
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.65",
+        "Node name for S&R": "BetaSamplingScheduler",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 13421,
+        "carousel_widget_names": [
+          "steps",
+          "alpha",
+          "beta"
+        ]
+      },
+      "widgets_values": [
+        6,
+        0.45000000000000007,
+        0.45
+      ],
+      "color": "#6a3fcf",
+      "bgcolor": "#2f283e",
+      "title": "KRAST Stage 2 - original beta sigmas"
+    },
+    {
+      "id": 50,
+      "type": "Sigmas Rescale",
+      "pos": [
+        1220,
+        2150
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 68,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 49
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sigmas_rescaled",
+          "type": "SIGMAS",
+          "links": [
+            50
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "res4lyf",
+        "ver": "46de917234f9fef3f2ab411c41e07aa3c633f4f7",
+        "Node name for S&R": "Sigmas Rescale",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 13422,
+        "carousel_widget_names": [
+          "sigma_max",
+          "sigma_min"
+        ]
+      },
+      "widgets_values": [
+        0.988,
+        0
+      ],
+      "title": "Original sigma rescale 0.988"
+    },
+    {
+      "id": 51,
+      "type": "Sigmas Rescale",
+      "pos": [
+        1220,
+        2300
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 71,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 50
+        }
+      ],
+      "outputs": [
+        {
+          "name": "sigmas_rescaled",
+          "type": "SIGMAS",
+          "links": [
+            87,
+            135,
+            171,
+            207,
+            243
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "res4lyf",
+        "ver": "46de917234f9fef3f2ab411c41e07aa3c633f4f7",
+        "Node name for S&R": "Sigmas Rescale",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 13424,
+        "carousel_widget_names": [
+          "sigma_max",
+          "sigma_min"
+        ]
+      },
+      "widgets_values": [
+        0.75,
+        0
+      ],
+      "title": "Original sigma rescale 0.75 (not denoise)"
+    },
+    {
+      "id": 52,
+      "type": "SamplerDPMPP_SDE",
+      "pos": [
+        1630,
+        2150
+      ],
+      "size": [
+        340,
+        170
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            86,
+            134,
+            170,
+            206,
+            242
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.69",
+        "Node name for S&R": "SamplerDPMPP_SDE",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1634,
+        "carousel_widget_names": [
+          "eta",
+          "s_noise",
+          "r",
+          "noise_device"
+        ]
+      },
+      "widgets_values": [
+        1.05,
+        1.005,
+        1.25,
+        "gpu"
+      ],
+      "shape": 1,
+      "title": "KRAST Stage 2 - original DPM++ SDE"
+    },
+    {
+      "id": 53,
+      "type": "AdvancedNoise",
+      "pos": [
+        2030,
+        2150
+      ],
+      "size": [
+        350,
+        210
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise_seed",
+          "type": "INT",
+          "widget": {
+            "name": "noise_seed"
+          },
+          "link": 51
+        }
+      ],
+      "outputs": [
+        {
+          "name": "NOISE",
+          "type": "NOISE",
+          "links": [
+            84,
+            132,
+            168,
+            204,
+            240
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "RES4LYF",
+        "ver": "7750bf7800b6ad9d670308a09989fc0c04c40cec",
+        "Node name for S&R": "AdvancedNoise",
+        "carousel_source_node": 1622
+      },
+      "widgets_values": [
+        1,
+        1,
+        0,
+        "fixed",
+        "gaussian"
+      ],
+      "shape": 1,
+      "title": "KRAST Stage 2 - original noise"
+    },
+    {
+      "type": "PrimitiveInt",
+      "title": "KRAST Stage 2 fixed seed",
+      "pos": [
+        2030,
+        2410
+      ],
+      "size": [
+        350,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "widgets_values": [
+        742277270076956,
+        "fixed"
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveInt",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value",
+          null
+        ]
+      },
+      "id": 54,
+      "order": 23
+    },
+    {
+      "id": 55,
+      "type": "DepthAnythingV2Preprocessor",
+      "pos": [
+        0,
+        2750
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 52
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            53
+          ]
+        }
+      ],
+      "title": "BASE DEPTH - Depth Anything / 768",
+      "properties": {
+        "cnr_id": "comfyui_controlnet_aux",
+        "ver": "1.1.4",
+        "Node name for S&R": "DepthAnythingV2Preprocessor",
+        "carousel_source_node": 44,
+        "carousel_widget_names": [
+          "ckpt_name",
+          "resolution"
+        ]
+      },
+      "widgets_values": [
+        "depth_anything_v2_vitl.pth",
+        768
+      ]
+    },
+    {
+      "id": 56,
+      "type": "Krea2ControlImageEncode",
+      "pos": [
+        430,
+        2750
+      ],
+      "size": [
+        400,
+        290
+      ],
+      "flags": {},
+      "order": 69,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "control_image",
+          "type": "IMAGE",
+          "link": 53
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 54
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 55,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "links": [
+            58
+          ]
+        },
+        {
+          "name": "encoded_control_image",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "BASE DEPTH - control encode",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlImageEncode",
+        "carousel_source_node": 45,
+        "carousel_widget_names": [
+          "resize",
+          "upscale_method",
+          "crop",
+          "channel_mode",
+          "normalize",
+          "invert",
+          "batch_mode"
+        ]
+      },
+      "widgets_values": [
+        "match_latent_size",
+        "bicubic",
+        "center",
+        "grayscale",
+        "per_image_minmax",
+        false,
+        "independent_images"
+      ]
+    },
+    {
+      "id": 57,
+      "type": "Krea2ControlLoRALoader",
+      "pos": [
+        900,
+        2750
+      ],
+      "size": [
+        400,
+        140
+      ],
+      "flags": {},
+      "order": 53,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 56
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            57
+          ]
+        }
+      ],
+      "title": "BASE DEPTH - strength",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlLoRALoader",
+        "carousel_source_node": 46,
+        "carousel_widget_names": [
+          "lora_name",
+          "strength"
+        ]
+      },
+      "widgets_values": [
+        "depth-control-lora.safetensors",
+        0.75
+      ]
+    },
+    {
+      "id": 58,
+      "type": "Krea2ControlApply",
+      "pos": [
+        900,
+        2960
+      ],
+      "size": [
+        400,
+        110
+      ],
+      "flags": {},
+      "order": 72,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 57
+        },
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "link": 58
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            60
+          ]
+        }
+      ],
+      "title": "BASE DEPTH - apply",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlApply",
+        "carousel_source_node": 47
+      },
+      "widgets_values": []
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "BASE DEPTH - OFF bypasses depth",
+      "pos": [
+        1350,
+        2750
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 59
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 60
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 61,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            62
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 59,
+      "order": 73
+    },
+    {
+      "id": 60,
+      "type": "KSampler",
+      "pos": [
+        3000,
+        1250
+      ],
+      "size": [
+        440,
+        450
+      ],
+      "flags": {},
+      "order": 74,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 62
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 63
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 64
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 65
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            70
+          ]
+        }
+      ],
+      "title": "GENERATE BASE - original sampler",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "KSampler",
+        "carousel_source_node": 170
+      },
+      "widgets_values": [
+        742277270076956,
+        "fixed",
+        8,
+        1,
+        "er_sde",
+        "simple",
+        1
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "BASE STAGE 2 DEPTH - original OFF",
+      "pos": [
+        3000,
+        1750
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            68
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 61,
+      "order": 24
+    },
+    {
+      "type": "BOOLConstant",
+      "title": "Base depth master fallback",
+      "pos": [
+        3450,
+        1750
+      ],
+      "size": [
+        370,
+        80
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "value",
+          "type": "BOOLEAN",
+          "links": [
+            67
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "BOOLConstant",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 62,
+      "order": 25
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "BASE second depth master",
+      "pos": [
+        3850,
+        1750
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 67
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 68
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 69,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            80
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 63,
+      "order": 43
+    },
+    {
+      "id": 64,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        380,
+        3400
+      ],
+      "size": [
+        370,
+        120
+      ],
+      "flags": {},
+      "order": 75,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 70
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            74,
+            88
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "LatentUpscaleBy",
+        "carousel_source_node": 1639,
+        "carousel_widget_names": [
+          "upscale_method",
+          "scale_by"
+        ]
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#9e3fc0",
+      "bgcolor": "#36283b",
+      "title": "GENERATED BASE STAGE 2 - original 1.5x latent upscale"
+    },
+    {
+      "id": 65,
+      "type": "DepthAnythingV2Preprocessor",
+      "pos": [
+        0,
+        3750
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 71
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            72
+          ]
+        }
+      ],
+      "title": "GENERATED BASE STAGE 2 DEPTH - Depth Anything / 768",
+      "properties": {
+        "cnr_id": "comfyui_controlnet_aux",
+        "ver": "1.1.4",
+        "Node name for S&R": "DepthAnythingV2Preprocessor",
+        "carousel_source_node": 44,
+        "carousel_widget_names": [
+          "ckpt_name",
+          "resolution"
+        ]
+      },
+      "widgets_values": [
+        "depth_anything_v2_vitl.pth",
+        768
+      ]
+    },
+    {
+      "id": 66,
+      "type": "Krea2ControlImageEncode",
+      "pos": [
+        430,
+        3750
+      ],
+      "size": [
+        400,
+        290
+      ],
+      "flags": {},
+      "order": 76,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "control_image",
+          "type": "IMAGE",
+          "link": 72
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 73
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 74,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "links": [
+            77
+          ]
+        },
+        {
+          "name": "encoded_control_image",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "GENERATED BASE STAGE 2 DEPTH - control encode",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlImageEncode",
+        "carousel_source_node": 45,
+        "carousel_widget_names": [
+          "resize",
+          "upscale_method",
+          "crop",
+          "channel_mode",
+          "normalize",
+          "invert",
+          "batch_mode"
+        ]
+      },
+      "widgets_values": [
+        "match_latent_size",
+        "bicubic",
+        "center",
+        "grayscale",
+        "per_image_minmax",
+        false,
+        "independent_images"
+      ]
+    },
+    {
+      "id": 67,
+      "type": "Krea2ControlLoRALoader",
+      "pos": [
+        900,
+        3750
+      ],
+      "size": [
+        400,
+        140
+      ],
+      "flags": {},
+      "order": 62,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 75
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            76
+          ]
+        }
+      ],
+      "title": "GENERATED BASE STAGE 2 DEPTH - strength",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlLoRALoader",
+        "carousel_source_node": 46,
+        "carousel_widget_names": [
+          "lora_name",
+          "strength"
+        ]
+      },
+      "widgets_values": [
+        "depth-control-lora.safetensors",
+        0.75
+      ]
+    },
+    {
+      "id": 68,
+      "type": "Krea2ControlApply",
+      "pos": [
+        900,
+        3960
+      ],
+      "size": [
+        400,
+        110
+      ],
+      "flags": {},
+      "order": 77,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 76
+        },
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "link": 77
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            79
+          ]
+        }
+      ],
+      "title": "GENERATED BASE STAGE 2 DEPTH - apply",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlApply",
+        "carousel_source_node": 47
+      },
+      "widgets_values": []
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "GENERATED BASE STAGE 2 DEPTH - OFF bypasses depth",
+      "pos": [
+        1350,
+        3750
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 78
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 79
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 80,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            81
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 69,
+      "order": 78
+    },
+    {
+      "id": 70,
+      "type": "CFGGuider",
+      "pos": [
+        800,
+        3400
+      ],
+      "size": [
+        350,
+        130
+      ],
+      "flags": {},
+      "order": 79,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 81
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 82
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 83
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            85
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "CFGGuider",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1626,
+        "carousel_widget_names": [
+          "cfg"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "GENERATED BASE STAGE 2 - panel conditioning"
+    },
+    {
+      "id": 71,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1200,
+        3400
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 80,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 84
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 85
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 86
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 87
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 88
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            89
+          ]
+        }
+      ],
+      "title": "GENERATED BASE STAGE 2 - original STAGE 2",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1636
+      },
+      "widgets_values": [],
+      "color": "#009933",
+      "bgcolor": "#2f283e",
+      "shape": 1
+    },
+    {
+      "type": "VAEDecode",
+      "title": "GENERATED BASE STAGE 2 - decode",
+      "pos": [
+        1630,
+        3400
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 89
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 90
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            91
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEDecode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 72,
+      "order": 81
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "SOURCE PHOTO - uploaded or generated",
+      "pos": [
+        0,
+        4500
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 91
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 92
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 93,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            94,
+            95,
+            100,
+            154,
+            190,
+            226,
+            262
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 73,
+      "order": 82
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE CHOSEN SOURCE",
+      "pos": [
+        0,
+        4720
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 94
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/source"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 74,
+      "order": 83
+    },
+    {
+      "type": "GridStitch",
+      "title": "REPEAT SOURCE - fixed 2x2",
+      "pos": [
+        450,
+        4500
+      ],
+      "size": [
+        390,
+        180
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 95
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grid",
+          "type": "IMAGE",
+          "links": [
+            96
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": []
+        }
+      ],
+      "widgets_values": [
+        2,
+        2,
+        5.4525952,
+        "lanczos"
+      ],
+      "properties": {
+        "Node name for S&R": "GridStitch",
+        "cnr_id": "comfyui-autogrid",
+        "carousel_widget_names": [
+          "rows",
+          "cols",
+          "megapixels",
+          "scale_method"
+        ]
+      },
+      "id": 75,
+      "order": 84
+    },
+    {
+      "type": "ImageScaleToTotalPixels",
+      "title": "GRID SIZE - total budget / align 64 pixels",
+      "pos": [
+        900,
+        4500
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 96
+        },
+        {
+          "name": "megapixels",
+          "type": "FLOAT",
+          "link": 97,
+          "widget": {
+            "name": "megapixels"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            98
+          ]
+        }
+      ],
+      "widgets_values": [
+        "lanczos",
+        1,
+        64
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScaleToTotalPixels",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "upscale_method",
+          "megapixels",
+          "resolution_steps"
+        ]
+      },
+      "id": 76,
+      "order": 86
+    },
+    {
+      "type": "VAEEncodeTiled",
+      "title": "GRID VAE ENCODE - tiled for memory",
+      "pos": [
+        1350,
+        4500
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 98
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 99
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            106,
+            117
+          ]
+        }
+      ],
+      "widgets_values": [
+        512,
+        64,
+        64,
+        8
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncodeTiled",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "tile_size",
+          "overlap",
+          "temporal_size",
+          "temporal_overlap"
+        ]
+      },
+      "id": 77,
+      "order": 88
+    },
+    {
+      "id": 78,
+      "type": "DepthAnythingV2Preprocessor",
+      "pos": [
+        0,
+        5450
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "flags": {},
+      "order": 85,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 100
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            101
+          ]
+        }
+      ],
+      "title": "CAROUSEL DEPTH - Depth Anything / 768",
+      "properties": {
+        "cnr_id": "comfyui_controlnet_aux",
+        "ver": "1.1.4",
+        "Node name for S&R": "DepthAnythingV2Preprocessor",
+        "carousel_source_node": 44,
+        "carousel_widget_names": [
+          "ckpt_name",
+          "resolution"
+        ]
+      },
+      "widgets_values": [
+        "depth_anything_v2_vitl.pth",
+        768
+      ]
+    },
+    {
+      "type": "GridStitch",
+      "title": "CAROUSEL DEPTH - repeat depth in 2x2",
+      "pos": [
+        0,
+        5660
+      ],
+      "size": [
+        370,
+        160
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 101
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grid",
+          "type": "IMAGE",
+          "links": [
+            102
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": []
+        }
+      ],
+      "widgets_values": [
+        2,
+        2,
+        5.2,
+        "lanczos"
+      ],
+      "properties": {
+        "Node name for S&R": "GridStitch",
+        "cnr_id": "comfyui-autogrid",
+        "carousel_widget_names": [
+          "rows",
+          "cols",
+          "megapixels",
+          "scale_method"
+        ]
+      },
+      "id": 79,
+      "order": 87
+    },
+    {
+      "type": "ImageScaleToTotalPixels",
+      "title": "CAROUSEL DEPTH - align depth canvas",
+      "pos": [
+        0,
+        5880
+      ],
+      "size": [
+        370,
+        150
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 102
+        },
+        {
+          "name": "megapixels",
+          "type": "FLOAT",
+          "link": 103,
+          "widget": {
+            "name": "megapixels"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            104
+          ]
+        }
+      ],
+      "widgets_values": [
+        "lanczos",
+        1,
+        64
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScaleToTotalPixels",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "upscale_method",
+          "megapixels",
+          "resolution_steps"
+        ]
+      },
+      "id": 80,
+      "order": 89
+    },
+    {
+      "id": 81,
+      "type": "Krea2ControlImageEncode",
+      "pos": [
+        430,
+        5450
+      ],
+      "size": [
+        400,
+        290
+      ],
+      "flags": {},
+      "order": 90,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "control_image",
+          "type": "IMAGE",
+          "link": 104
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 105
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 106,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "links": [
+            109
+          ]
+        },
+        {
+          "name": "encoded_control_image",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "title": "CAROUSEL DEPTH - control encode",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlImageEncode",
+        "carousel_source_node": 45,
+        "carousel_widget_names": [
+          "resize",
+          "upscale_method",
+          "crop",
+          "channel_mode",
+          "normalize",
+          "invert",
+          "batch_mode"
+        ]
+      },
+      "widgets_values": [
+        "match_latent_size",
+        "bicubic",
+        "center",
+        "grayscale",
+        "per_image_minmax",
+        false,
+        "independent_images"
+      ]
+    },
+    {
+      "id": 82,
+      "type": "Krea2ControlLoRALoader",
+      "pos": [
+        900,
+        5450
+      ],
+      "size": [
+        400,
+        140
+      ],
+      "flags": {},
+      "order": 54,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 107
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            108
+          ]
+        }
+      ],
+      "title": "CAROUSEL DEPTH - strength",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlLoRALoader",
+        "carousel_source_node": 46,
+        "carousel_widget_names": [
+          "lora_name",
+          "strength"
+        ]
+      },
+      "widgets_values": [
+        "depth-control-lora.safetensors",
+        0.35
+      ]
+    },
+    {
+      "id": 83,
+      "type": "Krea2ControlApply",
+      "pos": [
+        900,
+        5660
+      ],
+      "size": [
+        400,
+        110
+      ],
+      "flags": {},
+      "order": 91,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 108
+        },
+        {
+          "name": "control_latent",
+          "type": "LATENT",
+          "link": 109
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            111
+          ]
+        }
+      ],
+      "title": "CAROUSEL DEPTH - apply",
+      "properties": {
+        "aux_id": "facok/comfyui-krea2-controlnet",
+        "ver": "79ebfd3bd80d2180b334dd7ce57f3c9ddaa0848f",
+        "Node name for S&R": "Krea2ControlApply",
+        "carousel_source_node": 47
+      },
+      "widgets_values": []
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "CAROUSEL DEPTH - OFF bypasses depth",
+      "pos": [
+        1350,
+        5450
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 110
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 111
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 112,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            114
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 84,
+      "order": 92
+    },
+    {
+      "id": 85,
+      "type": "KSampler",
+      "pos": [
+        1800,
+        4500
+      ],
+      "size": [
+        450,
+        460
+      ],
+      "flags": {},
+      "order": 93,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 114
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 115
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 116
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 117
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 113
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            118
+          ]
+        }
+      ],
+      "title": "CAROUSEL IMG2IMG - KRAST er_sde / simple",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.50",
+        "Node name for S&R": "KSampler",
+        "carousel_source_node": 170
+      },
+      "widgets_values": [
+        742277270076956,
+        "fixed",
+        8,
+        1,
+        "er_sde",
+        "simple",
+        0.4
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "type": "VAEDecodeTiled",
+      "title": "GENERATED GRID - decode tiled",
+      "pos": [
+        2330,
+        4500
+      ],
+      "size": [
+        330,
+        160
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 118
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 119
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            120,
+            121,
+            122
+          ]
+        }
+      ],
+      "widgets_values": [
+        512,
+        64,
+        64,
+        8
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecodeTiled",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "tile_size",
+          "overlap",
+          "temporal_size",
+          "temporal_overlap"
+        ]
+      },
+      "id": 86,
+      "order": 94
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE GENERATED GRID - before panel finishing",
+      "pos": [
+        2750,
+        4500
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 120
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/grid_before_finish"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 87,
+      "order": 95
+    },
+    {
+      "type": "ImageGridtoBatch",
+      "title": "SPLIT EXACT 2x2 - TL / TR / BL / BR",
+      "pos": [
+        3250,
+        4500
+      ],
+      "size": [
+        380,
+        140
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 121
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            125,
+            161,
+            197,
+            233
+          ]
+        }
+      ],
+      "widgets_values": [
+        2,
+        2
+      ],
+      "properties": {
+        "Node name for S&R": "ImageGridtoBatch",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "columns",
+          "rows"
+        ]
+      },
+      "id": 88,
+      "order": 96
+    },
+    {
+      "type": "AutoGridSplit",
+      "title": "AUTOGRID DIAGNOSTIC - inspect red seams",
+      "pos": [
+        3250,
+        4800
+      ],
+      "size": [
+        380,
+        190
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 122
+        }
+      ],
+      "outputs": [
+        {
+          "name": "panels",
+          "type": "IMAGE",
+          "links": [],
+          "shape": 6
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "preview",
+          "type": "IMAGE",
+          "links": [
+            123
+          ]
+        }
+      ],
+      "widgets_values": [
+        1.0,
+        64,
+        0
+      ],
+      "properties": {
+        "Node name for S&R": "AutoGridSplit",
+        "cnr_id": "comfyui-autogrid",
+        "carousel_widget_names": [
+          "sensitivity",
+          "min_panel_px",
+          "edge_trim"
+        ]
+      },
+      "id": 89,
+      "order": 97
+    },
+    {
+      "type": "PreviewImage",
+      "title": "CHECK: model should have made four equal panels",
+      "pos": [
+        3750,
+        4500
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 123
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage",
+        "cnr_id": "comfy-core"
+      },
+      "id": 90,
+      "order": 98
+    },
+    {
+      "id": 91,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [
+        1950,
+        5600
+      ],
+      "size": [
+        370,
+        90
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 124
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            143,
+            179,
+            215,
+            251
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.27.0",
+        "Node name for S&R": "ModelSamplingAuraFlow",
+        "carousel_source_node": 13430,
+        "carousel_widget_names": [
+          "shift"
+        ]
+      },
+      "widgets_values": [
+        0.65
+      ],
+      "color": "#233",
+      "bgcolor": "#355",
+      "title": "SOFT FACE model sampling - original 0.65"
+    },
+    {
+      "id": 92,
+      "type": "UltralyticsDetectorProvider",
+      "pos": [
+        2380,
+        5600
+      ],
+      "size": [
+        390,
+        100
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "localized_name": "BBOX_DETECTOR",
+          "name": "BBOX_DETECTOR",
+          "type": "BBOX_DETECTOR",
+          "links": [
+            148,
+            184,
+            220,
+            256
+          ]
+        },
+        {
+          "localized_name": "SEGM_DETECTOR",
+          "name": "SEGM_DETECTOR",
+          "type": "SEGM_DETECTOR",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-subpack",
+        "ver": "1.3.5",
+        "Node name for S&R": "UltralyticsDetectorProvider",
+        "carousel_source_node": 13428,
+        "carousel_widget_names": [
+          "model_name"
+        ]
+      },
+      "widgets_values": [
+        "bbox/face_yolov8m.pt"
+      ],
+      "title": "SOFT FACE bbox model"
+    },
+    {
+      "id": 93,
+      "type": "SAMLoader",
+      "pos": [
+        2830,
+        5600
+      ],
+      "size": [
+        390,
+        110
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "SAM_model_name",
+          "localized_name": "model_name",
+          "name": "model_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "model_name"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "SAM_MODEL",
+          "name": "SAM_MODEL",
+          "type": "SAM_MODEL",
+          "links": [
+            149,
+            185,
+            221,
+            257
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "8.28.1",
+        "Node name for S&R": "SAMLoader",
+        "carousel_source_node": 13429,
+        "carousel_widget_names": [
+          "model_name",
+          "device_mode"
+        ]
+      },
+      "widgets_values": [
+        "sam_vit_b_01ec64.pth",
+        "AUTO"
+      ],
+      "title": "SOFT FACE SAM model"
+    },
+    {
+      "type": "PrimitiveFloat",
+      "title": "SOFT FACE DENOISE - original 0.15",
+      "pos": [
+        3300,
+        5600
+      ],
+      "size": [
+        370,
+        85
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            150,
+            186,
+            222,
+            258
+          ]
+        }
+      ],
+      "widgets_values": [
+        0.15
+      ],
+      "properties": {
+        "Node name for S&R": "PrimitiveFloat",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "value"
+        ]
+      },
+      "id": 94,
+      "order": 28
+    },
+    {
+      "type": "ImageFromBatch",
+      "title": "PANEL 1 - fixed index 0",
+      "pos": [
+        0,
+        6400
+      ],
+      "size": [
+        330,
+        140
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 125
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            126,
+            139
+          ]
+        }
+      ],
+      "widgets_values": [
+        0,
+        1
+      ],
+      "properties": {
+        "Node name for S&R": "ImageFromBatch",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "batch_index",
+          "length"
+        ]
+      },
+      "id": 95,
+      "order": 99
+    },
+    {
+      "type": "VAEEncode",
+      "title": "PANEL 1 - encode panel",
+      "pos": [
+        380,
+        6400
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 126
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 127
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            128
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEEncode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 96,
+      "order": 103
+    },
+    {
+      "id": 97,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        760,
+        6400
+      ],
+      "size": [
+        370,
+        120
+      ],
+      "flags": {},
+      "order": 107,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 128
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            136
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "LatentUpscaleBy",
+        "carousel_source_node": 1639,
+        "carousel_widget_names": [
+          "upscale_method",
+          "scale_by"
+        ]
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#9e3fc0",
+      "bgcolor": "#36283b",
+      "title": "PANEL 1 - original 1.5x latent upscale"
+    },
+    {
+      "id": 98,
+      "type": "CFGGuider",
+      "pos": [
+        1180,
+        6400
+      ],
+      "size": [
+        350,
+        130
+      ],
+      "flags": {},
+      "order": 63,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 129
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 130
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 131
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            133
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "CFGGuider",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1626,
+        "carousel_widget_names": [
+          "cfg"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "PANEL 1 - panel conditioning"
+    },
+    {
+      "id": 99,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1580,
+        6400
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 111,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 132
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 133
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 134
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 135
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 136
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            137
+          ]
+        }
+      ],
+      "title": "PANEL 1 - original STAGE 2",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1636
+      },
+      "widgets_values": [],
+      "color": "#009933",
+      "bgcolor": "#2f283e",
+      "shape": 1
+    },
+    {
+      "type": "VAEDecode",
+      "title": "PANEL 1 - decode",
+      "pos": [
+        2010,
+        6400
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 137
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 138
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            140
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEDecode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 100,
+      "order": 115
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 1 - optional final refinement",
+      "pos": [
+        2420,
+        6400
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 139
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 140
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 141,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            142,
+            151
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 101,
+      "order": 119
+    },
+    {
+      "id": 102,
+      "type": "FaceDetailer",
+      "pos": [
+        2850,
+        6400
+      ],
+      "size": [
+        400,
+        1150
+      ],
+      "flags": {},
+      "order": 123,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 142
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 143
+        },
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 144
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 145
+        },
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 146
+        },
+        {
+          "localized_name": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 147
+        },
+        {
+          "localized_name": "bbox_detector",
+          "name": "bbox_detector",
+          "type": "BBOX_DETECTOR",
+          "link": 148
+        },
+        {
+          "localized_name": "sam_model_opt",
+          "name": "sam_model_opt",
+          "shape": 7,
+          "type": "SAM_MODEL",
+          "link": 149
+        },
+        {
+          "localized_name": "segm_detector_opt",
+          "name": "segm_detector_opt",
+          "shape": 7,
+          "type": "SEGM_DETECTOR",
+          "link": null
+        },
+        {
+          "localized_name": "detailer_hook",
+          "name": "detailer_hook",
+          "shape": 7,
+          "type": "DETAILER_HOOK",
+          "link": null
+        },
+        {
+          "localized_name": "scheduler_func_opt",
+          "name": "scheduler_func_opt",
+          "shape": 7,
+          "type": "SCHEDULER_FUNC",
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "denoise",
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 150
+        },
+        {
+          "label": "trigger threshold (lower = more chance)",
+          "localized_name": "bbox_threshold",
+          "name": "bbox_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_threshold"
+          },
+          "link": null
+        },
+        {
+          "label": "face crop facor (less is closer)",
+          "localized_name": "bbox_crop_factor",
+          "name": "bbox_crop_factor",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_crop_factor"
+          },
+          "link": null
+        },
+        {
+          "label": "number_of_passes",
+          "localized_name": "cycle",
+          "name": "cycle",
+          "type": "INT",
+          "widget": {
+            "name": "cycle"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            152
+          ]
+        },
+        {
+          "localized_name": "cropped_refined",
+          "name": "cropped_refined",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "cropped_enhanced_alpha",
+          "name": "cropped_enhanced_alpha",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "detailer_pipe",
+          "name": "detailer_pipe",
+          "type": "DETAILER_PIPE",
+          "links": []
+        },
+        {
+          "localized_name": "cnet_images",
+          "name": "cnet_images",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "8.28.3",
+        "Node name for S&R": "FaceDetailer",
+        "carousel_source_node": 13432
+      },
+      "widgets_values": [
+        1024,
+        true,
+        1024,
+        446700986820561,
+        "fixed",
+        3,
+        1,
+        "euler",
+        "simple",
+        0.15,
+        27,
+        true,
+        true,
+        0.214000244140625,
+        35,
+        1.2000000000000002,
+        "center-1",
+        30,
+        0.93,
+        0,
+        0.7,
+        "False",
+        10,
+        "",
+        1,
+        false,
+        20,
+        false,
+        false
+      ],
+      "title": "PANEL 1 - gentle FaceDetailer"
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 1 - FaceDetailer ON/OFF",
+      "pos": [
+        3300,
+        6400
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 151
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 152
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 153,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            155,
+            157
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 103,
+      "order": 127
+    },
+    {
+      "type": "ColorMatch",
+      "size": [
+        390,
+        190
+      ],
+      "widgets_values": [
+        "mkl",
+        0.3,
+        true
+      ],
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 154
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 155
+        },
+        {
+          "name": "strength",
+          "type": "FLOAT",
+          "link": 156,
+          "widget": {
+            "name": "strength"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            158
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_source_node": 52,
+        "carousel_widget_names": [
+          "method",
+          "strength",
+          "multithread"
+        ]
+      },
+      "id": 104,
+      "title": "PANEL 1 - Color Match mkl",
+      "pos": [
+        3750,
+        6400
+      ],
+      "order": 131,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 1 - Color Match ON/OFF",
+      "pos": [
+        4200,
+        6400
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 157
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 158
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 159,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            160,
+            269
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 105,
+      "order": 135
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE FINAL PANEL 01",
+      "pos": [
+        4650,
+        6400
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 160
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/panel_01"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 106,
+      "order": 139
+    },
+    {
+      "type": "ImageFromBatch",
+      "title": "PANEL 2 - fixed index 1",
+      "pos": [
+        0,
+        7700
+      ],
+      "size": [
+        330,
+        140
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 161
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            162,
+            175
+          ]
+        }
+      ],
+      "widgets_values": [
+        1,
+        1
+      ],
+      "properties": {
+        "Node name for S&R": "ImageFromBatch",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "batch_index",
+          "length"
+        ]
+      },
+      "id": 107,
+      "order": 100
+    },
+    {
+      "type": "VAEEncode",
+      "title": "PANEL 2 - encode panel",
+      "pos": [
+        380,
+        7700
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 162
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 163
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            164
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEEncode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 108,
+      "order": 104
+    },
+    {
+      "id": 109,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        760,
+        7700
+      ],
+      "size": [
+        370,
+        120
+      ],
+      "flags": {},
+      "order": 108,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 164
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            172
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "LatentUpscaleBy",
+        "carousel_source_node": 1639,
+        "carousel_widget_names": [
+          "upscale_method",
+          "scale_by"
+        ]
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#9e3fc0",
+      "bgcolor": "#36283b",
+      "title": "PANEL 2 - original 1.5x latent upscale"
+    },
+    {
+      "id": 110,
+      "type": "CFGGuider",
+      "pos": [
+        1180,
+        7700
+      ],
+      "size": [
+        350,
+        130
+      ],
+      "flags": {},
+      "order": 64,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 165
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 166
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 167
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            169
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "CFGGuider",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1626,
+        "carousel_widget_names": [
+          "cfg"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "PANEL 2 - panel conditioning"
+    },
+    {
+      "id": 111,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1580,
+        7700
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 112,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 168
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 169
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 170
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 171
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 172
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            173
+          ]
+        }
+      ],
+      "title": "PANEL 2 - original STAGE 2",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1636
+      },
+      "widgets_values": [],
+      "color": "#009933",
+      "bgcolor": "#2f283e",
+      "shape": 1
+    },
+    {
+      "type": "VAEDecode",
+      "title": "PANEL 2 - decode",
+      "pos": [
+        2010,
+        7700
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 173
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 174
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            176
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEDecode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 112,
+      "order": 116
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 2 - optional final refinement",
+      "pos": [
+        2420,
+        7700
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 175
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 176
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 177,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            178,
+            187
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 113,
+      "order": 120
+    },
+    {
+      "id": 114,
+      "type": "FaceDetailer",
+      "pos": [
+        2850,
+        7700
+      ],
+      "size": [
+        400,
+        1150
+      ],
+      "flags": {},
+      "order": 124,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 178
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 179
+        },
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 180
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 181
+        },
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 182
+        },
+        {
+          "localized_name": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 183
+        },
+        {
+          "localized_name": "bbox_detector",
+          "name": "bbox_detector",
+          "type": "BBOX_DETECTOR",
+          "link": 184
+        },
+        {
+          "localized_name": "sam_model_opt",
+          "name": "sam_model_opt",
+          "shape": 7,
+          "type": "SAM_MODEL",
+          "link": 185
+        },
+        {
+          "localized_name": "segm_detector_opt",
+          "name": "segm_detector_opt",
+          "shape": 7,
+          "type": "SEGM_DETECTOR",
+          "link": null
+        },
+        {
+          "localized_name": "detailer_hook",
+          "name": "detailer_hook",
+          "shape": 7,
+          "type": "DETAILER_HOOK",
+          "link": null
+        },
+        {
+          "localized_name": "scheduler_func_opt",
+          "name": "scheduler_func_opt",
+          "shape": 7,
+          "type": "SCHEDULER_FUNC",
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "denoise",
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 186
+        },
+        {
+          "label": "trigger threshold (lower = more chance)",
+          "localized_name": "bbox_threshold",
+          "name": "bbox_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_threshold"
+          },
+          "link": null
+        },
+        {
+          "label": "face crop facor (less is closer)",
+          "localized_name": "bbox_crop_factor",
+          "name": "bbox_crop_factor",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_crop_factor"
+          },
+          "link": null
+        },
+        {
+          "label": "number_of_passes",
+          "localized_name": "cycle",
+          "name": "cycle",
+          "type": "INT",
+          "widget": {
+            "name": "cycle"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            188
+          ]
+        },
+        {
+          "localized_name": "cropped_refined",
+          "name": "cropped_refined",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "cropped_enhanced_alpha",
+          "name": "cropped_enhanced_alpha",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "detailer_pipe",
+          "name": "detailer_pipe",
+          "type": "DETAILER_PIPE",
+          "links": []
+        },
+        {
+          "localized_name": "cnet_images",
+          "name": "cnet_images",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "8.28.3",
+        "Node name for S&R": "FaceDetailer",
+        "carousel_source_node": 13432
+      },
+      "widgets_values": [
+        1024,
+        true,
+        1024,
+        446700986820561,
+        "fixed",
+        3,
+        1,
+        "euler",
+        "simple",
+        0.15,
+        27,
+        true,
+        true,
+        0.214000244140625,
+        35,
+        1.2000000000000002,
+        "center-1",
+        30,
+        0.93,
+        0,
+        0.7,
+        "False",
+        10,
+        "",
+        1,
+        false,
+        20,
+        false,
+        false
+      ],
+      "title": "PANEL 2 - gentle FaceDetailer"
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 2 - FaceDetailer ON/OFF",
+      "pos": [
+        3300,
+        7700
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 187
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 188
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 189,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            191,
+            193
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 115,
+      "order": 128
+    },
+    {
+      "type": "ColorMatch",
+      "size": [
+        390,
+        190
+      ],
+      "widgets_values": [
+        "mkl",
+        0.3,
+        true
+      ],
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 190
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 191
+        },
+        {
+          "name": "strength",
+          "type": "FLOAT",
+          "link": 192,
+          "widget": {
+            "name": "strength"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            194
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_source_node": 52,
+        "carousel_widget_names": [
+          "method",
+          "strength",
+          "multithread"
+        ]
+      },
+      "id": 116,
+      "title": "PANEL 2 - Color Match mkl",
+      "pos": [
+        3750,
+        7700
+      ],
+      "order": 132,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 2 - Color Match ON/OFF",
+      "pos": [
+        4200,
+        7700
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 193
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 194
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 195,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            196,
+            270
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 117,
+      "order": 136
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE FINAL PANEL 02",
+      "pos": [
+        4650,
+        7700
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 196
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/panel_02"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 118,
+      "order": 140
+    },
+    {
+      "type": "ImageFromBatch",
+      "title": "PANEL 3 - fixed index 2",
+      "pos": [
+        0,
+        9000
+      ],
+      "size": [
+        330,
+        140
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 197
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            198,
+            211
+          ]
+        }
+      ],
+      "widgets_values": [
+        2,
+        1
+      ],
+      "properties": {
+        "Node name for S&R": "ImageFromBatch",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "batch_index",
+          "length"
+        ]
+      },
+      "id": 119,
+      "order": 101
+    },
+    {
+      "type": "VAEEncode",
+      "title": "PANEL 3 - encode panel",
+      "pos": [
+        380,
+        9000
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 198
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 199
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            200
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEEncode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 120,
+      "order": 105
+    },
+    {
+      "id": 121,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        760,
+        9000
+      ],
+      "size": [
+        370,
+        120
+      ],
+      "flags": {},
+      "order": 109,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 200
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            208
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "LatentUpscaleBy",
+        "carousel_source_node": 1639,
+        "carousel_widget_names": [
+          "upscale_method",
+          "scale_by"
+        ]
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#9e3fc0",
+      "bgcolor": "#36283b",
+      "title": "PANEL 3 - original 1.5x latent upscale"
+    },
+    {
+      "id": 122,
+      "type": "CFGGuider",
+      "pos": [
+        1180,
+        9000
+      ],
+      "size": [
+        350,
+        130
+      ],
+      "flags": {},
+      "order": 65,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 201
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 202
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 203
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            205
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "CFGGuider",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1626,
+        "carousel_widget_names": [
+          "cfg"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "PANEL 3 - panel conditioning"
+    },
+    {
+      "id": 123,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1580,
+        9000
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 113,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 204
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 205
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 206
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 207
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 208
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            209
+          ]
+        }
+      ],
+      "title": "PANEL 3 - original STAGE 2",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1636
+      },
+      "widgets_values": [],
+      "color": "#009933",
+      "bgcolor": "#2f283e",
+      "shape": 1
+    },
+    {
+      "type": "VAEDecode",
+      "title": "PANEL 3 - decode",
+      "pos": [
+        2010,
+        9000
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 209
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 210
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            212
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEDecode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 124,
+      "order": 117
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 3 - optional final refinement",
+      "pos": [
+        2420,
+        9000
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 211
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 212
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 213,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            214,
+            223
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 125,
+      "order": 121
+    },
+    {
+      "id": 126,
+      "type": "FaceDetailer",
+      "pos": [
+        2850,
+        9000
+      ],
+      "size": [
+        400,
+        1150
+      ],
+      "flags": {},
+      "order": 125,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 214
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 215
+        },
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 216
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 217
+        },
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 218
+        },
+        {
+          "localized_name": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 219
+        },
+        {
+          "localized_name": "bbox_detector",
+          "name": "bbox_detector",
+          "type": "BBOX_DETECTOR",
+          "link": 220
+        },
+        {
+          "localized_name": "sam_model_opt",
+          "name": "sam_model_opt",
+          "shape": 7,
+          "type": "SAM_MODEL",
+          "link": 221
+        },
+        {
+          "localized_name": "segm_detector_opt",
+          "name": "segm_detector_opt",
+          "shape": 7,
+          "type": "SEGM_DETECTOR",
+          "link": null
+        },
+        {
+          "localized_name": "detailer_hook",
+          "name": "detailer_hook",
+          "shape": 7,
+          "type": "DETAILER_HOOK",
+          "link": null
+        },
+        {
+          "localized_name": "scheduler_func_opt",
+          "name": "scheduler_func_opt",
+          "shape": 7,
+          "type": "SCHEDULER_FUNC",
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "denoise",
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 222
+        },
+        {
+          "label": "trigger threshold (lower = more chance)",
+          "localized_name": "bbox_threshold",
+          "name": "bbox_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_threshold"
+          },
+          "link": null
+        },
+        {
+          "label": "face crop facor (less is closer)",
+          "localized_name": "bbox_crop_factor",
+          "name": "bbox_crop_factor",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_crop_factor"
+          },
+          "link": null
+        },
+        {
+          "label": "number_of_passes",
+          "localized_name": "cycle",
+          "name": "cycle",
+          "type": "INT",
+          "widget": {
+            "name": "cycle"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            224
+          ]
+        },
+        {
+          "localized_name": "cropped_refined",
+          "name": "cropped_refined",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "cropped_enhanced_alpha",
+          "name": "cropped_enhanced_alpha",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "detailer_pipe",
+          "name": "detailer_pipe",
+          "type": "DETAILER_PIPE",
+          "links": []
+        },
+        {
+          "localized_name": "cnet_images",
+          "name": "cnet_images",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "8.28.3",
+        "Node name for S&R": "FaceDetailer",
+        "carousel_source_node": 13432
+      },
+      "widgets_values": [
+        1024,
+        true,
+        1024,
+        446700986820561,
+        "fixed",
+        3,
+        1,
+        "euler",
+        "simple",
+        0.15,
+        27,
+        true,
+        true,
+        0.214000244140625,
+        35,
+        1.2000000000000002,
+        "center-1",
+        30,
+        0.93,
+        0,
+        0.7,
+        "False",
+        10,
+        "",
+        1,
+        false,
+        20,
+        false,
+        false
+      ],
+      "title": "PANEL 3 - gentle FaceDetailer"
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 3 - FaceDetailer ON/OFF",
+      "pos": [
+        3300,
+        9000
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 223
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 224
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 225,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            227,
+            229
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 127,
+      "order": 129
+    },
+    {
+      "type": "ColorMatch",
+      "size": [
+        390,
+        190
+      ],
+      "widgets_values": [
+        "mkl",
+        0.3,
+        true
+      ],
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 226
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 227
+        },
+        {
+          "name": "strength",
+          "type": "FLOAT",
+          "link": 228,
+          "widget": {
+            "name": "strength"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            230
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_source_node": 52,
+        "carousel_widget_names": [
+          "method",
+          "strength",
+          "multithread"
+        ]
+      },
+      "id": 128,
+      "title": "PANEL 3 - Color Match mkl",
+      "pos": [
+        3750,
+        9000
+      ],
+      "order": 133,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 3 - Color Match ON/OFF",
+      "pos": [
+        4200,
+        9000
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 229
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 230
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 231,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            232,
+            271
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 129,
+      "order": 137
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE FINAL PANEL 03",
+      "pos": [
+        4650,
+        9000
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 232
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/panel_03"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 130,
+      "order": 141
+    },
+    {
+      "type": "ImageFromBatch",
+      "title": "PANEL 4 - fixed index 3",
+      "pos": [
+        0,
+        10300
+      ],
+      "size": [
+        330,
+        140
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 233
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            234,
+            247
+          ]
+        }
+      ],
+      "widgets_values": [
+        3,
+        1
+      ],
+      "properties": {
+        "Node name for S&R": "ImageFromBatch",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "batch_index",
+          "length"
+        ]
+      },
+      "id": 131,
+      "order": 102
+    },
+    {
+      "type": "VAEEncode",
+      "title": "PANEL 4 - encode panel",
+      "pos": [
+        380,
+        10300
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 234
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 235
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            236
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEEncode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 132,
+      "order": 106
+    },
+    {
+      "id": 133,
+      "type": "LatentUpscaleBy",
+      "pos": [
+        760,
+        10300
+      ],
+      "size": [
+        370,
+        120
+      ],
+      "flags": {},
+      "order": 110,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 236
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            244
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.30.1",
+        "Node name for S&R": "LatentUpscaleBy",
+        "carousel_source_node": 1639,
+        "carousel_widget_names": [
+          "upscale_method",
+          "scale_by"
+        ]
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1.5
+      ],
+      "color": "#9e3fc0",
+      "bgcolor": "#36283b",
+      "title": "PANEL 4 - original 1.5x latent upscale"
+    },
+    {
+      "id": 134,
+      "type": "CFGGuider",
+      "pos": [
+        1180,
+        10300
+      ],
+      "size": [
+        350,
+        130
+      ],
+      "flags": {},
+      "order": 66,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 237
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 238
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 239
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            241
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "CFGGuider",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1626,
+        "carousel_widget_names": [
+          "cfg"
+        ]
+      },
+      "widgets_values": [
+        1
+      ],
+      "shape": 1,
+      "title": "PANEL 4 - panel conditioning"
+    },
+    {
+      "id": 135,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        1580,
+        10300
+      ],
+      "size": [
+        360,
+        180
+      ],
+      "flags": {},
+      "order": 114,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 240
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 241
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 242
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 243
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 244
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            245
+          ]
+        }
+      ],
+      "title": "PANEL 4 - original STAGE 2",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.68",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "carousel_source_node": 1636
+      },
+      "widgets_values": [],
+      "color": "#009933",
+      "bgcolor": "#2f283e",
+      "shape": 1
+    },
+    {
+      "type": "VAEDecode",
+      "title": "PANEL 4 - decode",
+      "pos": [
+        2010,
+        10300
+      ],
+      "size": [
+        330,
+        90
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 245
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 246
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            248
+          ]
+        }
+      ],
+      "widgets_values": [],
+      "properties": {
+        "Node name for S&R": "VAEDecode",
+        "cnr_id": "comfy-core"
+      },
+      "id": 136,
+      "order": 118
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 4 - optional final refinement",
+      "pos": [
+        2420,
+        10300
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 247
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 248
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 249,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            250,
+            259
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 137,
+      "order": 122
+    },
+    {
+      "id": 138,
+      "type": "FaceDetailer",
+      "pos": [
+        2850,
+        10300
+      ],
+      "size": [
+        400,
+        1150
+      ],
+      "flags": {},
+      "order": 126,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 250
+        },
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 251
+        },
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 252
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 253
+        },
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 254
+        },
+        {
+          "localized_name": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 255
+        },
+        {
+          "localized_name": "bbox_detector",
+          "name": "bbox_detector",
+          "type": "BBOX_DETECTOR",
+          "link": 256
+        },
+        {
+          "localized_name": "sam_model_opt",
+          "name": "sam_model_opt",
+          "shape": 7,
+          "type": "SAM_MODEL",
+          "link": 257
+        },
+        {
+          "localized_name": "segm_detector_opt",
+          "name": "segm_detector_opt",
+          "shape": 7,
+          "type": "SEGM_DETECTOR",
+          "link": null
+        },
+        {
+          "localized_name": "detailer_hook",
+          "name": "detailer_hook",
+          "shape": 7,
+          "type": "DETAILER_HOOK",
+          "link": null
+        },
+        {
+          "localized_name": "scheduler_func_opt",
+          "name": "scheduler_func_opt",
+          "shape": 7,
+          "type": "SCHEDULER_FUNC",
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "denoise",
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 258
+        },
+        {
+          "label": "trigger threshold (lower = more chance)",
+          "localized_name": "bbox_threshold",
+          "name": "bbox_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_threshold"
+          },
+          "link": null
+        },
+        {
+          "label": "face crop facor (less is closer)",
+          "localized_name": "bbox_crop_factor",
+          "name": "bbox_crop_factor",
+          "type": "FLOAT",
+          "widget": {
+            "name": "bbox_crop_factor"
+          },
+          "link": null
+        },
+        {
+          "label": "number_of_passes",
+          "localized_name": "cycle",
+          "name": "cycle",
+          "type": "INT",
+          "widget": {
+            "name": "cycle"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            260
+          ]
+        },
+        {
+          "localized_name": "cropped_refined",
+          "name": "cropped_refined",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "cropped_enhanced_alpha",
+          "name": "cropped_enhanced_alpha",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "detailer_pipe",
+          "name": "detailer_pipe",
+          "type": "DETAILER_PIPE",
+          "links": []
+        },
+        {
+          "localized_name": "cnet_images",
+          "name": "cnet_images",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-impact-pack",
+        "ver": "8.28.3",
+        "Node name for S&R": "FaceDetailer",
+        "carousel_source_node": 13432
+      },
+      "widgets_values": [
+        1024,
+        true,
+        1024,
+        446700986820561,
+        "fixed",
+        3,
+        1,
+        "euler",
+        "simple",
+        0.15,
+        27,
+        true,
+        true,
+        0.214000244140625,
+        35,
+        1.2000000000000002,
+        "center-1",
+        30,
+        0.93,
+        0,
+        0.7,
+        "False",
+        10,
+        "",
+        1,
+        false,
+        20,
+        false,
+        false
+      ],
+      "title": "PANEL 4 - gentle FaceDetailer"
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 4 - FaceDetailer ON/OFF",
+      "pos": [
+        3300,
+        10300
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 259
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 260
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 261,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            263,
+            265
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 139,
+      "order": 130
+    },
+    {
+      "type": "ColorMatch",
+      "size": [
+        390,
+        190
+      ],
+      "widgets_values": [
+        "mkl",
+        0.3,
+        true
+      ],
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 262
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 263
+        },
+        {
+          "name": "strength",
+          "type": "FLOAT",
+          "link": 264,
+          "widget": {
+            "name": "strength"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            266
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_source_node": 52,
+        "carousel_widget_names": [
+          "method",
+          "strength",
+          "multithread"
+        ]
+      },
+      "id": 140,
+      "title": "PANEL 4 - Color Match mkl",
+      "pos": [
+        3750,
+        10300
+      ],
+      "order": 134,
+      "mode": 0,
+      "flags": {}
+    },
+    {
+      "type": "LazySwitchKJ",
+      "title": "PANEL 4 - Color Match ON/OFF",
+      "pos": [
+        4200,
+        10300
+      ],
+      "size": [
+        370,
+        115
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 265
+        },
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 266
+        },
+        {
+          "name": "switch",
+          "type": "BOOLEAN",
+          "link": 267,
+          "widget": {
+            "name": "switch"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            268,
+            272
+          ]
+        }
+      ],
+      "widgets_values": [
+        false
+      ],
+      "properties": {
+        "Node name for S&R": "LazySwitchKJ",
+        "cnr_id": "comfyui-kjnodes",
+        "carousel_widget_names": [
+          "switch"
+        ]
+      },
+      "id": 141,
+      "order": 138
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE FINAL PANEL 04",
+      "pos": [
+        4650,
+        10300
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 268
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/panel_04"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 142,
+      "order": 142
+    },
+    {
+      "type": "GridStitchAdvanced",
+      "title": "FINAL CONTACT SHEET - preview / 2 MP only",
+      "pos": [
+        0,
+        11800
+      ],
+      "size": [
+        430,
+        330
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "image_1",
+          "type": "IMAGE",
+          "link": 269
+        },
+        {
+          "name": "image_2",
+          "type": "IMAGE",
+          "link": 270
+        },
+        {
+          "name": "image_3",
+          "type": "IMAGE",
+          "link": 271
+        },
+        {
+          "name": "image_4",
+          "type": "IMAGE",
+          "link": 272
+        }
+      ],
+      "outputs": [
+        {
+          "name": "grid",
+          "type": "IMAGE",
+          "links": [
+            273
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "widgets_values": [
+        2,
+        2,
+        "auto",
+        "3:4",
+        2.0,
+        "lanczos",
+        ""
+      ],
+      "properties": {
+        "Node name for S&R": "GridStitchAdvanced",
+        "cnr_id": "comfyui-autogrid",
+        "carousel_widget_names": [
+          "rows",
+          "cols",
+          "mode",
+          "ratio",
+          "megapixels",
+          "scale_method",
+          "mask_cells"
+        ]
+      },
+      "id": 143,
+      "order": 143
+    },
+    {
+      "type": "SaveImage",
+      "title": "SAVE FINAL CONTACT SHEET - individual files are full size",
+      "pos": [
+        520,
+        11800
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 273
+        }
+      ],
+      "outputs": [],
+      "widgets_values": [
+        "KRAST_Carousel/contact_sheet"
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage",
+        "cnr_id": "comfy-core",
+        "carousel_widget_names": [
+          "filename_prefix"
+        ]
+      },
+      "id": 144,
+      "order": 144
+    },
+    {
+      "type": "Note",
+      "title": "START HERE - CAROUSEL",
+      "pos": [
+        4500,
+        0
+      ],
+      "size": [
+        950,
+        600
+      ],
+      "mode": 0,
+      "flags": {},
+      "inputs": [],
+      "outputs": [],
+      "widgets_values": [
+        "1. Upload an approved photo in 01. SOURCE=true uses it directly; false runs the original base generator below.\n2. Edit COMMON DESCRIPTION and four PANEL prompts. There is no automatic captioning.\n3. Run: source, generated grid, four separately finished panels, and a small contact sheet are saved.\n4. Denoise 0.40 is a starting point. Raise slightly for more pose change; lower for more preservation.\n5. CAROUSEL DEPTH defaults OFF; it repeats the source depth in four cells and can restrict pose changes.\n6. Color Match and final refinement/upscale have independent switches. KRAST SoftFace is OFF.\n7. Final extraction uses an exact 2x2 split. Inspect the AutoGrid red-box preview: if the model creates a malformed layout, fix prompt/denoise and regenerate.\n8. GRID BUDGET is for all four panels. Lowering it reduces per-panel detail. Dimensions align to 64 pixels before VAE encoding.\n9. The optional original base generator has its own prompt and depth controls. With SOURCE=true it is not sampled.\nRequires the same model files as your source workflow, KJNodes and current ComfyUI-AutoGrid. See UPUTSTVO.md.\nNo GPU render was available locally. Original workflow files are unchanged."
+      ],
+      "properties": {
+        "Node name for S&R": "Note",
+        "cnr_id": "comfy-core"
+      },
+      "id": 145,
+      "order": 29
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      4,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      2,
+      0,
+      4,
+      1,
+      "CLIP"
+    ],
+    [
+      3,
+      15,
+      0,
+      21,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      20,
+      0,
+      21,
+      1,
+      "STRING"
+    ],
+    [
+      5,
+      21,
+      0,
+      22,
+      0,
+      "STRING"
+    ],
+    [
+      6,
+      16,
+      0,
+      22,
+      1,
+      "STRING"
+    ],
+    [
+      7,
+      22,
+      0,
+      23,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      17,
+      0,
+      23,
+      1,
+      "STRING"
+    ],
+    [
+      9,
+      23,
+      0,
+      24,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      18,
+      0,
+      24,
+      1,
+      "STRING"
+    ],
+    [
+      11,
+      24,
+      0,
+      25,
+      0,
+      "STRING"
+    ],
+    [
+      12,
+      19,
+      0,
+      25,
+      1,
+      "STRING"
+    ],
+    [
+      13,
+      2,
+      0,
+      26,
+      0,
+      "CLIP"
+    ],
+    [
+      14,
+      25,
+      0,
+      26,
+      1,
+      "STRING"
+    ],
+    [
+      15,
+      2,
+      0,
+      27,
+      0,
+      "CLIP"
+    ],
+    [
+      16,
+      15,
+      0,
+      28,
+      0,
+      "STRING"
+    ],
+    [
+      17,
+      16,
+      0,
+      28,
+      1,
+      "STRING"
+    ],
+    [
+      18,
+      2,
+      0,
+      29,
+      0,
+      "CLIP"
+    ],
+    [
+      19,
+      28,
+      0,
+      29,
+      1,
+      "STRING"
+    ],
+    [
+      20,
+      15,
+      0,
+      30,
+      0,
+      "STRING"
+    ],
+    [
+      21,
+      17,
+      0,
+      30,
+      1,
+      "STRING"
+    ],
+    [
+      22,
+      2,
+      0,
+      31,
+      0,
+      "CLIP"
+    ],
+    [
+      23,
+      30,
+      0,
+      31,
+      1,
+      "STRING"
+    ],
+    [
+      24,
+      15,
+      0,
+      32,
+      0,
+      "STRING"
+    ],
+    [
+      25,
+      18,
+      0,
+      32,
+      1,
+      "STRING"
+    ],
+    [
+      26,
+      2,
+      0,
+      33,
+      0,
+      "CLIP"
+    ],
+    [
+      27,
+      32,
+      0,
+      33,
+      1,
+      "STRING"
+    ],
+    [
+      28,
+      15,
+      0,
+      34,
+      0,
+      "STRING"
+    ],
+    [
+      29,
+      19,
+      0,
+      34,
+      1,
+      "STRING"
+    ],
+    [
+      30,
+      2,
+      0,
+      35,
+      0,
+      "CLIP"
+    ],
+    [
+      31,
+      34,
+      0,
+      35,
+      1,
+      "STRING"
+    ],
+    [
+      32,
+      2,
+      0,
+      36,
+      0,
+      "CLIP"
+    ],
+    [
+      33,
+      2,
+      0,
+      37,
+      0,
+      "CLIP"
+    ],
+    [
+      34,
+      5,
+      0,
+      38,
+      0,
+      "IMAGE"
+    ],
+    [
+      35,
+      38,
+      0,
+      39,
+      0,
+      "IMAGE"
+    ],
+    [
+      36,
+      39,
+      0,
+      40,
+      0,
+      "INT"
+    ],
+    [
+      37,
+      39,
+      1,
+      40,
+      1,
+      "INT"
+    ],
+    [
+      38,
+      38,
+      0,
+      41,
+      0,
+      "IMAGE"
+    ],
+    [
+      39,
+      3,
+      0,
+      41,
+      1,
+      "VAE"
+    ],
+    [
+      40,
+      40,
+      0,
+      43,
+      0,
+      "LATENT"
+    ],
+    [
+      41,
+      41,
+      0,
+      43,
+      1,
+      "LATENT"
+    ],
+    [
+      42,
+      42,
+      0,
+      43,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      43,
+      45,
+      0,
+      46,
+      0,
+      "FLOAT"
+    ],
+    [
+      44,
+      44,
+      0,
+      46,
+      1,
+      "FLOAT"
+    ],
+    [
+      45,
+      42,
+      0,
+      46,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      46,
+      4,
+      0,
+      47,
+      0,
+      "MODEL"
+    ],
+    [
+      47,
+      47,
+      0,
+      48,
+      0,
+      "MODEL"
+    ],
+    [
+      48,
+      48,
+      0,
+      49,
+      0,
+      "MODEL"
+    ],
+    [
+      49,
+      49,
+      0,
+      50,
+      0,
+      "SIGMAS"
+    ],
+    [
+      50,
+      50,
+      0,
+      51,
+      0,
+      "SIGMAS"
+    ],
+    [
+      51,
+      54,
+      0,
+      53,
+      0,
+      "INT"
+    ],
+    [
+      52,
+      5,
+      0,
+      55,
+      0,
+      "IMAGE"
+    ],
+    [
+      53,
+      55,
+      0,
+      56,
+      0,
+      "IMAGE"
+    ],
+    [
+      54,
+      3,
+      0,
+      56,
+      1,
+      "VAE"
+    ],
+    [
+      55,
+      43,
+      0,
+      56,
+      2,
+      "LATENT"
+    ],
+    [
+      56,
+      4,
+      0,
+      57,
+      0,
+      "MODEL"
+    ],
+    [
+      57,
+      57,
+      0,
+      58,
+      0,
+      "MODEL"
+    ],
+    [
+      58,
+      56,
+      0,
+      58,
+      1,
+      "LATENT"
+    ],
+    [
+      59,
+      4,
+      0,
+      59,
+      0,
+      "MODEL"
+    ],
+    [
+      60,
+      58,
+      0,
+      59,
+      1,
+      "MODEL"
+    ],
+    [
+      61,
+      7,
+      0,
+      59,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      62,
+      59,
+      0,
+      60,
+      0,
+      "MODEL"
+    ],
+    [
+      63,
+      36,
+      0,
+      60,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      64,
+      37,
+      0,
+      60,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      65,
+      43,
+      0,
+      60,
+      3,
+      "LATENT"
+    ],
+    [
+      66,
+      46,
+      0,
+      60,
+      5,
+      "FLOAT"
+    ],
+    [
+      67,
+      62,
+      0,
+      63,
+      0,
+      "BOOLEAN"
+    ],
+    [
+      68,
+      61,
+      0,
+      63,
+      1,
+      "BOOLEAN"
+    ],
+    [
+      69,
+      7,
+      0,
+      63,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      70,
+      60,
+      0,
+      64,
+      0,
+      "LATENT"
+    ],
+    [
+      71,
+      5,
+      0,
+      65,
+      0,
+      "IMAGE"
+    ],
+    [
+      72,
+      65,
+      0,
+      66,
+      0,
+      "IMAGE"
+    ],
+    [
+      73,
+      3,
+      0,
+      66,
+      1,
+      "VAE"
+    ],
+    [
+      74,
+      64,
+      0,
+      66,
+      2,
+      "LATENT"
+    ],
+    [
+      75,
+      48,
+      0,
+      67,
+      0,
+      "MODEL"
+    ],
+    [
+      76,
+      67,
+      0,
+      68,
+      0,
+      "MODEL"
+    ],
+    [
+      77,
+      66,
+      0,
+      68,
+      1,
+      "LATENT"
+    ],
+    [
+      78,
+      48,
+      0,
+      69,
+      0,
+      "MODEL"
+    ],
+    [
+      79,
+      68,
+      0,
+      69,
+      1,
+      "MODEL"
+    ],
+    [
+      80,
+      63,
+      0,
+      69,
+      2,
+      "*"
+    ],
+    [
+      81,
+      69,
+      0,
+      70,
+      0,
+      "MODEL"
+    ],
+    [
+      82,
+      36,
+      0,
+      70,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      83,
+      37,
+      0,
+      70,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      84,
+      53,
+      0,
+      71,
+      0,
+      "NOISE"
+    ],
+    [
+      85,
+      70,
+      0,
+      71,
+      1,
+      "GUIDER"
+    ],
+    [
+      86,
+      52,
+      0,
+      71,
+      2,
+      "SAMPLER"
+    ],
+    [
+      87,
+      51,
+      0,
+      71,
+      3,
+      "SIGMAS"
+    ],
+    [
+      88,
+      64,
+      0,
+      71,
+      4,
+      "LATENT"
+    ],
+    [
+      89,
+      71,
+      1,
+      72,
+      0,
+      "LATENT"
+    ],
+    [
+      90,
+      3,
+      0,
+      72,
+      1,
+      "VAE"
+    ],
+    [
+      91,
+      72,
+      0,
+      73,
+      0,
+      "IMAGE"
+    ],
+    [
+      92,
+      5,
+      0,
+      73,
+      1,
+      "IMAGE"
+    ],
+    [
+      93,
+      6,
+      0,
+      73,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      94,
+      73,
+      0,
+      74,
+      0,
+      "IMAGE"
+    ],
+    [
+      95,
+      73,
+      0,
+      75,
+      0,
+      "IMAGE"
+    ],
+    [
+      96,
+      75,
+      0,
+      76,
+      0,
+      "IMAGE"
+    ],
+    [
+      97,
+      13,
+      0,
+      76,
+      1,
+      "FLOAT"
+    ],
+    [
+      98,
+      76,
+      0,
+      77,
+      0,
+      "IMAGE"
+    ],
+    [
+      99,
+      3,
+      0,
+      77,
+      1,
+      "VAE"
+    ],
+    [
+      100,
+      73,
+      0,
+      78,
+      0,
+      "IMAGE"
+    ],
+    [
+      101,
+      78,
+      0,
+      79,
+      0,
+      "IMAGE"
+    ],
+    [
+      102,
+      79,
+      0,
+      80,
+      0,
+      "IMAGE"
+    ],
+    [
+      103,
+      13,
+      0,
+      80,
+      1,
+      "FLOAT"
+    ],
+    [
+      104,
+      80,
+      0,
+      81,
+      0,
+      "IMAGE"
+    ],
+    [
+      105,
+      3,
+      0,
+      81,
+      1,
+      "VAE"
+    ],
+    [
+      106,
+      77,
+      0,
+      81,
+      2,
+      "LATENT"
+    ],
+    [
+      107,
+      4,
+      0,
+      82,
+      0,
+      "MODEL"
+    ],
+    [
+      108,
+      82,
+      0,
+      83,
+      0,
+      "MODEL"
+    ],
+    [
+      109,
+      81,
+      0,
+      83,
+      1,
+      "LATENT"
+    ],
+    [
+      110,
+      4,
+      0,
+      84,
+      0,
+      "MODEL"
+    ],
+    [
+      111,
+      83,
+      0,
+      84,
+      1,
+      "MODEL"
+    ],
+    [
+      112,
+      8,
+      0,
+      84,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      113,
+      12,
+      0,
+      85,
+      5,
+      "FLOAT"
+    ],
+    [
+      114,
+      84,
+      0,
+      85,
+      0,
+      "MODEL"
+    ],
+    [
+      115,
+      26,
+      0,
+      85,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      116,
+      27,
+      0,
+      85,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      117,
+      77,
+      0,
+      85,
+      3,
+      "LATENT"
+    ],
+    [
+      118,
+      85,
+      0,
+      86,
+      0,
+      "LATENT"
+    ],
+    [
+      119,
+      3,
+      0,
+      86,
+      1,
+      "VAE"
+    ],
+    [
+      120,
+      86,
+      0,
+      87,
+      0,
+      "IMAGE"
+    ],
+    [
+      121,
+      86,
+      0,
+      88,
+      0,
+      "IMAGE"
+    ],
+    [
+      122,
+      86,
+      0,
+      89,
+      0,
+      "IMAGE"
+    ],
+    [
+      123,
+      89,
+      2,
+      90,
+      0,
+      "IMAGE"
+    ],
+    [
+      124,
+      4,
+      0,
+      91,
+      0,
+      "MODEL"
+    ],
+    [
+      125,
+      88,
+      0,
+      95,
+      0,
+      "IMAGE"
+    ],
+    [
+      126,
+      95,
+      0,
+      96,
+      0,
+      "IMAGE"
+    ],
+    [
+      127,
+      3,
+      0,
+      96,
+      1,
+      "VAE"
+    ],
+    [
+      128,
+      96,
+      0,
+      97,
+      0,
+      "LATENT"
+    ],
+    [
+      129,
+      48,
+      0,
+      98,
+      0,
+      "MODEL"
+    ],
+    [
+      130,
+      29,
+      0,
+      98,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      131,
+      27,
+      0,
+      98,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      132,
+      53,
+      0,
+      99,
+      0,
+      "NOISE"
+    ],
+    [
+      133,
+      98,
+      0,
+      99,
+      1,
+      "GUIDER"
+    ],
+    [
+      134,
+      52,
+      0,
+      99,
+      2,
+      "SAMPLER"
+    ],
+    [
+      135,
+      51,
+      0,
+      99,
+      3,
+      "SIGMAS"
+    ],
+    [
+      136,
+      97,
+      0,
+      99,
+      4,
+      "LATENT"
+    ],
+    [
+      137,
+      99,
+      1,
+      100,
+      0,
+      "LATENT"
+    ],
+    [
+      138,
+      3,
+      0,
+      100,
+      1,
+      "VAE"
+    ],
+    [
+      139,
+      95,
+      0,
+      101,
+      0,
+      "IMAGE"
+    ],
+    [
+      140,
+      100,
+      0,
+      101,
+      1,
+      "IMAGE"
+    ],
+    [
+      141,
+      10,
+      0,
+      101,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      142,
+      101,
+      0,
+      102,
+      0,
+      "IMAGE"
+    ],
+    [
+      143,
+      91,
+      0,
+      102,
+      1,
+      "MODEL"
+    ],
+    [
+      144,
+      2,
+      0,
+      102,
+      2,
+      "CLIP"
+    ],
+    [
+      145,
+      3,
+      0,
+      102,
+      3,
+      "VAE"
+    ],
+    [
+      146,
+      29,
+      0,
+      102,
+      4,
+      "CONDITIONING"
+    ],
+    [
+      147,
+      27,
+      0,
+      102,
+      5,
+      "CONDITIONING"
+    ],
+    [
+      148,
+      92,
+      0,
+      102,
+      6,
+      "BBOX_DETECTOR"
+    ],
+    [
+      149,
+      93,
+      0,
+      102,
+      7,
+      "SAM_MODEL"
+    ],
+    [
+      150,
+      94,
+      0,
+      102,
+      16,
+      "FLOAT"
+    ],
+    [
+      151,
+      101,
+      0,
+      103,
+      0,
+      "IMAGE"
+    ],
+    [
+      152,
+      102,
+      0,
+      103,
+      1,
+      "IMAGE"
+    ],
+    [
+      153,
+      11,
+      0,
+      103,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      154,
+      73,
+      0,
+      104,
+      0,
+      "IMAGE"
+    ],
+    [
+      155,
+      103,
+      0,
+      104,
+      1,
+      "IMAGE"
+    ],
+    [
+      156,
+      14,
+      0,
+      104,
+      2,
+      "FLOAT"
+    ],
+    [
+      157,
+      103,
+      0,
+      105,
+      0,
+      "IMAGE"
+    ],
+    [
+      158,
+      104,
+      0,
+      105,
+      1,
+      "IMAGE"
+    ],
+    [
+      159,
+      9,
+      0,
+      105,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      160,
+      105,
+      0,
+      106,
+      0,
+      "IMAGE"
+    ],
+    [
+      161,
+      88,
+      0,
+      107,
+      0,
+      "IMAGE"
+    ],
+    [
+      162,
+      107,
+      0,
+      108,
+      0,
+      "IMAGE"
+    ],
+    [
+      163,
+      3,
+      0,
+      108,
+      1,
+      "VAE"
+    ],
+    [
+      164,
+      108,
+      0,
+      109,
+      0,
+      "LATENT"
+    ],
+    [
+      165,
+      48,
+      0,
+      110,
+      0,
+      "MODEL"
+    ],
+    [
+      166,
+      31,
+      0,
+      110,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      167,
+      27,
+      0,
+      110,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      168,
+      53,
+      0,
+      111,
+      0,
+      "NOISE"
+    ],
+    [
+      169,
+      110,
+      0,
+      111,
+      1,
+      "GUIDER"
+    ],
+    [
+      170,
+      52,
+      0,
+      111,
+      2,
+      "SAMPLER"
+    ],
+    [
+      171,
+      51,
+      0,
+      111,
+      3,
+      "SIGMAS"
+    ],
+    [
+      172,
+      109,
+      0,
+      111,
+      4,
+      "LATENT"
+    ],
+    [
+      173,
+      111,
+      1,
+      112,
+      0,
+      "LATENT"
+    ],
+    [
+      174,
+      3,
+      0,
+      112,
+      1,
+      "VAE"
+    ],
+    [
+      175,
+      107,
+      0,
+      113,
+      0,
+      "IMAGE"
+    ],
+    [
+      176,
+      112,
+      0,
+      113,
+      1,
+      "IMAGE"
+    ],
+    [
+      177,
+      10,
+      0,
+      113,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      178,
+      113,
+      0,
+      114,
+      0,
+      "IMAGE"
+    ],
+    [
+      179,
+      91,
+      0,
+      114,
+      1,
+      "MODEL"
+    ],
+    [
+      180,
+      2,
+      0,
+      114,
+      2,
+      "CLIP"
+    ],
+    [
+      181,
+      3,
+      0,
+      114,
+      3,
+      "VAE"
+    ],
+    [
+      182,
+      31,
+      0,
+      114,
+      4,
+      "CONDITIONING"
+    ],
+    [
+      183,
+      27,
+      0,
+      114,
+      5,
+      "CONDITIONING"
+    ],
+    [
+      184,
+      92,
+      0,
+      114,
+      6,
+      "BBOX_DETECTOR"
+    ],
+    [
+      185,
+      93,
+      0,
+      114,
+      7,
+      "SAM_MODEL"
+    ],
+    [
+      186,
+      94,
+      0,
+      114,
+      16,
+      "FLOAT"
+    ],
+    [
+      187,
+      113,
+      0,
+      115,
+      0,
+      "IMAGE"
+    ],
+    [
+      188,
+      114,
+      0,
+      115,
+      1,
+      "IMAGE"
+    ],
+    [
+      189,
+      11,
+      0,
+      115,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      190,
+      73,
+      0,
+      116,
+      0,
+      "IMAGE"
+    ],
+    [
+      191,
+      115,
+      0,
+      116,
+      1,
+      "IMAGE"
+    ],
+    [
+      192,
+      14,
+      0,
+      116,
+      2,
+      "FLOAT"
+    ],
+    [
+      193,
+      115,
+      0,
+      117,
+      0,
+      "IMAGE"
+    ],
+    [
+      194,
+      116,
+      0,
+      117,
+      1,
+      "IMAGE"
+    ],
+    [
+      195,
+      9,
+      0,
+      117,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      196,
+      117,
+      0,
+      118,
+      0,
+      "IMAGE"
+    ],
+    [
+      197,
+      88,
+      0,
+      119,
+      0,
+      "IMAGE"
+    ],
+    [
+      198,
+      119,
+      0,
+      120,
+      0,
+      "IMAGE"
+    ],
+    [
+      199,
+      3,
+      0,
+      120,
+      1,
+      "VAE"
+    ],
+    [
+      200,
+      120,
+      0,
+      121,
+      0,
+      "LATENT"
+    ],
+    [
+      201,
+      48,
+      0,
+      122,
+      0,
+      "MODEL"
+    ],
+    [
+      202,
+      33,
+      0,
+      122,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      203,
+      27,
+      0,
+      122,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      204,
+      53,
+      0,
+      123,
+      0,
+      "NOISE"
+    ],
+    [
+      205,
+      122,
+      0,
+      123,
+      1,
+      "GUIDER"
+    ],
+    [
+      206,
+      52,
+      0,
+      123,
+      2,
+      "SAMPLER"
+    ],
+    [
+      207,
+      51,
+      0,
+      123,
+      3,
+      "SIGMAS"
+    ],
+    [
+      208,
+      121,
+      0,
+      123,
+      4,
+      "LATENT"
+    ],
+    [
+      209,
+      123,
+      1,
+      124,
+      0,
+      "LATENT"
+    ],
+    [
+      210,
+      3,
+      0,
+      124,
+      1,
+      "VAE"
+    ],
+    [
+      211,
+      119,
+      0,
+      125,
+      0,
+      "IMAGE"
+    ],
+    [
+      212,
+      124,
+      0,
+      125,
+      1,
+      "IMAGE"
+    ],
+    [
+      213,
+      10,
+      0,
+      125,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      214,
+      125,
+      0,
+      126,
+      0,
+      "IMAGE"
+    ],
+    [
+      215,
+      91,
+      0,
+      126,
+      1,
+      "MODEL"
+    ],
+    [
+      216,
+      2,
+      0,
+      126,
+      2,
+      "CLIP"
+    ],
+    [
+      217,
+      3,
+      0,
+      126,
+      3,
+      "VAE"
+    ],
+    [
+      218,
+      33,
+      0,
+      126,
+      4,
+      "CONDITIONING"
+    ],
+    [
+      219,
+      27,
+      0,
+      126,
+      5,
+      "CONDITIONING"
+    ],
+    [
+      220,
+      92,
+      0,
+      126,
+      6,
+      "BBOX_DETECTOR"
+    ],
+    [
+      221,
+      93,
+      0,
+      126,
+      7,
+      "SAM_MODEL"
+    ],
+    [
+      222,
+      94,
+      0,
+      126,
+      16,
+      "FLOAT"
+    ],
+    [
+      223,
+      125,
+      0,
+      127,
+      0,
+      "IMAGE"
+    ],
+    [
+      224,
+      126,
+      0,
+      127,
+      1,
+      "IMAGE"
+    ],
+    [
+      225,
+      11,
+      0,
+      127,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      226,
+      73,
+      0,
+      128,
+      0,
+      "IMAGE"
+    ],
+    [
+      227,
+      127,
+      0,
+      128,
+      1,
+      "IMAGE"
+    ],
+    [
+      228,
+      14,
+      0,
+      128,
+      2,
+      "FLOAT"
+    ],
+    [
+      229,
+      127,
+      0,
+      129,
+      0,
+      "IMAGE"
+    ],
+    [
+      230,
+      128,
+      0,
+      129,
+      1,
+      "IMAGE"
+    ],
+    [
+      231,
+      9,
+      0,
+      129,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      232,
+      129,
+      0,
+      130,
+      0,
+      "IMAGE"
+    ],
+    [
+      233,
+      88,
+      0,
+      131,
+      0,
+      "IMAGE"
+    ],
+    [
+      234,
+      131,
+      0,
+      132,
+      0,
+      "IMAGE"
+    ],
+    [
+      235,
+      3,
+      0,
+      132,
+      1,
+      "VAE"
+    ],
+    [
+      236,
+      132,
+      0,
+      133,
+      0,
+      "LATENT"
+    ],
+    [
+      237,
+      48,
+      0,
+      134,
+      0,
+      "MODEL"
+    ],
+    [
+      238,
+      35,
+      0,
+      134,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      239,
+      27,
+      0,
+      134,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      240,
+      53,
+      0,
+      135,
+      0,
+      "NOISE"
+    ],
+    [
+      241,
+      134,
+      0,
+      135,
+      1,
+      "GUIDER"
+    ],
+    [
+      242,
+      52,
+      0,
+      135,
+      2,
+      "SAMPLER"
+    ],
+    [
+      243,
+      51,
+      0,
+      135,
+      3,
+      "SIGMAS"
+    ],
+    [
+      244,
+      133,
+      0,
+      135,
+      4,
+      "LATENT"
+    ],
+    [
+      245,
+      135,
+      1,
+      136,
+      0,
+      "LATENT"
+    ],
+    [
+      246,
+      3,
+      0,
+      136,
+      1,
+      "VAE"
+    ],
+    [
+      247,
+      131,
+      0,
+      137,
+      0,
+      "IMAGE"
+    ],
+    [
+      248,
+      136,
+      0,
+      137,
+      1,
+      "IMAGE"
+    ],
+    [
+      249,
+      10,
+      0,
+      137,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      250,
+      137,
+      0,
+      138,
+      0,
+      "IMAGE"
+    ],
+    [
+      251,
+      91,
+      0,
+      138,
+      1,
+      "MODEL"
+    ],
+    [
+      252,
+      2,
+      0,
+      138,
+      2,
+      "CLIP"
+    ],
+    [
+      253,
+      3,
+      0,
+      138,
+      3,
+      "VAE"
+    ],
+    [
+      254,
+      35,
+      0,
+      138,
+      4,
+      "CONDITIONING"
+    ],
+    [
+      255,
+      27,
+      0,
+      138,
+      5,
+      "CONDITIONING"
+    ],
+    [
+      256,
+      92,
+      0,
+      138,
+      6,
+      "BBOX_DETECTOR"
+    ],
+    [
+      257,
+      93,
+      0,
+      138,
+      7,
+      "SAM_MODEL"
+    ],
+    [
+      258,
+      94,
+      0,
+      138,
+      16,
+      "FLOAT"
+    ],
+    [
+      259,
+      137,
+      0,
+      139,
+      0,
+      "IMAGE"
+    ],
+    [
+      260,
+      138,
+      0,
+      139,
+      1,
+      "IMAGE"
+    ],
+    [
+      261,
+      11,
+      0,
+      139,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      262,
+      73,
+      0,
+      140,
+      0,
+      "IMAGE"
+    ],
+    [
+      263,
+      139,
+      0,
+      140,
+      1,
+      "IMAGE"
+    ],
+    [
+      264,
+      14,
+      0,
+      140,
+      2,
+      "FLOAT"
+    ],
+    [
+      265,
+      139,
+      0,
+      141,
+      0,
+      "IMAGE"
+    ],
+    [
+      266,
+      140,
+      0,
+      141,
+      1,
+      "IMAGE"
+    ],
+    [
+      267,
+      9,
+      0,
+      141,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      268,
+      141,
+      0,
+      142,
+      0,
+      "IMAGE"
+    ],
+    [
+      269,
+      105,
+      0,
+      143,
+      0,
+      "IMAGE"
+    ],
+    [
+      270,
+      117,
+      0,
+      143,
+      1,
+      "IMAGE"
+    ],
+    [
+      271,
+      129,
+      0,
+      143,
+      2,
+      "IMAGE"
+    ],
+    [
+      272,
+      141,
+      0,
+      143,
+      3,
+      "IMAGE"
+    ],
+    [
+      273,
+      143,
+      0,
+      144,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "PANEL 01 - TOP LEFT",
+      "bounding": [
+        -40,
+        6330,
+        5150,
+        1230
+      ],
+      "color": "#365d6b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "PANEL 02 - TOP RIGHT",
+      "bounding": [
+        -40,
+        7630,
+        5150,
+        1230
+      ],
+      "color": "#365d6b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "PANEL 03 - BOTTOM LEFT",
+      "bounding": [
+        -40,
+        8930,
+        5150,
+        1230
+      ],
+      "color": "#365d6b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "PANEL 04 - BOTTOM RIGHT",
+      "bounding": [
+        -40,
+        10230,
+        5150,
+        1230
+      ],
+      "color": "#365d6b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "01 CONTROLS + MANUAL PANEL PROMPTS",
+      "bounding": [
+        -50,
+        -80,
+        5500,
+        1030
+      ],
+      "color": "#2e715e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "02 ORIGINAL MODEL + OPTIONAL BASE GENERATION",
+      "bounding": [
+        -50,
+        880,
+        4500,
+        3470
+      ],
+      "color": "#665444",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "03 CAROUSEL GRID + SEPARATE DEPTH",
+      "bounding": [
+        -50,
+        4420,
+        4500,
+        1900
+      ],
+      "color": "#424f82",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 8,
+      "title": "04 FINAL CONTACT SHEET",
+      "bounding": [
+        -50,
+        11730,
+        1100,
+        600
+      ],
+      "color": "#2e715e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        70,
+        80
+      ]
+    },
+    "carousel": {
+      "version": 1,
+      "kind": "KRAST",
+      "roles": {
+        "source_upload": 6,
+        "reference": 5,
+        "base_model": 4,
+        "vae": 3,
+        "base_depth": 7,
+        "carousel_depth": 8,
+        "color": 9,
+        "upscale": 10,
+        "face": 11,
+        "denoise": 12,
+        "grid_budget": 13,
+        "panel_texts": [
+          16,
+          17,
+          18,
+          19
+        ],
+        "shared_text": 15,
+        "base_img2img": 42,
+        "base_depth2": 61,
+        "source": 73,
+        "base_sampler": 60,
+        "grid_sampler": 85,
+        "grid_encoder": 77,
+        "grid": 86,
+        "split": 88,
+        "grid_conditioning": 26,
+        "panel_savers": [
+          106,
+          118,
+          130,
+          142
+        ],
+        "panel_refiners": [
+          99,
+          111,
+          123,
+          135
+        ],
+        "panel_conditioning": [
+          29,
+          31,
+          33,
+          35
+        ]
+      },
+      "source_sha256": "a87302d420b8407074bf4ba589d96d93d0443a255910bd73bc1bca0691648110",
+      "notes": "Flat graph. Exact equal 2x2 extraction; AutoGrid detection is diagnostic. Model rendering not tested."
+    }
+  },
+  "version": 0.4
+}

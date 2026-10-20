@@ -2004,6 +2004,12 @@
       "repo": "https://github.com/pamparamm/sd-perturbed-attention.git",
       "ref": "2be8d83fa44dc0f28baf7be8122e57ed5d7165c3",
       "install_requirements": true
+    },
+    {
+      "name": "ComfyUI-AutoGrid",
+      "repo": "https://github.com/workordie/ComfyUI-AutoGrid.git",
+      "ref": "323b34e20ddc3196f45fe4e7be93970fa77929a2",
+      "install_requirements": false
     }
   ],
   "simple_files": [
@@ -2970,5 +2976,55 @@
   ],
   "rawgirl_millie_nodes": [
     "RES4LYF"
+  ],
+  "krast_org_depth_files": [
+    "krast-v20",
+    "krast-org-heretic-te",
+    "edit-vae",
+    "krast-org-lustify",
+    "millie",
+    "face",
+    "sam",
+    "krast-org-hands-seg",
+    "krast-org-nipples-seg",
+    "krast-org-pussy-bbox",
+    "krast-org-eyeful",
+    "krast-org-cockandball",
+    "depth",
+    "depth-anything"
+  ],
+  "krast_org_depth_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Pixaroma",
+    "ComfyUI-Adaptive-Guidance",
+    "ComfyUI-Crystools",
+    "ComfyUI-1hewNodes",
+    "CRT-Nodes",
+    "ComfyUI_Eclipse",
+    "sd-perturbed-attention",
+    "comfyui-krea2-controlnet",
+    "comfyui_controlnet_aux",
+    "ComfyUI-AutoGrid"
+  ],
+  "rawgirl_files": [
+    "rawgirl-krea2-v20-fp8",
+    "encoder",
+    "qwen-vae",
+    "millie",
+    "nmkd",
+    "depth",
+    "depth-anything"
+  ],
+  "rawgirl_nodes": [
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "rgthree-comfy",
+    "comfyui-krea2-controlnet",
+    "comfyui_controlnet_aux",
+    "ComfyUI-AutoGrid"
   ]
 }
