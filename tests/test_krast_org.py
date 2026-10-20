@@ -59,3 +59,26 @@ def test_rawgirl_millie_card():
     for html in ('launcher/static/index.html','scripts/selfism-section.html'):
         page=(ROOT/html).read_text()
         assert 'data-sf-action="rawgirl_millie"' in page and '96 GB' not in page.split('sf-card-rawgirl-millie')[1].split('</article>')[0]
+
+
+def test_krast_org_load_image_and_saves():
+    w=json.loads((ROOT/'selfism_workflows/krast_org.json').read_text())
+    top={n['id']:n for n in w['nodes']}
+    loads=[n for n in w['nodes'] if n['type']=='LoadImage']
+    assert len(loads)==1 and loads[0]['widgets_values'][0]=='example.png'
+    assert not any(n['type']=='LoadImage' for s in w['definitions']['subgraphs'] for n in s['nodes'])
+    assert '2026-07-17003' not in json.dumps(w)
+    assert not any(p[0]=='13440' for p in top[13448]['properties']['proxyWidgets'])
+    pats={json.loads(n['properties']['saveImageState'])['pattern'] for n in w['nodes'] if n['type']=='PixaromaSaveImage'}
+    assert pats=={'KRAST_ORG/final_%counter%','KRAST_ORG/face_%counter%','KRAST_ORG/stage2_%counter%'}
+    loras=top[13441]['widgets_values'][0]['loras']
+    assert loras==[{'name':'millie_000002750.safetensors','on':True,'sm':1.0,'sc':1.0,'triggers':[]}]
+    # every link is consistent at both ends (top level and inside subgraphs)
+    def ok(nodes,links,io=None):
+        N={n['id']:n for n in nodes}
+        for l in links:
+            i,o,os_,t,ts=(l['id'],l['origin_id'],l['origin_slot'],l['target_id'],l['target_slot']) if isinstance(l,dict) else l[:5]
+            assert (i in io['inputs'][os_]['linkIds']) if o==-10 else i in (N[o]['outputs'][os_].get('links') or [])
+            assert (i in io['outputs'][ts]['linkIds']) if t==-20 else N[t]['inputs'][ts].get('link')==i
+    ok(w['nodes'],w['links'])
+    for s in w['definitions']['subgraphs']: ok(s['nodes'],s['links'],s)

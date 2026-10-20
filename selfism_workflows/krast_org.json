@@ -1,8 +1,8 @@
 {
  "id": "ba2f25e3-1b56-4a30-a62e-28a9edc0bae9",
  "revision": 0,
- "last_node_id": 13463,
- "last_link_id": 26711,
+ "last_node_id": 13465,
+ "last_link_id": 26713,
  "nodes": [
   {
    "id": 117,
@@ -188,7 +188,15 @@
    "widgets_values": [
     {
      "version": 1,
-     "loras": [],
+     "loras": [
+      {
+       "name": "millie_000002750.safetensors",
+       "on": true,
+       "sm": 1.0,
+       "sc": 1.0,
+       "triggers": []
+      }
+     ],
      "sep": ", ",
      "step": 0.05,
      "defStrength": 1,
@@ -768,7 +776,7 @@
      ]
     }
    ],
-   "title": "\u26a1STAGE 2\u26a1",
+   "title": "⚡STAGE 2⚡",
    "properties": {
     "cnr_id": "comfy-core",
     "ver": "0.3.68",
@@ -895,13 +903,15 @@
      "widget_ue_connectable": {},
      "input_ue_unconnectable": {},
      "version": "7.8"
-    }
+    },
+    "saveImageState": "{\"version\": 1, \"folder\": \"\", \"pattern\": \"KRAST_ORG/face_%counter%\", \"format\": \"png\", \"quality\": 100, \"embedWorkflow\": true, \"saveOnRun\": true, \"counterDigits\": 3}"
    },
    "widgets_values": [
     ""
    ],
    "color": "#1d1d1d",
-   "bgcolor": "#2a2a2a"
+   "bgcolor": "#2a2a2a",
+   "title": "Save after FaceDetailer"
   },
   {
    "id": 13455,
@@ -1038,13 +1048,15 @@
      "input_ue_unconnectable": {},
      "version": "7.8"
     },
-    "Node name for S&R": "PixaromaSaveImage"
+    "Node name for S&R": "PixaromaSaveImage",
+    "saveImageState": "{\"version\": 1, \"folder\": \"\", \"pattern\": \"KRAST_ORG/final_%counter%\", \"format\": \"png\", \"quality\": 100, \"embedWorkflow\": true, \"saveOnRun\": true, \"counterDigits\": 3}"
    },
    "widgets_values": [
     ""
    ],
    "color": "#1d1d1d",
-   "bgcolor": "#2a2a2a"
+   "bgcolor": "#2a2a2a",
+   "title": "Save FINAL (after face + NSFW detailers)"
   },
   {
    "id": 13438,
@@ -1149,6 +1161,28 @@
       "name": "megapixels"
      },
      "link": null
+    },
+    {
+     "name": "megapixels_1",
+     "type": "FLOAT",
+     "widget": {
+      "name": "megapixels_1"
+     },
+     "link": null
+    },
+    {
+     "name": "aspect_ratio",
+     "type": "COMBO",
+     "widget": {
+      "name": "aspect_ratio"
+     },
+     "link": null
+    },
+    {
+     "label": "reference image (image to image)",
+     "name": "image",
+     "type": "IMAGE",
+     "link": 26712
     }
    ],
    "outputs": [
@@ -1178,14 +1212,6 @@
       "megapixels"
      ],
      [
-      "13440",
-      "upload"
-     ],
-     [
-      "13440",
-      "$$canvas-image-preview"
-     ],
-     [
       "13446",
       "value"
      ],
@@ -1213,8 +1239,6 @@
    "widgets_values": [
     null,
     1,
-    null,
-    null,
     null,
     null,
     1.3,
@@ -1447,7 +1471,8 @@
      "name": "images",
      "type": "IMAGE",
      "links": [
-      26686
+      26686,
+      26713
      ]
     }
    ],
@@ -1758,6 +1783,103 @@
    ],
    "color": "#d57bba",
    "bgcolor": "#3f313b"
+  },
+  {
+   "id": 13464,
+   "type": "LoadImage",
+   "pos": [
+    -3076.036238510052,
+    -139.71772938163627
+   ],
+   "size": [
+    282.798828125,
+    314.0000000000001
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "localized_name": "IMAGE",
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      26712
+     ]
+    },
+    {
+     "localized_name": "MASK",
+     "name": "MASK",
+     "type": "MASK",
+     "links": null
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "ver": "0.30.1",
+    "Node name for S&R": "LoadImage",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "input_ue_unconnectable": {},
+     "version": "7.8"
+    }
+   },
+   "widgets_values": [
+    "example.png",
+    "image"
+   ],
+   "color": "#2a6fcf",
+   "bgcolor": "#252f3e",
+   "title": "Reference image (image to image only)"
+  },
+  {
+   "id": 13465,
+   "type": "PixaromaSaveImage",
+   "pos": [
+    -1213.7520265729202,
+    592.6923424912217
+   ],
+   "size": [
+    474,
+    806
+   ],
+   "flags": {
+    "collapsed": false
+   },
+   "order": 25,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 26713
+    },
+    {
+     "name": "name",
+     "shape": 7,
+     "type": "STRING",
+     "link": null
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "ComfyUI-Pixaroma",
+    "ver": "27cc07ec889560b07c4c58379e4d8cd289eb936a",
+    "Node name for S&R": "PixaromaSaveImage",
+    "ue_properties": {
+     "widget_ue_connectable": {},
+     "input_ue_unconnectable": {},
+     "version": "7.8"
+    },
+    "saveImageState": "{\"version\": 1, \"folder\": \"\", \"pattern\": \"KRAST_ORG/stage2_%counter%\", \"format\": \"png\", \"quality\": 100, \"embedWorkflow\": true, \"saveOnRun\": true, \"counterDigits\": 3}"
+   },
+   "widgets_values": [
+    ""
+   ],
+   "color": "#1d1d1d",
+   "bgcolor": "#2a2a2a",
+   "title": "Save STAGE 2 (before detailers)"
   }
  ],
  "links": [
@@ -2136,6 +2258,22 @@
    13456,
    0,
    "IMAGE"
+  ],
+  [
+   26712,
+   13464,
+   0,
+   13448,
+   4,
+   "IMAGE"
+  ],
+  [
+   26713,
+   1629,
+   0,
+   13465,
+   0,
+   "IMAGE"
   ]
  ],
  "groups": [],
@@ -2146,8 +2284,8 @@
     "version": 1,
     "state": {
      "lastGroupId": 356,
-     "lastNodeId": 13463,
-     "lastLinkId": 26711,
+     "lastNodeId": 13465,
+     "lastLinkId": 26713,
      "lastRerouteId": 318
     },
     "revision": 0,
@@ -2534,8 +2672,8 @@
     "version": 1,
     "state": {
      "lastGroupId": 356,
-     "lastNodeId": 13463,
-     "lastLinkId": 26711,
+     "lastNodeId": 13465,
+     "lastLinkId": 26713,
      "lastRerouteId": 318
     },
     "revision": 0,
@@ -2547,7 +2685,7 @@
       -2832.2646551616294,
       257.3920500441794,
       213.70703125,
-      120
+      140
      ]
     },
     "outputNode": {
@@ -2609,6 +2747,20 @@
        -2638.5576239116294,
        337.3920500441794
       ]
+     },
+     {
+      "id": "3957199f-73aa-464e-809c-e7b8d7d0b44c",
+      "name": "image",
+      "type": "IMAGE",
+      "linkIds": [
+       26712
+      ],
+      "localized_name": "image",
+      "label": "reference image (image to image)",
+      "pos": [
+       -2638.56,
+       357.39
+      ]
      }
     ],
     "outputs": [
@@ -2642,54 +2794,6 @@
     "widgets": [],
     "nodes": [
      {
-      "id": 13440,
-      "type": "LoadImage",
-      "pos": [
-       -2537.5480937270268,
-       56.57660198922372
-      ],
-      "size": [
-       282.798828125,
-       314.0000000000001
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-       {
-        "localized_name": "IMAGE",
-        "name": "IMAGE",
-        "type": "IMAGE",
-        "links": [
-         26649
-        ]
-       },
-       {
-        "localized_name": "MASK",
-        "name": "MASK",
-        "type": "MASK",
-        "links": null
-       }
-      ],
-      "properties": {
-       "cnr_id": "comfy-core",
-       "ver": "0.30.1",
-       "Node name for S&R": "LoadImage",
-       "ue_properties": {
-        "widget_ue_connectable": {},
-        "input_ue_unconnectable": {},
-        "version": "7.8"
-       }
-      },
-      "widgets_values": [
-       "2026-07-17003.png",
-       "image"
-      ],
-      "color": "#2a6fcf",
-      "bgcolor": "#252f3e"
-     },
-     {
       "id": 13439,
       "type": "ImageScaleToTotalPixels",
       "pos": [
@@ -2708,7 +2812,7 @@
         "localized_name": "image",
         "name": "image",
         "type": "IMAGE",
-        "link": 26649
+        "link": 26712
        },
        {
         "localized_name": "megapixels",
@@ -3193,14 +3297,6 @@
     "groups": [],
     "links": [
      {
-      "id": 26649,
-      "origin_id": 13440,
-      "origin_slot": 0,
-      "target_id": 13439,
-      "target_slot": 0,
-      "type": "IMAGE"
-     },
-     {
       "id": 26648,
       "origin_id": 13439,
       "origin_slot": 0,
@@ -3303,6 +3399,14 @@
       "target_id": 13411,
       "target_slot": 1,
       "type": "COMBO"
+     },
+     {
+      "id": 26712,
+      "origin_id": -10,
+      "origin_slot": 4,
+      "target_id": 13439,
+      "target_slot": 0,
+      "type": "IMAGE"
      }
     ],
     "extra": {
@@ -3317,8 +3421,8 @@
     "version": 1,
     "state": {
      "lastGroupId": 356,
-     "lastNodeId": 13463,
-     "lastLinkId": 26711,
+     "lastNodeId": 13465,
+     "lastLinkId": 26713,
      "lastRerouteId": 318
     },
     "revision": 0,
@@ -4227,8 +4331,8 @@
     "version": 1,
     "state": {
      "lastGroupId": 356,
-     "lastNodeId": 13463,
-     "lastLinkId": 26711,
+     "lastNodeId": 13465,
+     "lastLinkId": 26713,
      "lastRerouteId": 318
     },
     "revision": 0,

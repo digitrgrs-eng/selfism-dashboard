@@ -349,7 +349,7 @@ def register(host):
                     dest=folder/'KRAST_ORG_Millie.json'
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/krast_org.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('Krast ORG: author KRAST workflow (krast_v20 INT8, Qwen3-VL-4B Heretic INT8 ConvRot, krea2RealVae; er_sde 8 steps + 1.5x DPM++ SDE/Beta/APG pass; FaceDetailer with Millie LoRA 1.0 (bypassed as in author file); MoP Mix Lustify SDXL NSFW detailers). Not GPU-validated yet.')
+                    logs.append('Krast ORG: author KRAST workflow (krast_v20 INT8, Qwen3-VL-4B Heretic INT8 ConvRot, krea2RealVae; er_sde 8 steps + 1.5x DPM++ SDE/Beta/APG pass; Millie LoRA 1.0 in the main Pixaroma LoRA loader; Load Image on the main graph (example.png default, i2i switch off); saves to output/KRAST_ORG/stage2, face, final; MoP Mix Lustify SDXL NSFW detailers). Not GPU-validated yet.')
                 if profile=='rawgirl_millie':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
