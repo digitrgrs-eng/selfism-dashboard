@@ -1317,8 +1317,8 @@ class Diagnostics:
         recorded only from the finally, so pressing Debug during an update produced a
         report with no COMFYUI UPDATE section at all - measured live, with the panel
         reading "Updating ComfyUI, installing requirements, 2m17s" at the same moment.
-        That is the slowest part of a MiniMax install and therefore exactly when somebody
-        presses Debug, so the report was silent about the pause it was opened to explain.
+        That is the slowest part of an install that updates ComfyUI and therefore exactly when
+        somebody presses Debug, so the report was silent about the pause it was opened to explain.
 
         Replaced rather than duplicated for free: this is one attribute, so the call from
         the finally overwrites whatever the in-flight calls left behind.
@@ -1756,7 +1756,7 @@ def render_install_report(report: dict[str, Any], tier: str = "unknown") -> str:
                 f"{update.get('total_seconds', 0)}s so far"
             )
             # Whichever steps have already finished. A pause with the fetch and the reset
-            # behind it is a pip install, which is where the MiniMax cost actually is.
+            # behind it is a pip install, which is where the time actually goes.
             for label, key in (
                 ("fetched", "fetch_seconds"),
                 ("reset", "reset_seconds"),

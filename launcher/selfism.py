@@ -22,21 +22,10 @@ from launcher.private_r2 import r2_client, select_private
 
 # Profiles that need a ComfyUI able to load Selfora INT8 (int8_tensorwise).
 INT8_PROFILES = ('simple','aio','full','full_refine','repair')
-MINIMAX_WORKFLOW_NAME = 'Simply_Advanced_MiniMax_H3_v1.4.json'
-MINIMAX_R2V_WORKFLOW_NAME = 'MiniMax_H3_R2V_Turbo_Hearmeman.json'
-MINIMAX_R2V_SWAP_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_LowVRAM_Hearmeman.json'
-MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME = 'MiniMax_H3_R2V_Swap_HighRes_Hearmeman.json'
-MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_OriginalAudio_v2.json'
-MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME = 'MiniMax_H3_Reel_Recreation_FirstFrame_OriginalAudio_v3.json'
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
-MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME = 'MiniMax_H3_R2V_Hearmeman_Full.json'
-MINIMAX_SWAP_1_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_OriginalAudio_v1.json'
-MINIMAX_SWAP_2_WORKFLOW_NAME = 'MiniMax_H3_LBH_Millie_AuthorSettings_OriginalAudio.json'
-MINIMAX_SWAP_3_WORKFLOW_NAME = 'MiniMax_H3_Studio_Swap.json'
-AKATZ_CHARACTER_SWAP_WORKFLOW_NAME = 'MiniMax_H3_akatz_Character_Swap_v1.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -179,30 +168,6 @@ def register(host):
                             ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
             logs.append('Bundled AIO Qwen Carousel helper installed in the ComfyUI environment.')
 
-        async def _install_h3_studio_nodes(self, python):
-            # MiniMax H3 Studio packs are local (not on git): shipped in the image under bundled_nodes/.
-            sources=[root/'bundled_nodes'/name for name in catalog['minimax_swap_3_bundled_nodes']]
-            self.update(stage='installing', message='Installing MiniMax H3 Studio nodes…', percent=95)
-            # PIP_CONSTRAINT (torch cu130 / numpy / transformers / opencv snapshot) is active here,
-            # so these small requirements (opencv-python, imageio-ffmpeg, safetensors, packaging) cannot move the core stack.
-            rc, output=await self._run_process(python, '-m', 'pip', 'install',
-                                             '-r', sources[0]/'requirements.txt', '-r', sources[1]/'requirements.txt', timeout=900)
-            if rc: raise RuntimeError('H3 Studio dependencies failed: '+output[-1500:])
-            rc, output=await self._run_process(python, '-c',
-                'import cv2, imageio_ffmpeg, safetensors, packaging; print("H3 Studio dependencies ready")', timeout=120)
-            if rc: raise RuntimeError('H3 Studio dependency import failed: '+output[-1500:])
-            self.check_cancelled()
-            for source in sources:
-                target=host.COMFYUI_DIR/'custom_nodes'/source.name
-                if target.exists():
-                    backup=host.COMFYUI_DIR/'user/h3_studio_backups'/uuid.uuid4().hex/source.name
-                    backup.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copytree(target, backup)
-                    logs.append('Previous '+source.name+' saved: '+str(backup))
-                shutil.copytree(source, target, dirs_exist_ok=True,
-                                ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
-            logs.append('MiniMax H3 Studio nodes installed: '+', '.join(s.name for s in sources)+'.')
-
         async def _install_krast_nodes(self):
             # KRASTv3 Carousel grid node is local (not on git): shipped in the image under bundled_nodes/.
             self.update(stage='installing', message='Installing KRASTv3 Carousel node…', percent=95)
@@ -303,8 +268,6 @@ def register(host):
                     await self._install_python_packages(python,workflow['pip_packages'])
                 if workflow.get('selfism_profile') == 'carousel':
                     await self._install_carousel_helper(python)
-                if workflow.get('selfism_profile') == 'minimax_swap_3':
-                    await self._install_h3_studio_nodes(python)
                 if workflow.get('selfism_profile') == 'krast':
                     await self._install_krast_nodes()
                 if workflow.get('selfism_repair'):
@@ -386,113 +349,6 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/6gsc.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('6gsc: upload the source image and edit the text prompt. Original Krea2 Turbo, DWPose/Ostris, sampling, refine and FaceDetailer settings are preserved. Mystic v3 replaces disabled v1; Yumi remains OFF and is not installed. The disconnected Flux GGUF loader was removed. No LLM prompter or presets are needed.')
-                if profile=='minimax':
-                    # Third-party workflow shipped byte-for-byte: no patching and no re-serialisation.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_simply_advanced.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Backend Attention defaults to "sage attention"; if SageAttention is not installed, choose "pytorch attention" in that subgraph.')
-                if profile=='minimax_r2v':
-                    # HearmemanAI R2V Turbo workflow: shipped as-is (only the UNETLoader file name was made to match the installed file).
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_R2V_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('The MiniMax References Manager node writes the prompt through OpenRouter by default: set OPENROUTER_API_KEY (or LLM_KEY) in the pod environment, or choose prompt_provider "none" in that node. Latent preview is pinned to none at boot. The hmmotion LoRA row is off; optional HM* LoRAs are not installed.')
-                if profile=='minimax_r2v_swap_lowvram':
-                    # Low-VRAM character swap built on the HearmemanAI R2V workflow: Picture 1/2 (LoadImage) and Video 1
-                    # (VHS_LoadVideo, 640 wide, 24 fps, frame cap = duration) wired straight into MiniMax H3 Reference to Video.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_R2V_SWAP_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Load Picture 1 (original woman from video), Picture 2 (Millie / new person) and Video 1 (source reel). The reel\'s audio feeds <Audio 1>; if the reel has no audio track, delete the audio link from Video 1. No OpenRouter key is needed: the Prompt node goes straight to MiniMax H3 Reference to Video.')
-                if profile=='minimax_r2v_swap_highres':
-                    # High-Res character swap: same Picture 1/2 + Video 1 wiring as Low-VRAM, plus Chunk FeedForward + Low VRAM Attention.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_swap_highres.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Load Picture 1 (original woman from video), Picture 2 (Millie / new person) and Video 1 (source reel, width 512). Defaults: 9:16 at 0.98 MP, 5 s; raise duration to 11 for a full reel. Chunk FeedForward + Low VRAM Attention are on; optional Sage attention is off. If the reel has no audio track, delete the audio link from Video 1.')
-                    # Soft-ensure --reserve-vram 8 in workspace comfyui_args.txt (append if missing; do not create the file).
-                    try:
-                        ws=Path(os.environ.get('SELFISM_WORKSPACE','/workspace/runpod-slim'))
-                        args_path=ws/'comfyui_args.txt'
-                        if args_path.is_file():
-                            lines=args_path.read_text(encoding='utf-8').splitlines()
-                            if not any(l.strip()=='--reserve-vram 8' for l in lines):
-                                text=args_path.read_text(encoding='utf-8')
-                                if text and not text.endswith('\n'): text+='\n'
-                                args_path.write_text(text+'--reserve-vram 8\n',encoding='utf-8')
-                                logs.append('Appended --reserve-vram 8 to '+str(args_path)+'. Restart ComfyUI for the flag to take effect.')
-                            else:
-                                logs.append('--reserve-vram 8 already present in '+str(args_path)+'. Restart ComfyUI if you just added it.')
-                        else:
-                            logs.append('comfyui_args.txt not found at '+str(args_path)+'; skipped --reserve-vram 8 (soft-fail).')
-                    except Exception as exc:
-                        logs.append('Could not update comfyui_args.txt for --reserve-vram 8: '+str(exc))
-                if profile=='minimax_reel_recreation_v2':
-                    # Reel Recreation v2: persona photos (front + 3/4) + source reel with original audio export;
-                    # fixed roles + scene prompt concatenated into MiniMaxH3ReferenceToVideo; turbo 8-step.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_reel_recreation_v2.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Load Picture 1 (persona front), Picture 2 (persona 3/4) and Video 1 (source reel). Fixed roles + scene prompt are concatenated into the R2V prompt. The reel audio feeds <Audio 1> and is exported in the MP4. Defaults: 5 s, 768x1344, turbo 8-step @ 0.85, euler/simple 8 steps, INT8 encoder. If the reel has no audio track, delete both audio links from Video 1.')
-                if profile=='minimax_reel_recreation_v3':
-                    # Reel Recreation v3: prepared first-frame guide (Picture 1) + persona portrait (Picture 2) + source reel with original audio; base Ref2VA, no turbo LoRA.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_reel_recreation_v3.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Load Picture 1 (recreated first frame with persona IN scene; also MiniMaxH3AddGuide frame_idx=0), Picture 2 (matching persona portrait) and Video 1 (source reel). Fixed roles + scene prompt concatenate into R2V. Original reel audio feeds <Audio 1> and the MP4. Defaults: 5 s, 768x1344, base Ref2VA, res_multistep/simple 20 steps, INT8 encoder, no Turbo LoRA. If the reel has no audio track, delete both audio links from Video 1.')
-                if profile=='minimax_r2v_hearmeman_full':
-                    # Full HearmemanAI R2V with References Manager: pruned Ref2VA INT8 + 8-step turbo LoRA; prompt_provider preset to none.
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_h3_r2v_hearmeman_full.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Add references in the MiniMax References Manager node (Picture/Video/Audio order = labels). prompt_provider is preset to "none": paste your own prompt, no OpenRouter key needed. Latent preview is pinned to none at boot (ModelPreviewOverrideKJ tiny_vae = none). Defaults: 2:3, 0.7 MP, 5 s, pruned Ref2VA INT8 + turbo 8-step LoRA @ 0.85, euler/simple 8 steps.')
-                if profile=='minimax_swap_1':
-                    # minimax swap 1: LBH Millie original-audio swap (Ref2VA INT8 + NVFP4 encoder + turbo + character swap LoRA + 3D latent upscaler).
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_SWAP_1_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_1.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('Load Millie photo in 01, source reel in 02 (73 frames @24 fps by default; frame_load_cap 0 = whole short clip), prompt in 03. Run 07 PREVIEW first; then unmute 08 FINAL OUTPUT (Ctrl+M) for ~1 MP latent-upscaled output. Original reel audio goes straight to both exports. Character Swap LoRA @ 1.0.')
-                if profile=='minimax_swap_2':
-                    # minimax swap 2: LBH author settings (full Ref2VA INT8 + FL2V LightX2V 4-step v0.1 + character swap + 3D upscaler + KJ preview).
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_SWAP_2_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_2.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('LBH author settings: load Millie photo in 01, source reel in 02 (73 frames @24 fps), prompt in 03. Run 07 PREVIEW (0.2 MP) first; then unmute 08 FINAL OUTPUT (Ctrl+M) for 1 MP with 3-step latent-upscaled refine. Full Ref2VA INT8 + FL2V LightX2V 4-step v0.1, euler 8 steps split at 4, comfy kitchen attention, KJ taeh3 live preview. Original reel audio goes straight to both exports.')
-                if profile=='minimax_swap_3':
-                    # minimax swap 3: MiniMax H3 Studio (SAM3.1 masked video inpainting with a reference picture; bundled Studio nodes).
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/MINIMAX_SWAP_3_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/minimax_swap_3.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('MiniMax H3 Studio: in the Media card upload the reference photo and the source reel (trim start/end), keep mode "Video inpainting", set the SAM3 target (e.g. "the woman driving") and the prompt, then Run. Output keeps the original reel audio (trimmed). Turbo V4 Step 600 pruned LoRA @ 1.0, 8 steps. The example owl inputs are not installed; select your own media first.')
-                if profile=='akatz_character_swap':
-                    # akatz character swap: official H3 Ref2VA template + akatz-ai Character Swap LoRA (core nodes only).
-                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
-                    folder.mkdir(parents=True,exist_ok=True)
-                    dest=folder/AKATZ_CHARACTER_SWAP_WORKFLOW_NAME
-                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/akatz_character_swap.json').read_bytes())
-                    logs.append('Workflow saved: '+str(dest))
-                    logs.append('akatz character swap: load the Millie photo (<Picture 1>) and one 4-5 s shot at 24 fps (<Video 1>), short prompt "Swap the woman in <Video 1> with the character in <Picture 1>.", set duration to the shot length. Ref2VA INT8 pruned + Character Swap LoRA @ 1.0, 20 steps res_multistep, turbo off. Original reel audio switch is on by default (trimmed to the output).')
                 if profile=='god_mode':
                     # GOD Mode: Wan 2.2 Animate character replacement / animation (Kijai WanVideoWrapper + preprocess + SAM2 + RIFE).
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
@@ -604,50 +460,6 @@ def register(host):
             request=request.model_copy(update={'precision':precision})
             file_keys=[precision]+catalog[profile+'_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
-        elif profile=='minimax':
-            # MiniMax H3 Simply Advanced: exactly the default-active models of the workflow (R2 first, HF fallback).
-            file_keys=catalog['minimax_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_nodes']]
-        elif profile=='minimax_r2v':
-            # MiniMax H3 R2V Turbo (HearmemanAI): INT8 Ref2VA + INT8 encoder + FP16/audio VAEs + turbo LoRA + TAEH3 preview decoder.
-            file_keys=catalog['r2v_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_nodes']]
-        elif profile=='minimax_r2v_swap_lowvram':
-            # MiniMax H3 R2V Swap Low-VRAM: pruned Ref2VA INT8 + NVFP4 encoder + FP16/audio VAEs + turbo LoRA; rgthree + VHS only.
-            file_keys=catalog['r2v_swap_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_nodes']]
-        elif profile=='minimax_r2v_swap_highres':
-            # MiniMax H3 R2V Swap High-Res: same models as Low-VRAM + KJNodes (Chunk FeedForward / Low VRAM Attention).
-            file_keys=catalog['r2v_swap_highres_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_swap_highres_nodes']]
-        elif profile=='minimax_reel_recreation_v2':
-            # MiniMax H3 Reel Recreation v2: pruned Ref2VA INT8 + INT8 encoder + FP16/audio VAEs + 8-step turbo LoRA; VHS only.
-            file_keys=catalog['reel_recreation_v2_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reel_recreation_v2_nodes']]
-        elif profile=='minimax_reel_recreation_v3':
-            # MiniMax H3 Reel Recreation v3: same INT8 set as v2 without turbo LoRA; first-frame MiniMaxH3AddGuide; VHS only.
-            file_keys=catalog['reel_recreation_v3_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['reel_recreation_v3_nodes']]
-        elif profile=='minimax_r2v_hearmeman_full':
-            # MiniMax H3 R2V Hearmeman Full: pruned Ref2VA INT8 + INT8 encoder + FP16/audio VAEs + 8-step turbo LoRA + TAEH3; R2V node packs.
-            file_keys=catalog['r2v_hearmeman_full_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['r2v_hearmeman_full_nodes']]
-        elif profile=='minimax_swap_1':
-            # minimax swap 1: LBH Millie original audio; VHS + LBH latent upscaler.
-            file_keys=catalog['minimax_swap_1_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_1_nodes']]
-        elif profile=='minimax_swap_2':
-            # minimax swap 2: LBH author settings; VHS + KJNodes + LBH latent upscaler.
-            file_keys=catalog['minimax_swap_2_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_2_nodes']]
-        elif profile=='minimax_swap_3':
-            # minimax swap 3: MiniMax H3 Studio; nodes are bundled (installed by _install_h3_studio_nodes), no git packs.
-            file_keys=catalog['minimax_swap_3_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['minimax_swap_3_nodes']]
-        elif profile=='akatz_character_swap':
-            # akatz character swap: pruned Ref2VA INT8 + Character Swap LoRA + optional Ref2V 4-step turbo + NVFP4 encoder + INT8/audio VAEs; core nodes only.
-            file_keys=catalog['akatz_character_swap_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['akatz_character_swap_nodes']]
         elif profile=='god_mode':
             # GOD Mode: Wan 2.2 Animate 14B bf16 + VAE/UMT5/CLIP/SAM2/ViTPose/YOLO + LoRAs + RIFE; WanVideoWrapper stack.
             file_keys=catalog['god_mode_files']
@@ -702,7 +514,7 @@ def register(host):
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
                   'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
-                  'pip_packages':(list(catalog.get('minimax_pip',[])) if profile=='minimax' else list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
+                  'pip_packages':(list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':(copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else [])+lut_links}
         return await controller.start(workflow)
 
@@ -741,31 +553,9 @@ def register(host):
             return FileResponse(root/'selfism_workflows/6gsc.json',filename='6gsc_dashboard_v1.json')
         if profile=='full_refine':
             return FileResponse(root/'selfism_workflows/full_refine.json',filename='Selfism_FULL_int8_Refine_v1.json')
-        if profile not in ('simple','aio','reference','carousel','full','minimax','minimax_r2v','minimax_r2v_swap_lowvram','minimax_r2v_swap_highres','minimax_reel_recreation_v2','minimax_reel_recreation_v3','god_mode','minimax_r2v_hearmeman_full','minimax_swap_1','minimax_swap_2','minimax_swap_3','akatz_character_swap'): raise HTTPException(404)
-        if profile=='akatz_character_swap':
-            return FileResponse(root/'selfism_workflows/akatz_character_swap.json',filename=AKATZ_CHARACTER_SWAP_WORKFLOW_NAME)
-        if profile=='minimax_swap_3':
-            return FileResponse(root/'selfism_workflows/minimax_swap_3.json',filename=MINIMAX_SWAP_3_WORKFLOW_NAME)
-        if profile=='minimax_swap_2':
-            return FileResponse(root/'selfism_workflows/minimax_swap_2.json',filename=MINIMAX_SWAP_2_WORKFLOW_NAME)
-        if profile=='minimax_swap_1':
-            return FileResponse(root/'selfism_workflows/minimax_swap_1.json',filename=MINIMAX_SWAP_1_WORKFLOW_NAME)
-        if profile=='minimax_r2v_hearmeman_full':
-            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_hearmeman_full.json',filename=MINIMAX_R2V_HEARMEMAN_FULL_WORKFLOW_NAME)
+        if profile not in ('simple','aio','reference','carousel','full','god_mode'): raise HTTPException(404)
         if profile=='god_mode':
             return FileResponse(root/'selfism_workflows/wan22_animate_god_mode.json',filename=GOD_MODE_WORKFLOW_NAME)
-        if profile=='minimax_reel_recreation_v3':
-            return FileResponse(root/'selfism_workflows/minimax_h3_reel_recreation_v3.json',filename=MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME)
-        if profile=='minimax_reel_recreation_v2':
-            return FileResponse(root/'selfism_workflows/minimax_h3_reel_recreation_v2.json',filename=MINIMAX_REEL_RECREATION_V2_WORKFLOW_NAME)
-        if profile=='minimax_r2v_swap_highres':
-            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_highres.json',filename=MINIMAX_R2V_SWAP_HIGHRES_WORKFLOW_NAME)
-        if profile=='minimax_r2v_swap_lowvram':
-            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_swap_lowvram.json',filename=MINIMAX_R2V_SWAP_WORKFLOW_NAME)
-        if profile=='minimax_r2v':
-            return FileResponse(root/'selfism_workflows/minimax_h3_r2v_turbo_hearmeman.json',filename=MINIMAX_R2V_WORKFLOW_NAME)
-        if profile=='minimax':
-            return FileResponse(root/'selfism_workflows/minimax_h3_simply_advanced.json',filename=MINIMAX_WORKFLOW_NAME)
         return FileResponse(root/'selfism_workflows'/f'{profile}.json',filename=('Selfism_FULL_workflow.json' if profile=='full' else f'Selfism_{profile}_m1lli3.json'))
 
     async def startup_repair():

@@ -211,8 +211,8 @@ def test_health_and_public_catalog() -> None:
         response = client.get("/api/catalog")
         assert response.status_code == 200
         workflows = response.json()["workflows"]
-        assert len(workflows) == 5
-        assert sum(not item.get("disabled", False) for item in workflows) == 5
+        assert len(workflows) == 3
+        assert sum(not item.get("disabled", False) for item in workflows) == 3
         assert "files" not in workflows[0]
         assert "custom_nodes" not in workflows[0]
         assert "url" not in workflows[0]
@@ -226,7 +226,6 @@ def test_catalog_contains_installers_but_no_product_workflows() -> None:
         "krea-2-extended",
         "motion-control",
         "motion-control-god-edition",
-        "minimax-h3",
     ]
     assert {
         "image-generation",
@@ -369,66 +368,18 @@ def test_motion_control_god_edition_matches_the_workflow_export() -> None:
     ]
 
 
-def test_minimax_h3_installer_matches_the_runpod_manifest() -> None:
-    catalog = launcher_app.load_catalog()
-    installer = next(
-        item for item in catalog["workflows"] if item["id"] == "minimax-h3"
-    )
-
-    assert installer["estimated_size"] == "Approx. 63.4 GB"
-    assert installer["update_comfyui"] is True
-    assert [item["destination"] for item in installer["files"]] == [
-        "models/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
-        "models/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
-        "models/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
-        "models/vae/minimax_h3_video_vae_fp16.safetensors",
-        "models/vae/minimax_h3_audio_vae_fp32.safetensors",
-    ]
-    assert [item["name"] for item in installer["custom_nodes"]] == [
-        "ComfyUI-KJNodes",
-        "rgthree-comfy",
-        "ComfyUI-VideoHelperSuite",
-    ]
-    assert all("/resolve/main/" in item["url"] for item in installer["files"])
-
-
-def test_local_windows_installers_match_the_catalog() -> None:
-    catalog = launcher_app.load_catalog()
-    workflows = {item["id"]: item for item in catalog["workflows"]}
-    installers = {
-        "minimax_h3_model_installer.bat": "minimax-h3",
+def test_local_windows_installers_do_not_ship_minimax_h3() -> None:
+    root = launcher_app.SOURCE_ROOT / "local-installers"
+    assert not (root / "minimax_h3_model_installer.bat").exists()
+    bats = sorted(root.glob("*.bat"))
+    assert {path.name for path in bats} == {
+        "dataset_generator_model_installer.bat",
+        "krea2_model_installer.bat",
     }
-
-    for filename, workflow_id in installers.items():
-        script = (
-            launcher_app.SOURCE_ROOT / "local-installers" / filename
-        ).read_text(encoding="utf-8")
-        workflow = workflows[workflow_id]
-        downloads = [
-            (url, destination.replace("\\", "/"), sha256)
-            for url, destination, sha256 in re.findall(
-                r'^call :download "([^"]+)" "([^"]+)" "([0-9a-f]{64})"',
-                script,
-                flags=re.MULTILINE,
-            )
-        ]
-        nodes = re.findall(
-            r'^call :install_node "([^"]+)" "([^"]+)" "([0-9a-f]{40})"',
-            script,
-            flags=re.MULTILINE,
-        )
-
-        assert downloads == [
-            (item["url"], item["destination"], item["sha256"])
-            for item in workflow["files"]
-        ]
-        assert nodes == [
-            (item["name"], item["repo"], item["ref"])
-            for item in workflow["custom_nodes"]
-        ]
-        assert "Get-FileHash -Algorithm SHA256" in script
-        assert "checkout --detach" in script
-        assert "pip install --disable-pip-version-check" in script
+    for path in bats:
+        text = path.read_text(encoding="utf-8").lower()
+        assert "minimax" not in text
+        assert "minimax_h3" not in text
 
 
 def test_unknown_workflow_cannot_start() -> None:
@@ -1215,7 +1166,7 @@ def test_catalog_api_is_skipped_when_no_base_is_configured(monkeypatch) -> None:
     monkeypatch.delenv("LCT_API_BASE", raising=False)
 
     assert launcher_remote.fetch_catalog() is None
-    assert len(launcher_app.load_catalog()["workflows"]) == 5
+    assert len(launcher_app.load_catalog()["workflows"]) == 3
 
 
 def test_catalog_api_failures_fall_back_to_the_bundled_catalog(
@@ -1228,19 +1179,19 @@ def test_catalog_api_failures_fall_back_to_the_bundled_catalog(
     monkeypatch.setenv("LCT_API_BASE", f"http://127.0.0.1:{closed_port()}")
     launcher_remote._reset_state()
     assert launcher_remote.fetch_catalog() is None
-    assert len(launcher_app.load_catalog()["workflows"]) == 5
+    assert len(launcher_app.load_catalog()["workflows"]) == 3
 
     with catalog_api(b"upstream exploded", status=500) as base:
         monkeypatch.setenv("LCT_API_BASE", base)
         launcher_remote._reset_state()
         assert launcher_remote.fetch_catalog() is None
-        assert len(launcher_app.load_catalog()["workflows"]) == 5
+        assert len(launcher_app.load_catalog()["workflows"]) == 3
 
     with catalog_api(b'{"workflows": [') as base:
         monkeypatch.setenv("LCT_API_BASE", base)
         launcher_remote._reset_state()
         assert launcher_remote.fetch_catalog() is None
-        assert len(launcher_app.load_catalog()["workflows"]) == 5
+        assert len(launcher_app.load_catalog()["workflows"]) == 3
 
 
 def test_catalog_request_omits_authorization_without_a_credential(
@@ -1330,7 +1281,7 @@ def test_malformed_remote_catalog_falls_back_instead_of_breaking_the_pod(
             monkeypatch.setenv("LCT_API_BASE", base)
             launcher_remote._reset_state()
             catalog = launcher_app.load_catalog(fresh=True)
-        assert len(catalog["workflows"]) == 5
+        assert len(catalog["workflows"]) == 3
 
 
 def test_a_malformed_bundled_catalog_still_raises(tmp_path, monkeypatch) -> None:
@@ -1365,7 +1316,7 @@ def test_remote_catalog_without_a_checksum_falls_back_to_the_bundled_catalog(
     with catalog_api(body) as base:
         monkeypatch.setenv("LCT_API_BASE", base)
         assert launcher_remote.fetch_catalog(fresh=True) is None
-        assert len(launcher_app.load_catalog()["workflows"]) == 5
+        assert len(launcher_app.load_catalog()["workflows"]) == 3
 
 
 def test_public_catalog_never_leaks_install_details(monkeypatch) -> None:
@@ -4946,7 +4897,7 @@ def test_diagnostics_never_exports_a_url_or_a_path() -> None:
     # The update subtree too, with the shape git actually produces: a path in the middle
     # of a sentence, which the "starts with a slash" half of this walk would never catch.
     store.record_comfyui_update(
-        workflow_id="minimax-h3",
+        workflow_id="motion-control",
         error=(
             "ComfyUI update failed: fatal: not a git repository: "
             "/workspace/runpod-slim/ComfyUI/.git, remote https://github.com/x/y.git"
@@ -5436,8 +5387,8 @@ def test_an_up_to_date_comfyui_is_not_fetched_reset_or_reinstalled(
 ) -> None:
     """The common case: the base image ships a current ComfyUI.
 
-    The pip install alone measures about two minutes on a pod, and MiniMax H3 runs this
-    before any download - which is why that panel sat at 0% doing nothing visible.
+    The pip install alone measures about two minutes on a pod, and an install that updates
+    ComfyUI runs this before any download - which is why that panel sat at 0% doing nothing visible.
     """
     controller, recorded, messages, _updates = comfyui_update_harness(
         tmp_path,
@@ -5653,14 +5604,14 @@ def test_the_update_lands_in_diagnostics(tmp_path, monkeypatch) -> None:
         heads=[(0, SHA_INSTALLED + "\n")],
         remote=(0, f"{SHA_INSTALLED}\trefs/heads/master\n"),
     )
-    controller.state.workflow_id = "minimax-h3"
+    controller.state.workflow_id = "motion-control"
 
     asyncio.run(controller._update_comfyui())
 
     record = store.export()["comfyui_update"]
     assert record["skipped"] is True
     assert record["reason"] == "already-up-to-date"
-    assert record["workflow_id"] == "minimax-h3"
+    assert record["workflow_id"] == "motion-control"
     assert record["requirements_seconds"] == 0.0
     assert record["error"] is None
 
@@ -6398,12 +6349,12 @@ def test_an_update_still_running_is_in_the_report(monkeypatch) -> None:
 
     Measured live: the panel read "Updating ComfyUI, installing requirements, 2m17s" while
     the report for that same pod said nothing about an update. It is the slowest part of a
-    MiniMax install, so that is exactly when somebody presses Debug.
+    install that updates ComfyUI, so that is exactly when somebody presses Debug.
     """
     pretend_free_space(monkeypatch, 300 * 1024**3)
     store = report_store(files=[a_big_file()])
     store.record_comfyui_update(
-        workflow_id="minimax-h3",
+        workflow_id="motion-control",
         in_flight=True,
         phase="installing requirements",
         fetch_seconds=3.4,
@@ -6429,13 +6380,13 @@ def test_the_finished_update_replaces_the_running_one(monkeypatch) -> None:
     store = report_store(files=[a_big_file()])
     for elapsed in (12.0, 74.0, 137.0):
         store.record_comfyui_update(
-            workflow_id="minimax-h3",
+            workflow_id="motion-control",
             in_flight=True,
             phase="installing requirements",
             total_seconds=elapsed,
         )
     store.record_comfyui_update(
-        workflow_id="minimax-h3",
+        workflow_id="motion-control",
         fetch_seconds=3.4,
         reset_seconds=1.1,
         requirements_seconds=138.2,
@@ -6551,7 +6502,7 @@ def test_the_report_carries_no_url_and_no_path(monkeypatch) -> None:
         files=[a_big_file()],
         nodes=[{"name": "ComfyUI-Impact-Pack", "total_seconds": 11.5}],
         update={
-            "workflow_id": "minimax-h3",
+            "workflow_id": "motion-control",
             "error": (
                 "fatal: not a git repository: /workspace/runpod-slim/ComfyUI/.git via "
                 "https://github.com/x/y.git?token=secret"
@@ -6702,7 +6653,7 @@ def test_the_help_page_is_served_as_part_of_the_page(tmp_path, monkeypatch) -> N
     with TestClient(launcher_app.app) as client:
         page = client.get("/").text
 
-    assert len(re.findall(r'data-view-target="([^"]+)"', page)) == 5
+    assert len(re.findall(r'data-view-target="([^"]+)"', page)) == 6
     assert 'data-view-target="docs"' in page
     assert 'id="view-docs"' in page
     # The content really is in the page, not a placeholder waiting on a fetch.

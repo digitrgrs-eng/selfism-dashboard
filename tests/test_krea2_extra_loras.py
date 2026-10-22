@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from launcher.private_r2 import select_private
-from tests.test_minimax import start_install
+from tests.test_god_mode import start_install
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = json.loads((ROOT / 'catalog/selfism.json').read_text(encoding='utf-8'))

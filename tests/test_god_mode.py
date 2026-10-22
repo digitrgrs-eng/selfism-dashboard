@@ -69,10 +69,6 @@ AUX_TO_PACK = {
     'rgthree/rgthree-comfy': 'rgthree-comfy',
     'pythongosssss/ComfyUI-Custom-Scripts': 'ComfyUI-Custom-Scripts',
 }
-REEL_V3_IDS = ['mm-ref2va', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio']
-REEL_V2_IDS = ['mm-ref2va', 'r2v-enc', 'mm-vae-fp16', 'mm-vae-audio', 'r2v-lora-turbo-8step']
-
-
 def start_install(monkeypatch, body):
     class Client:
         def __init__(self, **kwargs): pass
@@ -98,7 +94,7 @@ def start_install(monkeypatch, body):
         return r, captured, client.get('/').text
 
 
-def test_god_mode_catalog_files_nodes_links_and_unchanged_siblings():
+def test_god_mode_catalog_files_nodes_and_links():
     files = CATALOG['files']
     assert CATALOG['god_mode_files'] == GOD_IDS
     assert CATALOG['god_mode_nodes'] == GOD_NODES
@@ -122,10 +118,6 @@ def test_god_mode_catalog_files_nodes_links_and_unchanged_siblings():
     assert set(GOD_NODES) <= set(names)
     for n in GOD_NODES:
         assert names[n]['repo'].startswith('https://github.com/') and re.fullmatch(r'[0-9a-f]{40}', names[n]['ref']), n
-    # sibling MiniMax cards unchanged
-    assert CATALOG['reel_recreation_v3_files'] == REEL_V3_IDS
-    assert CATALOG['reel_recreation_v2_files'] == REEL_V2_IDS
-    assert CATALOG['r2v_swap_highres_nodes'] == ['rgthree-comfy', 'ComfyUI-VideoHelperSuite', 'ComfyUI-KJNodes']
 
 
 def test_god_mode_install_selects_files_nodes_and_ui_card(monkeypatch):
@@ -144,9 +136,6 @@ def test_god_mode_install_selects_files_nodes_and_ui_card(monkeypatch):
         assert '>GOD Mode</h2>' in page
         assert 'Instaliraj</button>' in page
         assert gb in page
-        # siblings stay
-        assert 'data-sf-action="minimax_reel_recreation_v3"' in page
-        assert 'data-sf-action="minimax_reel_recreation_v2"' in page
 
 
 def test_god_mode_workflow_covers_catalog_models_and_nodes():
@@ -204,7 +193,6 @@ def test_god_mode_workflow_download_and_install_are_byte_identical_and_nondestru
     wf = {'selfism_profile': 'god_mode', 'precision': 'fp8', 'files': [{'id': 'x'}], 'pip_packages': []}
     asyncio.run(ctrl._install_workflow(wf))
     assert saved.read_bytes() == GOD_WF.read_bytes()
-    assert not (tmp_path / 'user/default/workflows/Selfism' / s.MINIMAX_REEL_RECREATION_V3_WORKFLOW_NAME).exists()
     saved.write_text('{"user_edited":true}')
     asyncio.run(ctrl._install_workflow(wf))
     assert json.loads(saved.read_text()) == {'user_edited': True}
