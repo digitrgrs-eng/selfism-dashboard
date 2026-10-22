@@ -123,8 +123,8 @@ def test_krast_org_depth_and_rawgirl_cards():
     assert depth_users
 
 
-AUX=['einops','huggingface-hub','pyyaml','scipy','scikit-image','matplotlib']
-IMPACT=['segment-anything','scikit-image','piexif','opencv-python-headless','scipy','dill','matplotlib']
+AUX=['einops','huggingface-hub','pyyaml','scipy','scikit-image','matplotlib','filelock','python-dateutil','omegaconf','addict','yacs','trimesh','rtree','albumentationsx==2.3.0','scikit-learn','onnxruntime-gpu==1.30.0']
+IMPACT=['segment-anything','scikit-image','piexif','transformers','opencv-python-headless','scipy','numpy','dill','matplotlib']
 DEPTH_PROFILES=('krast','recreate_hybrid','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org_depth','rawgirl')
 
 
@@ -134,8 +134,15 @@ def test_shared_packs_install_only_the_preprocessors_the_cards_use():
     assert nodes['comfyui_controlnet_aux']['requirements_packages']==AUX
     assert nodes['ComfyUI-Impact-Pack']['requirements_packages']==IMPACT
     for name in ('comfyui_controlnet_aux','ComfyUI-Impact-Pack'):
-        blob=' '.join(nodes[name]['requirements_packages']).lower()
-        assert 'opencv-contrib' not in blob and 'sam2' not in blob and 'onnxruntime' not in blob
+        packages=nodes[name]['requirements_packages']
+        blob=' '.join(packages).lower()
+        bases=[p.split('[',1)[0].split('=',1)[0].split('<',1)[0].split('>',1)[0].split('!',1)[0].split('~',1)[0].strip().lower().replace('_','-') for p in packages]
+        # mediapipe and sam2 are baked by docker/bake_comfyui.sh, not this list: a plain
+        # pip of mediapipe pulls opencv-contrib, and sam2 is a pinned git commit.
+        assert 'opencv-contrib' not in blob and 'sam2' not in bases and 'mediapipe' not in bases
+        assert 'onnxruntime' not in bases and 'opencv-python' not in bases
+    assert 'onnxruntime-gpu' in [p.split('==',1)[0] for p in nodes['comfyui_controlnet_aux']['requirements_packages']]
+    assert nodes['comfyui_controlnet_aux']['requirements_packages'][-1]=='onnxruntime-gpu==1.30.0'
     users=[key[:-6] for key,value in c.items() if key.endswith('_nodes') and 'comfyui_controlnet_aux' in value]
     assert 'krast_org_depth' in users and len(users)>=11
     assert 'ComfyUI-Impact-Pack' in c['krast_org_nodes'] and 'sam2' not in IMPACT

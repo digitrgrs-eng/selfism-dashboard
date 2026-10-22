@@ -1622,8 +1622,10 @@
         "segment-anything",
         "scikit-image",
         "piexif",
+        "transformers",
         "opencv-python-headless",
         "scipy",
+        "numpy",
         "dill",
         "matplotlib"
       ]
@@ -1699,7 +1701,17 @@
         "pyyaml",
         "scipy",
         "scikit-image",
-        "matplotlib"
+        "matplotlib",
+        "filelock",
+        "python-dateutil",
+        "omegaconf",
+        "addict",
+        "yacs",
+        "trimesh",
+        "rtree",
+        "albumentationsx==2.3.0",
+        "scikit-learn",
+        "onnxruntime-gpu==1.30.0"
       ]
     },
     {
@@ -1754,7 +1766,11 @@
       "name": "ComfyUI-WanAnimatePreprocess",
       "repo": "https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
       "ref": "0e0b6a2a555625acf4d4aefb780e27d06937132f",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "onnx",
+        "onnxruntime-gpu==1.30.0"
+      ]
     },
     {
       "name": "ComfyUI-segment-anything-2",

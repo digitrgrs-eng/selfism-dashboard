@@ -2616,6 +2616,40 @@ PROTECTED_TORCH_PACKAGES = frozenset({"torch", "torchvision", "torchaudio"})
 _REQUIREMENT_PACKAGE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*(\[[A-Za-z0-9,._-]+\])?([<>=!~]=?[A-Za-z0-9.*+!_-]+)?")
 
 
+def requirement_project_name(line: str) -> str:
+    """The distribution name a requirement line would install, without markers or pins."""
+    body = line.split("#", 1)[0].split(";", 1)[0].strip()
+    base = re.split(r"[\[<>=!~]", body, maxsplit=1)[0].strip()
+    return base.lower().replace("_", "-")
+
+
+def requirements_without_cpu_onnxruntime(path: Path) -> Path:
+    """Drop the CPU `onnxruntime` distribution so it cannot shadow onnxruntime-gpu.
+
+    The image bake installs onnxruntime-gpu==1.30.0 (CUDA 13). Easy-Use and a few
+    other packs still name the CPU package. The GPU build also provides
+    CPUExecutionProvider, so those nodes keep a CPU fallback.
+    """
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    kept: list[str] = []
+    dropped = False
+    for raw in lines:
+        if requirement_project_name(raw) == "onnxruntime":
+            dropped = True
+            continue
+        kept.append(raw)
+    if not dropped:
+        return path
+    filtered = path.parent / ".selfism-requirements.txt"
+    filtered.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+    print(
+        "10sorLabs launcher: skipped CPU onnxruntime from "
+        f"{path.parent.name}; the image provides onnxruntime-gpu.",
+        flush=True,
+    )
+    return filtered
+
+
 def validated_requirement_packages(name: str, packages: Any) -> list[str]:
     """Check a node pack's explicit pip package list before it reaches pip.
 
@@ -2630,9 +2664,14 @@ def validated_requirement_packages(name: str, packages: Any) -> list[str]:
         package = package.strip()
         if not _REQUIREMENT_PACKAGE.fullmatch(package):
             raise RuntimeError(f"Unsupported requirement for {name}: {package!r}")
-        base = re.split(r"[\[<>=!~]", package, maxsplit=1)[0].lower().replace("_", "-")
+        base = requirement_project_name(package)
         if base in PROTECTED_TORCH_PACKAGES:
             raise RuntimeError(f"{name} may not install {base}; torch is pinned by the image")
+        if base == "onnxruntime":
+            raise RuntimeError(
+                f"{name} may not install the CPU onnxruntime package; "
+                "the image provides onnxruntime-gpu"
+            )
         checked.append(package)
     return checked
 
@@ -4624,6 +4663,8 @@ print(sageattention.__file__, triton.__version__)
         pip_targets: list[Any] = ["-r", requirements]
         if explicit_packages is not None:
             pip_targets = validated_requirement_packages(name, explicit_packages)
+        elif requirements.is_file():
+            pip_targets = ["-r", requirements_without_cpu_onnxruntime(requirements)]
         # The image bake installs these deps under the cu130 constraints and stamps the
         # cache marker. A copied pack then does no pip work. A GitHub fallback has no
         # marker, so pip still runs.

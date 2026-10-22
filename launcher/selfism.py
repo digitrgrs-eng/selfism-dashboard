@@ -357,7 +357,7 @@ def register(host):
                     dest=folder/'Hearmeman_WanAnimate_V5_SAM3.json'
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_wan_v5.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('Hearmeman Wan Animate V5 (SAM3): load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. DWPose uses the image CPU onnxruntime. About 48 GB+ VRAM, not GPU-validated.')
+                    logs.append('Hearmeman Wan Animate V5 (SAM3): load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. DWPose uses the image CUDA onnxruntime (CUDAExecutionProvider). About 48 GB+ VRAM, not GPU-validated.')
                 if profile=='hearmeman_scail2_v2':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)

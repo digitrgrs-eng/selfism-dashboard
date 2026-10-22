@@ -6786,10 +6786,33 @@ def test_empty_requirement_packages_skip_pip(tmp_path, monkeypatch) -> None:
     assert failure is None and pip_runs == []
 
 
-@pytest.mark.parametrize("bad", ["torch", "torchvision==0.25", "TorchAudio", "-r x.txt", "git+https://x/y", "--index-url=x"])
+@pytest.mark.parametrize("bad", ["torch", "torchvision==0.25", "TorchAudio", "-r x.txt", "git+https://x/y", "--index-url=x", "onnxruntime", "onnxruntime==1.22.0"])
 def test_requirement_packages_never_touch_torch_or_pass_options(bad) -> None:
     with pytest.raises(RuntimeError):
         launcher_app.validated_requirement_packages("X", [bad])
+
+
+def test_requirements_file_drops_cpu_onnxruntime_and_keeps_the_gpu_build(tmp_path) -> None:
+    path = tmp_path / "requirements.txt"
+    path.write_text(
+        "einops\n"
+        "onnxruntime\n"
+        "onnxruntime-gpu==1.30.0\n"
+        "# onnxruntime is the CPU build\n"
+        "onnxruntime; platform_system == 'Linux'\n",
+        encoding="utf-8",
+    )
+    filtered = launcher_app.requirements_without_cpu_onnxruntime(path)
+    assert filtered != path
+    text = filtered.read_text(encoding="utf-8")
+    assert "onnxruntime-gpu==1.30.0" in text
+    assert "einops" in text
+    names = [
+        launcher_app.requirement_project_name(line)
+        for line in text.splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+    assert names == ["einops", "onnxruntime-gpu"]
 
 
 def test_node_installs_overlap_model_downloads_and_links_wait(tmp_path, monkeypatch) -> None:

@@ -29,6 +29,7 @@ RUN --mount=type=bind,source=docker/bake_comfyui.sh,target=/tmp/bake_comfyui.sh 
     apt-get update \
     && apt-get install -y --no-install-recommends \
        libgl1 libopengl0 libglu1-mesa libegl1 libegl-mesa0 libgl1-mesa-dri libgles2 \
+       libportaudio2 \
     && rm -rf /var/lib/apt/lists/* \
     && COMFYUI_TAG="${COMFYUI_TAG}" COMFYUI_SHA="${COMFYUI_SHA}" bash /tmp/bake_comfyui.sh
 
@@ -38,11 +39,15 @@ LABEL org.opencontainers.image.title="Selfora / Selfism dashboard" \
       org.opencontainers.image.source="https://github.com/digitrgrs-eng/selfism-dashboard" \
       org.opencontainers.image.version="${IMAGE_VERSION}"
 
+# controlnet_aux reads AUX_ORT_PROVIDERS (else its default list, which also starts
+# with CUDA). CUDA first, CPU if the provider cannot be selected. The bake installs
+# onnxruntime-gpu==1.30.0 and checks CUDAExecutionProvider is registered.
 ENV LAUNCHER_AUTO_UPDATE=0 \
     SELFISM_AUTO_REPAIR=1 \
     SELFISM_AUTO_COMFY_UPDATE=1 \
     HF_TOKEN_FILE=/dev/null \
-    PYTHONPATH=/opt/r2deps:/opt/10sorlabs
+    PYTHONPATH=/opt/r2deps:/opt/10sorlabs \
+    AUX_ORT_PROVIDERS=CUDAExecutionProvider,CPUExecutionProvider
 
 # User credentials must be supplied via RunPod environment variables.
 # Do not use credentials possibly baked into the upstream image.

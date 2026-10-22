@@ -31,8 +31,10 @@ opencv-python-headless
 # ComfyUI-Easy-Use, ComfyUI-Impact-Pack, ComfyUI-Impact-Subpack, ComfyUI-KJNodes, ComfyUI_LayerStyle, RES4LYF, seedvr2_videoupscaler
 matplotlib
 
-# ComfyUI-Easy-Use, ComfyUI_FaceAnalysis
-onnxruntime
+# ComfyUI-Easy-Use and ComfyUI_FaceAnalysis import onnxruntime. The CPU package
+# must not be installed: it shares the import name with the CUDA build and shadows
+# it. docker/bake_comfyui.sh installs onnxruntime-gpu==1.30.0 (CUDA 13 / cuDNN 9)
+# and the launcher drops a bare `onnxruntime` line from pack requirements.
 
 # ComfyUI-Easy-Use, seedvr2_videoupscaler
 diffusers>=0.33.1
