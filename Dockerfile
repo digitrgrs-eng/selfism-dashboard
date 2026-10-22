@@ -22,8 +22,9 @@ ARG COMFYUI_SHA=20ca544ee0436721d8eb5f544665e490609f72c8
 # The same RUN first installs OpenGL/EGL/GLES userspace for ComfyUI core GLSLShader
 # (Artfat Colorgrade grain); with it GLSLShader initializes via ANGLE on NVIDIA Vulkan.
 # The same RUN also bakes the Krast ORG + Depth node packs (and the two Hearmeman
-# packs) from catalog/selfism.json into /opt/10sorlabs/node_cache. Keep it one RUN:
-# BuildKit unpacks the base rootfs only for this step.
+# packs) from catalog/selfism.json into /opt/10sorlabs/node_cache, then installs
+# the SageAttention 2.2.0 cu130/cp312 wheel (--no-deps, so onnxruntime-gpu stays
+# 1.30.0). Keep it one RUN: BuildKit unpacks the base rootfs only for this step.
 RUN --mount=type=bind,source=docker/bake_comfyui.sh,target=/tmp/bake_comfyui.sh \
     --mount=type=bind,source=catalog/selfism.json,target=/tmp/selfism-catalog.json \
     apt-get update \

@@ -357,14 +357,14 @@ def register(host):
                     dest=folder/'Hearmeman_WanAnimate_V5_SAM3.json'
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_wan_v5.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('Hearmeman Wan Animate V5 (SAM3): load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. DWPose uses the image CUDA onnxruntime (CUDAExecutionProvider). About 48 GB+ VRAM, not GPU-validated.')
+                    logs.append('Hearmeman Wan Animate V5 (SAM3): load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention 2.2.0 fp8 (sageattn_qk_int8_pv_fp8_cuda++, fp32+fp16) is baked in the image for sm_89 (L40S, RTX 4090), sm_90 (H100/H200) and sm_120 (RTX 5090, RTX PRO 6000). DWPose uses the image CUDA onnxruntime (CUDAExecutionProvider). About 48 GB+ VRAM, not GPU-validated.')
                 if profile=='hearmeman_scail2_v2':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
                     dest=folder/'Hearmeman_SCAIL2_GodMode_V2.json'
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_scail2_v2.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('Hearmeman SCAIL 2 God Mode V2: load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. About 48 GB+ VRAM, not GPU-validated.')
+                    logs.append('Hearmeman SCAIL 2 God Mode V2: load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention 2.2.0 fp8 (sageattn_qk_int8_pv_fp8_cuda++, fp32+fp16) is baked in the image for sm_89 (L40S, RTX 4090), sm_90 (H100/H200) and sm_120 (RTX 5090, RTX PRO 6000). About 48 GB+ VRAM, not GPU-validated.')
                 if profile=='6gsc':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)

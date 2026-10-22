@@ -212,7 +212,10 @@ def test_wan_and_scail_install_payloads_cards_and_downloads(monkeypatch):
             card = page.split(css)[1].split('</article>')[0]
             assert f'<h2>{title}</h2>' in card
             assert f'data-sf-action="{profile}"' in card
-            assert 'OpenRouter' in card and 'SageAttention' in card and 'sdpa' in card
+            assert 'OpenRouter' in card and 'sageattn_qk_int8_pv_fp8_cuda++' in card
+            assert 'sm_89' in card and 'sm_90' in card and 'sm_120' in card
+            assert 'sdpa' not in card
+            assert 'runtime_profile' not in captured
             assert '48 GB' in card
             assert size in card
             assert f'{count} modela' in card

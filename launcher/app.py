@@ -51,7 +51,10 @@ DEFAULT_HF_TOKEN_FILE = Path("/opt/10sorlabs/secrets/hf_token")
 
 SAGEATTENTION_PROFILE = "sageattention-cu128-hopper-blackwell"
 SAGEATTENTION_VERSION = "2.2.0"
-SAGEATTENTION_ARCHITECTURES = "9.0;10.0;12.0"
+# Cubins inside the baked fp8 extension (_qattn_sm89). 9.0 and 12.0 are the
+# sm_90a and sm_120a builds. SageAttention 2.2.0's setup.py ignores 10.0, so
+# B200 (sm_100) is not in the wheel.
+SAGEATTENTION_ARCHITECTURES = "8.0;8.6;8.9;9.0;12.0"
 
 # Resolved once; a file may only use the parallel downloader when this is present.
 ARIA2C_PATH = shutil.which("aria2c")
@@ -4247,13 +4250,15 @@ class JobController:
                 raise RuntimeError(f"Could not place {source.name} for its custom node.")
 
     async def _install_runtime_profile(self, profile: str) -> None:
-        """Install one vetted native runtime profile from a catalog identifier.
+        """Confirm the image-baked SageAttention package for one catalog identifier.
 
-        This is intentionally an allowlist, not a remotely supplied shell hook. The
-        catalog may select a reviewed profile; it cannot make a pod execute arbitrary
-        commands. SageAttention is compiled on the rented GPU because the launcher is
-        live-updated independently of the Docker image and because its CUDA extension
-        must contain the architectures promised by this tile.
+        This is an allowlist, not a remotely supplied shell hook. The catalog may
+        select this profile; it cannot make a pod execute arbitrary commands.
+        SageAttention 2.2.0 is installed by docker/bake_comfyui.sh into system
+        site-packages (the ComfyUI venv sees those). This step only imports that
+        package. It does not compile, and it does not install or remove
+        onnxruntime-gpu or OpenCV. Those stay on the image pins: onnxruntime-gpu
+        1.30.0 with CUDAExecutionProvider, and no opencv-contrib-python.
         """
         if profile != SAGEATTENTION_PROFILE:
             raise RuntimeError(f"Unsupported runtime profile: {profile}")
@@ -4264,175 +4269,41 @@ class JobController:
         if not python.exists():
             python = Path("python3.12")
 
-        compatibility_check = """
-import torch
-if not torch.cuda.is_available():
-    raise SystemExit("no CUDA GPU is available")
-capability = torch.cuda.get_device_capability()
-if capability not in {(9, 0), (10, 0), (12, 0)}:
-    raise SystemExit(f"unsupported GPU compute capability {capability[0]}.{capability[1]}")
-cuda_version = tuple(int(part) for part in (torch.version.cuda or "0").split(".")[:2])
-if cuda_version < (12, 8):
-    raise SystemExit(f"CUDA 12.8 or newer is required; torch reports {torch.version.cuda}")
-print(torch.cuda.get_device_name(), capability, torch.__version__, torch.version.cuda)
-""".strip()
-        self.update(stage="installing", message="Checking GPU support for SageAttention…")
-        await self._run_profile_command(
-            "SageAttention GPU compatibility check",
-            python,
-            "-c",
-            compatibility_check,
-            timeout=60,
-        )
-
-        profile_dir = COMFYUI_DIR / ".10sorlabs" / "runtime-profiles"
-        marker = profile_dir / f"{SAGEATTENTION_PROFILE}.json"
-        signature = {
-            "sageattention": SAGEATTENTION_VERSION,
-            "architectures": SAGEATTENTION_ARCHITECTURES,
-            "onnxruntime_gpu": "1.22.0",
-            "opencv_contrib_python": "4.13.0.92",
-        }
         verify = """
-import importlib.metadata
-import cv2
+import importlib.metadata as metadata
 import onnxruntime
-import sageattention
-import triton
-assert importlib.metadata.version("sageattention") == "2.2.0"
-assert importlib.metadata.version("onnxruntime-gpu") == "1.22.0"
-assert importlib.metadata.version("opencv-contrib-python") == "4.13.0.92"
-assert "CUDAExecutionProvider" in onnxruntime.get_available_providers()
-from sageattention import sageattn
-print(sageattention.__file__, triton.__version__)
+import sageattention.core as core
+from sageattention import sageattn_qk_int8_pv_fp8_cuda
+version = metadata.version("sageattention")
+if not version.startswith("2.2.0"):
+    raise SystemExit("sageattention version is " + version)
+if not core.SM89_ENABLED:
+    raise SystemExit("sageattention fp8 CUDA extension is not loaded")
+dists = {dist.metadata["Name"].lower() for dist in metadata.distributions()}
+if "onnxruntime" in dists:
+    raise SystemExit("CPU onnxruntime is installed and would shadow onnxruntime-gpu")
+if metadata.version("onnxruntime-gpu") != "1.30.0":
+    raise SystemExit("onnxruntime-gpu version is " + metadata.version("onnxruntime-gpu"))
+if "CUDAExecutionProvider" not in onnxruntime.get_available_providers():
+    raise SystemExit("CUDAExecutionProvider is not available")
+if "opencv-contrib-python" in dists:
+    raise SystemExit("opencv-contrib-python is installed")
+print(sageattn_qk_int8_pv_fp8_cuda.__name__, version)
 """.strip()
-        try:
-            marked = json.loads(marker.read_text(encoding="utf-8")) == signature
-        except (FileNotFoundError, OSError, json.JSONDecodeError):
-            marked = False
-        if marked:
-            returncode, _ = await self._run_process(python, "-c", verify, timeout=60)
-            if returncode == 0:
-                self.update(message="SageAttention runtime is already ready.")
-                return
-
-        self.update(message="Installing the CUDA 12.8 build toolchain…")
-        await self._run_profile_command(
-            "apt package index update",
-            "apt-get",
-            "update",
-            timeout=900,
+        self.update(
+            stage="installing",
+            message=(
+                "Checking the baked SageAttention package "
+                f"({SAGEATTENTION_VERSION}, arches {SAGEATTENTION_ARCHITECTURES})…"
+            ),
         )
-        await self._run_profile_command(
-            "CUDA build dependency installation",
-            "apt-get",
-            "install",
-            "-y",
-            "--no-install-recommends",
-            "git",
-            "build-essential",
-            "ninja-build",
-            "cuda-nvcc-12-8",
-            "cuda-cudart-dev-12-8",
-            "libcublas-dev-12-8",
-            "libcusparse-dev-12-8",
-            "libcusolver-dev-12-8",
-            timeout=1800,
-        )
-
-        self.update(message="Preparing the ComfyUI Python environment…")
-        await self._run_profile_command(
-            "Python build dependency installation",
-            python,
-            "-m",
-            "pip",
-            "install",
-            "--disable-pip-version-check",
-            "--no-cache-dir",
-            "--upgrade",
-            "pip",
-            "setuptools",
-            "wheel",
-            "packaging",
-            "ninja",
-            "nvidia-ml-py",
-            timeout=900,
-        )
-        await self._run_profile_command(
-            "conflicting runtime removal",
-            python,
-            "-m",
-            "pip",
-            "uninstall",
-            "-y",
-            "sageattention",
-            "onnxruntime",
-            "onnxruntime-gpu",
-            "opencv-python",
-            "opencv-python-headless",
-            "opencv-contrib-python",
-            timeout=600,
-        )
-        await self._run_profile_command(
-            "GPU ONNX and OpenCV installation",
-            python,
-            "-m",
-            "pip",
-            "install",
-            "--disable-pip-version-check",
-            "--no-cache-dir",
-            "--no-deps",
-            "onnxruntime-gpu==1.22.0",
-            "opencv-contrib-python==4.13.0.92",
-            timeout=1200,
-        )
-
-        cuda_home = Path("/usr/local/cuda")
-        if not (cuda_home / "bin" / "nvcc").exists():
-            cuda_home = Path("/usr/local/cuda-12.8")
-        if not (cuda_home / "bin" / "nvcc").exists():
-            raise RuntimeError("CUDA 12.8 nvcc was installed but could not be found.")
-        build_env = os.environ.copy()
-        build_env.update(
-            {
-                "CUDA_HOME": str(cuda_home),
-                "PATH": f"{cuda_home / 'bin'}:{build_env.get('PATH', '')}",
-                "LD_LIBRARY_PATH": (
-                    f"{cuda_home / 'lib64'}:{build_env.get('LD_LIBRARY_PATH', '')}"
-                ).rstrip(":"),
-                "TORCH_CUDA_ARCH_LIST": SAGEATTENTION_ARCHITECTURES,
-                "MAX_JOBS": "4",
-                "EXT_PARALLEL": "1",
-                "NVCC_APPEND_FLAGS": "--threads 4",
-            }
-        )
-        self.update(message="Compiling SageAttention for H200, B200 and RTX PRO 6000…")
-        await self._run_profile_command(
-            "SageAttention compilation",
-            python,
-            "-m",
-            "pip",
-            "install",
-            "--disable-pip-version-check",
-            "--no-cache-dir",
-            "--no-build-isolation",
-            "--no-deps",
-            f"sageattention=={SAGEATTENTION_VERSION}",
-            timeout=3600,
-            env=build_env,
-        )
-        self.update(message="Verifying SageAttention and GPU ONNX…")
         await self._run_profile_command(
             "SageAttention runtime verification",
             python,
             "-c",
             verify,
             timeout=120,
-            env=build_env,
         )
-        profile_dir.mkdir(parents=True, exist_ok=True)
-        marker.write_text(json.dumps(signature, sort_keys=True), encoding="utf-8")
-        self.state.restart_required = True
 
     async def _install_custom_node(
         self,
