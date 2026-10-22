@@ -155,7 +155,146 @@ COMFYUI_COMMIT=$COMFYUI_SHA
 SELFISM_BAKED=1
 EOF
 
-# 7. Clean up build leftovers so the layer only holds the real changes.
+# 7. Bake the custom-node packs Krast ORG + Depth and the Hearmeman video cards
+# install, plus the small pip deps those packs still resolve at pod boot.
+# One codeload tarball per pinned sha: no .git history. example_workflows/ and a
+# workflows/ tree that is not Python are removed (RES4LYF is mostly those).
+# The launcher copies /opt/10sorlabs/node_cache/<name> when the marker matches and
+# only then falls back to a shallow GitHub fetch. requirements_baked means the
+# deps below were installed into system site-packages under the cu130 constraints,
+# so a copied pack does no pip work.
+: "${SELFISM_CATALOG_JSON:=/tmp/selfism-catalog.json}"
+NODE_CACHE=/opt/10sorlabs/node_cache
+# Keep this list equal to krast_org_depth_nodes plus the two Hearmeman packs.
+# tests/test_bake.py checks that.
+BAKED_NODE_PACKS=(
+  rgthree-comfy
+  RES4LYF
+  ComfyUI-KJNodes
+  ComfyUI-Impact-Pack
+  ComfyUI-Impact-Subpack
+  ComfyUI-Pixaroma
+  ComfyUI-Adaptive-Guidance
+  ComfyUI-Crystools
+  ComfyUI-1hewNodes
+  CRT-Nodes
+  ComfyUI_Eclipse
+  sd-perturbed-attention
+  comfyui-krea2-controlnet
+  comfyui_controlnet_aux
+  ComfyUI-AutoGrid
+  hearmemanai-upscale
+  openrouter_node
+)
+if [ ! -f "$SELFISM_CATALOG_JSON" ]; then
+  echo "catalog JSON missing at $SELFISM_CATALOG_JSON; refusing to bake nodes" >&2
+  exit 1
+fi
+mkdir -p "$NODE_CACHE"
+BAKED_PACKS_CSV=$(IFS=,; echo "${BAKED_NODE_PACKS[*]}")
+PIP_CONSTRAINT="$constraints" SELFISM_CATALOG_JSON="$SELFISM_CATALOG_JSON" \
+  NODE_CACHE="$NODE_CACHE" BAKED_PACKS="$BAKED_PACKS_CSV" "$PYTHON" - <<'PY'
+import json, os, shutil, tarfile, urllib.request
+from pathlib import Path
+
+catalog = json.loads(Path(os.environ["SELFISM_CATALOG_JSON"]).read_text())
+names = [part for part in os.environ["BAKED_PACKS"].split(",") if part]
+nodes = {node["name"]: node for node in catalog["nodes"]}
+missing = [name for name in names if name not in nodes]
+if missing:
+    raise SystemExit("baked pack list is not in the catalog: " + ", ".join(missing))
+cache = Path(os.environ["NODE_CACHE"])
+skip_names = {"torch", "torchvision", "torchaudio", "sam2", "opencv-contrib-python"}
+wanted = []
+
+def requirement_names(node, extracted: Path):
+    explicit = node.get("requirements_packages")
+    if explicit is not None:
+        return list(explicit)
+    path = extracted / "requirements.txt"
+    if not path.is_file():
+        return []
+    names = []
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if not line or line.startswith(("-", "git+", "http://", "https://")):
+            continue
+        base = line.split("[", 1)[0].split("=", 1)[0].split("<", 1)[0].split(">", 1)[0].split("!", 1)[0].split("~", 1)[0].strip()
+        if base.lower().replace("_", "-") in skip_names:
+            continue
+        names.append(line)
+    return names
+
+def strip_examples(root: Path):
+    for directory in list(root.rglob("*")):
+        if directory.is_dir() and directory.name in {"example_workflows", "example_workflow", ".github"}:
+            shutil.rmtree(directory, ignore_errors=True)
+    workflows = root / "workflows"
+    if workflows.is_dir() and not any(workflows.rglob("*.py")):
+        shutil.rmtree(workflows)
+    for cache_dir in list(root.rglob("__pycache__")):
+        shutil.rmtree(cache_dir, ignore_errors=True)
+
+for name in names:
+    node = nodes[name]
+    repo = node["repo"]
+    ref = node["ref"]
+    url = repo.removesuffix(".git").removeprefix("https://github.com/")
+    archive_url = f"https://codeload.github.com/{url}/tar.gz/{ref}"
+    print(f"[bake-nodes] {name} {ref[:12]}", flush=True)
+    work = Path("/tmp/bake-node") / name
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir(parents=True)
+    archive = work / "source.tar.gz"
+    urllib.request.urlretrieve(archive_url, archive)
+    with tarfile.open(archive, "r:gz") as bundle:
+        bundle.extractall(work / "extracted", filter="data")
+    roots = list((work / "extracted").iterdir())
+    if len(roots) != 1 or not roots[0].is_dir():
+        raise SystemExit(f"unexpected archive layout for {name}")
+    strip_examples(roots[0])
+    for package in requirement_names(node, roots[0]):
+        if package not in wanted:
+            wanted.append(package)
+    marker = {
+        "repo": repo if repo.endswith(".git") else repo + ".git",
+        "ref": ref,
+        "source": "image-cache",
+        "requirements_baked": True,
+    }
+    # Repo URLs in the catalog already end in .git. Keep the catalog string.
+    marker["repo"] = node["repo"]
+    (roots[0] / ".selfism-source.json").write_text(json.dumps(marker), encoding="utf-8")
+    destination = cache / name
+    shutil.rmtree(destination, ignore_errors=True)
+    shutil.move(str(roots[0]), destination)
+    if (destination / ".git").exists():
+        raise SystemExit(f"{name} bake still has a .git directory")
+    shutil.rmtree(work, ignore_errors=True)
+
+# Extra small deps the pinned requirements do not always name, but the packs import.
+for package in ("deepdiff", "pynvml", "py-cpuinfo", "pilgram", "soundfile", "pyyaml", "tiktoken", "mpmath"):
+    if package not in wanted:
+        wanted.append(package)
+blocked = [package for package in wanted if package.split("[", 1)[0].split("=", 1)[0].strip().lower().replace("_", "-") in skip_names]
+if blocked:
+    raise SystemExit("refusing to bake blocked packages: " + ", ".join(blocked))
+print("[bake-nodes] pip " + " ".join(wanted), flush=True)
+Path("/tmp/bake-node-requirements.txt").write_text("\n".join(wanted) + "\n", encoding="utf-8")
+PY
+if [ -s /tmp/bake-node-requirements.txt ]; then
+  PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir --disable-pip-version-check \
+    --break-system-packages -c "$constraints" -r /tmp/bake-node-requirements.txt
+fi
+# The cu130 stack must still be the one the ComfyUI bake just verified.
+torch_nodes="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
+if [ "$torch_nodes" != "$torch_after" ]; then
+  echo "torch changed during the node-pack bake: $torch_after -> $torch_nodes" >&2
+  exit 1
+fi
+log "baked node packs: $(du -sh "$NODE_CACHE" | cut -f1) at $NODE_CACHE"
+
+# 8. Clean up build leftovers so the layer only holds the real changes.
 rm -rf /tmp/bake-* /root/.cache /root/.gitconfig
 find "$BAKED" -name __pycache__ -prune -exec rm -rf -- {} + 2>/dev/null || true
 log "done: $(du -sh "$BAKED" | cut -f1) baked at $BAKED"

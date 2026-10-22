@@ -638,6 +638,98 @@ def read_source_marker(destination: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
+NODE_CACHE_DIR = Path(os.environ.get("SELFISM_NODE_CACHE", "/opt/10sorlabs/node_cache"))
+
+
+def baked_node_source(name: str, repo: str, ref: str) -> Path | None:
+    """Image-baked pack whose marker repo and ref match the catalog pin.
+
+    The bake writes one commit (no .git) under NODE_CACHE_DIR. A mismatch falls
+    through to the GitHub fetch, so an old image still installs a newer pin.
+    """
+    candidate = NODE_CACHE_DIR / name
+    marker = read_source_marker(candidate)
+    if marker is None or not candidate.is_dir():
+        return None
+    if normalized_git_remote(str(marker.get("repo", ""))) != normalized_git_remote(repo):
+        return None
+    if str(marker.get("ref", "")).lower() != ref.lower():
+        return None
+    return candidate
+
+
+def copy_baked_node(source: Path, destination: Path) -> None:
+    shutil.copytree(
+        source,
+        destination,
+        symlinks=False,
+        ignore=shutil.ignore_patterns(".git"),
+    )
+
+
+def requirements_were_baked(destination: Path, repo: str, ref: str) -> bool:
+    marker = read_source_marker(destination)
+    return bool(
+        marker
+        and marker.get("requirements_baked") is True
+        and normalized_git_remote(str(marker.get("repo", ""))) == normalized_git_remote(repo)
+        and str(marker.get("ref", "")).lower() == ref.lower()
+    )
+
+
+async def shallow_checkout_pinned(run: Any, repo: str, ref: str, destination: Path) -> tuple[int, str]:
+    """One-commit checkout of ref. Not a partial clone: --depth 1 of that sha ships its blobs.
+
+    GitHub refusing lazy blob fetches (--filter=blob:none) is why this is not a promisor
+    clone. A full history clone is the other extreme; the pinned tree is enough.
+    """
+    last_output = ""
+    for attempt, delay in enumerate((0.0, *GIT_RETRY_DELAYS), start=1):
+        if delay:
+            print(
+                f"Selfism launcher: shallow fetch of {ref[:12]} failed; retrying in "
+                f"{delay:.0f}s (attempt {attempt}). {last_output[-200:].strip()}",
+                flush=True,
+            )
+            await asyncio.sleep(delay)
+        shutil.rmtree(destination, ignore_errors=True)
+        returncode, output = await run_git(run, "init", "-q", destination, timeout=600)
+        if returncode:
+            last_output = output
+            continue
+        returncode, output = await run_git(
+            run, "-C", destination, "remote", "add", "origin", repo, timeout=600
+        )
+        if returncode:
+            last_output = output
+            continue
+        returncode, output = await run_git(
+            run,
+            "-C",
+            destination,
+            "fetch",
+            "--depth",
+            "1",
+            "--no-tags",
+            "--end-of-options",
+            "origin",
+            ref,
+            timeout=600,
+        )
+        if returncode:
+            last_output = output
+            continue
+        returncode, output = await run_git(
+            run, "-C", destination, "checkout", "--detach", "FETCH_HEAD", timeout=600
+        )
+        if returncode:
+            last_output = output
+            continue
+        return 0, output
+    shutil.rmtree(destination, ignore_errors=True)
+    return 1, last_output
+
+
 def _extract_tarball(archive: Path, target: Path) -> None:
     import tarfile
 
@@ -3039,42 +3131,58 @@ class JobController:
             total_bytes=known_total,
         )
 
-        timeout = httpx.Timeout(connect=30, read=None, write=30, pool=30)
-        async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
-            for index, file_spec in enumerate(files):
-                self.check_cancelled()
-                name = str(
-                    file_spec.get("name")
-                    or Path(str(file_spec.get("destination", "file"))).name
-                )
-                try:
-                    downloaded = await self._download_file(
-                        client,
-                        file_spec,
-                        index,
-                        len(files),
-                        completed_bytes,
-                        known_total,
-                        download_ceiling,
-                    )
-                    completed_bytes += downloaded
-                except InstallCancelled:
-                    raise
-                except Exception as exc:
-                    # The record for this file is still open. Close it here rather than
-                    # inside _download_file: a failure can leave from any of a dozen
-                    # points in there, and a try/finally around the whole transfer would
-                    # reindent 150 lines to catch what this one line already catches.
-                    diagnostics.fail_in_flight(str(exc))
-                    self.add_warning(f"{name}: {exc}")
-                    self.update(
-                        message=f"{name} failed — skipped; continuing setup…",
-                        percent=((index + 1) / max(len(files), 1)) * download_ceiling,
-                        bytes_per_second=0,
-                    )
-
+        # Node installs are git/pip (or a local copy of packs baked into the image).
+        # Model downloads are aria2c. They do not share a venv write, so they run
+        # together. Pip inside the node phase stays one pack at a time. Model links
+        # wait for both: they hard-link a downloaded file into a node directory.
+        node_task: asyncio.Task[None] | None = None
         if nodes:
-            await self._install_custom_nodes(nodes)
+            node_task = asyncio.create_task(self._install_custom_nodes(nodes))
+        try:
+            timeout = httpx.Timeout(connect=30, read=None, write=30, pool=30)
+            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+                for index, file_spec in enumerate(files):
+                    self.check_cancelled()
+                    name = str(
+                        file_spec.get("name")
+                        or Path(str(file_spec.get("destination", "file"))).name
+                    )
+                    try:
+                        downloaded = await self._download_file(
+                            client,
+                            file_spec,
+                            index,
+                            len(files),
+                            completed_bytes,
+                            known_total,
+                            download_ceiling,
+                        )
+                        completed_bytes += downloaded
+                    except InstallCancelled:
+                        raise
+                    except Exception as exc:
+                        # The record for this file is still open. Close it here rather than
+                        # inside _download_file: a failure can leave from any of a dozen
+                        # points in there, and a try/finally around the whole transfer would
+                        # reindent 150 lines to catch what this one line already catches.
+                        diagnostics.fail_in_flight(str(exc))
+                        self.add_warning(f"{name}: {exc}")
+                        self.update(
+                            message=f"{name} failed — skipped; continuing setup…",
+                            percent=((index + 1) / max(len(files), 1)) * download_ceiling,
+                            bytes_per_second=0,
+                        )
+            if node_task is not None:
+                await node_task
+                node_task = None
+        finally:
+            if node_task is not None:
+                if not node_task.done():
+                    node_task.cancel()
+                try:
+                    await node_task
+                except (asyncio.CancelledError, InstallCancelled):
+                    pass
         if model_links:
             self.update(stage="installing", percent=98, message="Linking workflow models…")
             await self._apply_model_links(model_links)
@@ -4349,10 +4457,11 @@ print(sageattention.__file__, triton.__version__)
                 ) from exc
 
         installed = False
+        copied = False
         if destination.exists():
             marker = read_source_marker(destination)
             if marker is not None:
-                # A previous archive install: not a Git repository, identified by marker.
+                # A previous archive or image-cache install: not a Git repository, identified by marker.
                 if normalized_git_remote(str(marker.get("repo", ""))) != normalized_git_remote(repo):
                     raise RuntimeError(
                         f"The existing {name} folder is not the expected Git repository."
@@ -4363,21 +4472,34 @@ print(sageattention.__file__, triton.__version__)
                     # An archive of another commit cannot be fetched into; start over.
                     shutil.rmtree(destination, ignore_errors=True)
 
+        cache = None if installed or destination.exists() else baked_node_source(name, repo, ref)
+        if cache is not None:
+            step("copying the baked node pack")
+            clone_started = time.monotonic()
+            try:
+                await asyncio.to_thread(copy_baked_node, cache, destination)
+            except Exception as exc:
+                shutil.rmtree(destination, ignore_errors=True)
+                print(
+                    f"Selfism launcher: {name}: baked copy failed, fetching from GitHub. {exc}",
+                    flush=True,
+                )
+            else:
+                clone_seconds = time.monotonic() - clone_started
+                copied = True
+                installed = True
+
         if installed:
             pass
         elif not destination.exists():
             step("cloning")
             clone_started = time.monotonic()
             try:
-                # No --filter: a partial clone fetches blobs lazily at checkout, and that
-                # second round of requests is what GitHub refused. See git_env.
-                returncode, output = await run_git_with_retries(
-                    self._run_process,
-                    "clone",
-                    repo,
-                    destination,
-                    timeout=600,
-                    before_retry=lambda: shutil.rmtree(destination, ignore_errors=True),
+                # Shallow single-commit fetch of the pinned sha. No --filter: a partial
+                # clone fetches blobs lazily at checkout, and that second round of
+                # requests is what GitHub refused. See git_env and shallow_checkout_pinned.
+                returncode, output = await shallow_checkout_pinned(
+                    self._run_process, repo, ref, destination
                 )
             except Exception:
                 # Any exit that is not a clean return leaves a partial directory here,
@@ -4385,14 +4507,16 @@ print(sageattention.__file__, triton.__version__)
                 # expected Git repository") until somebody deletes it by hand. A cancel
                 # or a timeout must not create a fault that a failure does not.
                 #
-                # Only the clone needs this. A cancelled fetch or checkout leaves a valid
-                # repository that the next run recovers from on its own.
+                # Only this fresh checkout needs this. A cancelled fetch or checkout of
+                # an existing repository leaves a valid one that the next run recovers.
                 shutil.rmtree(destination, ignore_errors=True)
                 raise
             clone_seconds = time.monotonic() - clone_started
             if returncode:
                 shutil.rmtree(destination, ignore_errors=True)
                 await from_archive(output)
+                installed = True
+            else:
                 installed = True
         else:
             returncode, origin = await run_git(
@@ -4500,7 +4624,11 @@ print(sageattention.__file__, triton.__version__)
         pip_targets: list[Any] = ["-r", requirements]
         if explicit_packages is not None:
             pip_targets = validated_requirement_packages(name, explicit_packages)
-        if node.get("install_requirements", True) and (
+        # The image bake installs these deps under the cu130 constraints and stamps the
+        # cache marker. A copied pack then does no pip work. A GitHub fallback has no
+        # marker, so pip still runs.
+        deps_baked = requirements_were_baked(destination, repo, ref)
+        if not deps_baked and node.get("install_requirements", True) and (
             pip_targets if explicit_packages is not None else requirements.exists()
         ):
             step("installing dependencies")
@@ -4571,7 +4699,7 @@ print(sageattention.__file__, triton.__version__)
         total_seconds = time.monotonic() - started
         phases = []
         if clone_seconds:
-            phases.append(f"cloned in {clone_seconds:.1f}s")
+            phases.append(f"{'copied' if copied else 'cloned'} in {clone_seconds:.1f}s")
         if dependencies_seconds:
             phases.append(f"dependencies in {dependencies_seconds:.1f}s")
         print(

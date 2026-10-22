@@ -1487,6 +1487,87 @@
       "civitai_version": 3338923,
       "civitai_file": 3286313,
       "id": "rawgirl-krea2-v20-fp8"
+    },
+    "wan22-animate-int8": {
+      "name": "Wan 2.2 Animate 14B INT8 ConvRot",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_animate_14B_int8_convrot.safetensors",
+      "destination": "models/diffusion_models/wan2.2_animate_14B_int8_convrot.safetensors",
+      "size_bytes": 18413068672,
+      "sha256": "419aa0b3d9079a8a39126f2894c3cb2427c288189d2dc8342c61cf0663731cb3",
+      "auth": "none",
+      "id": "wan22-animate-int8"
+    },
+    "umt5-xxl-fp8-scaled": {
+      "name": "UMT5 XXL FP8 e4m3fn scaled",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "destination": "models/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "size_bytes": 6735906897,
+      "sha256": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68",
+      "auth": "none",
+      "id": "umt5-xxl-fp8-scaled"
+    },
+    "wan21-vae": {
+      "name": "Wan 2.1 VAE",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors",
+      "destination": "models/vae/wan_2.1_vae.safetensors",
+      "size_bytes": 253815318,
+      "sha256": "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b",
+      "auth": "none",
+      "id": "wan21-vae"
+    },
+    "lightx2v-i2v-rank64": {
+      "name": "LightX2V I2V 14B 480p rank64 bf16",
+      "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+      "destination": "models/loras/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+      "size_bytes": 738005744,
+      "sha256": "85c4a61c30e0497aa44b91d93a893b624708461a56fe5485183b28fa07e2dfb3",
+      "auth": "none",
+      "id": "lightx2v-i2v-rank64"
+    },
+    "sam31-multiplex": {
+      "name": "SAM 3.1 Multiplex FP16",
+      "url": "https://huggingface.co/Comfy-Org/sam3.1/resolve/main/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "destination": "models/checkpoints/sam3.1_multiplex_fp16.safetensors",
+      "size_bytes": 1745546848,
+      "sha256": "9ba99c92703c2e8b4f47de2d34a539bb8e18923049e238b780d70dbe6368eb03",
+      "auth": "none",
+      "id": "sam31-multiplex"
+    },
+    "taew2-1": {
+      "name": "taew2_1.pth",
+      "url": "https://github.com/madebyollin/taehv/raw/main/taew2_1.pth",
+      "destination": "models/vae_approx/taew2_1.pth",
+      "size_bytes": 22678901,
+      "sha256": "d26151e76cdc2c9424bef988de874b33d9a53f30ef3060cd556c429c469c797e",
+      "auth": "none",
+      "id": "taew2-1"
+    },
+    "rife426": {
+      "name": "RIFE 4.26",
+      "url": "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation/releases/download/models/rife426.pth",
+      "destination": "models/frame_interpolation/rife426.pth",
+      "size_bytes": 24620531,
+      "sha256": "606421fe2148a9fdeca14e58d94dc339e87b87e0ebcc5dec84a50d6f488cfe7b",
+      "auth": "none",
+      "id": "rife426"
+    },
+    "scail2-int8": {
+      "name": "Wan 2.1 SCAIL 2 INT8 ConvRot",
+      "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+      "destination": "models/diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+      "size_bytes": 16654506256,
+      "sha256": "a2114c18a811243185f103765cd5004b61652141aa55a9016d3bdceebceb5ac0",
+      "auth": "none",
+      "id": "scail2-int8"
+    },
+    "scail2-dpo-lora": {
+      "name": "Wan 2.1 SCAIL 2 DPO LoRA bf16",
+      "url": "https://huggingface.co/Comfy-Org/SCAIL-2/resolve/main/loras/wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+      "destination": "models/loras/wan2.1_SCAIL_2_DPO_lora_bf16.safetensors",
+      "size_bytes": 1226936552,
+      "sha256": "b106522036f64e50f5f8ae3b808973515ff442cc2fac27b65d875eafb95b89e2",
+      "auth": "none",
+      "id": "scail2-dpo-lora"
     }
   },
   "nodes": [
@@ -1536,7 +1617,16 @@
       "name": "ComfyUI-Impact-Pack",
       "repo": "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git",
       "ref": "429d0159ad429e64d2b3916e6e7be9c22d025c3c",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "segment-anything",
+        "scikit-image",
+        "piexif",
+        "opencv-python-headless",
+        "scipy",
+        "dill",
+        "matplotlib"
+      ]
     },
     {
       "name": "ComfyUI-Impact-Subpack",
@@ -1602,7 +1692,15 @@
       "name": "comfyui_controlnet_aux",
       "repo": "https://github.com/Fannovel16/comfyui_controlnet_aux.git",
       "ref": "0cd290477128d42cdc3e76a826a402d866e8c684",
-      "install_requirements": true
+      "install_requirements": true,
+      "requirements_packages": [
+        "einops",
+        "huggingface-hub",
+        "pyyaml",
+        "scipy",
+        "scikit-image",
+        "matplotlib"
+      ]
     },
     {
       "name": "ComfyUI_essentials",
@@ -1762,6 +1860,23 @@
       "repo": "https://github.com/workordie/ComfyUI-AutoGrid.git",
       "ref": "323b34e20ddc3196f45fe4e7be93970fa77929a2",
       "install_requirements": false
+    },
+    {
+      "name": "hearmemanai-upscale",
+      "repo": "https://github.com/Hearmeman24/ComfyUI-HearmemanAI-Upscale.git",
+      "ref": "3ca96fddf8ba07094895d5aecec2438c85bb41ba",
+      "install_requirements": false
+    },
+    {
+      "name": "openrouter_node",
+      "repo": "https://github.com/gabe-init/ComfyUI-Openrouter_node.git",
+      "ref": "df18925e8d19f98987fe865fc0ed7b66015eeb05",
+      "install_requirements": true,
+      "requirements_packages": [
+        "requests",
+        "tiktoken",
+        "Pillow"
+      ]
     }
   ],
   "simple_files": [
@@ -2634,5 +2749,67 @@
     "comfyui-krea2-controlnet",
     "comfyui_controlnet_aux",
     "ComfyUI-AutoGrid"
+  ],
+  "depth_anything_links": [
+    {
+      "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
+  ],
+  "hearmeman_wan_v5_files": [
+    "wan22-animate-int8",
+    "umt5-xxl-fp8-scaled",
+    "wan21-vae",
+    "clip-vision-h",
+    "wan-relight-lora",
+    "lightx2v-i2v-rank64",
+    "sam31-multiplex",
+    "skin",
+    "taew2-1",
+    "rife426",
+    "vitpose-h-onnx",
+    "vitpose-h-bin",
+    "yolov10m",
+    "dwpose-det",
+    "dwpose-pose"
+  ],
+  "hearmeman_wan_v5_nodes": [
+    "ComfyUI-KJNodes",
+    "ComfyUI-VideoHelperSuite",
+    "ComfyUI-WanVideoWrapper",
+    "ComfyUI-WanAnimatePreprocess",
+    "comfyui_controlnet_aux",
+    "rgthree-comfy",
+    "hearmemanai-upscale",
+    "openrouter_node"
+  ],
+  "hearmeman_wan_v5_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
+  ],
+  "hearmeman_scail2_v2_files": [
+    "scail2-int8",
+    "scail2-dpo-lora",
+    "umt5-xxl-fp8-scaled",
+    "wan21-vae",
+    "clip-vision-h",
+    "lightx2v-i2v-rank64",
+    "sam31-multiplex",
+    "skin",
+    "taew2-1",
+    "rife426"
+  ],
+  "hearmeman_scail2_v2_nodes": [
+    "ComfyUI-KJNodes",
+    "ComfyUI-VideoHelperSuite",
+    "rgthree-comfy",
+    "hearmemanai-upscale",
+    "openrouter_node"
   ]
 }
