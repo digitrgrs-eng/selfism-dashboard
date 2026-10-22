@@ -144,6 +144,25 @@ def test_gpu_onnxruntime_mediapipe_and_sam2_are_baked_without_a_second_cv2():
     assert 'nvidia/*/lib' in text and 'ldconfig' in text
 
 
+def test_sageattention_wheel_is_baked_without_replacing_onnxruntime():
+    text = SCRIPT.read_text()
+    block = text.split("# 9. SageAttention", 1)[1].split("# 10. Clean up", 1)[0]
+    assert "sageattention-2.2.0+cu130torch2.10.0.cg1-cp312-cp312-linux_x86_64.whl" in block
+    assert "28e527a22203af9f858fa5facfa6dd2b89dcc562467ec1d360b78f68e4754a56" in block
+    assert "d1a57a5" in block and "5afde5e" in block
+    assert "--no-deps" in block
+    assert "from sageattention import sageattn_qk_int8_pv_fp8_cuda" in block
+    assert 'params["pv_accum_dtype"].default != "fp32+fp16"' in block
+    assert 'b"sm_89"' in block and 'b"sm_90a"' in block and 'b"sm_120a"' in block
+    assert "onnxruntime-gpu==1.22.0" not in block
+    assert "opencv-contrib-python==" not in block
+    assert '!= "1.30.0"' in block
+    assert "CUDAExecutionProvider missing after the SageAttention install" in block
+    assert "torch changed during the SageAttention install" in block
+    # The wheel install stays in the same RUN as the ComfyUI bake.
+    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 2
+
+
 def test_workflow_frees_enough_disk_for_unpacking_the_base():
     # The hosted runner has ~86 GiB free before and ~114 GiB after this cleanup; unpacking
     # the base rootfs (~11 GiB) plus the bake needs well under that.

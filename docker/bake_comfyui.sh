@@ -383,7 +383,74 @@ if [ "$torch_nodes" != "$torch_after" ]; then
 fi
 log "baked node packs: $(du -sh "$NODE_CACHE" | cut -f1) at $NODE_CACHE"
 
-# 8. Clean up build leftovers so the layer only holds the real changes.
+# 9. SageAttention 2.2.0, the CUDA build KJNodes calls for
+# sageattn_qk_int8_pv_fp8_cuda++ (pv_accum_dtype="fp32+fp16").
+# Prebuilt wheel, so pod boot does not compile it.
+# Source: thu-ml/SageAttention d1a57a5, plus deepbeepmeep cg1 commit 5afde5e
+# (kernels launch on PyTorch's current stream; the sm90 extension is built for
+# sm_90a only, which is what lets one wheel contain every arch).
+# Built for torch 2.10.0+cu130 / CPython 3.12. The fp8 extension (_qattn_sm89)
+# has cubins for sm_80, sm_86, sm_89, sm_90a and sm_120a. sm_100 (B200) is not
+# included: SageAttention 2.2.0's setup.py ignores compute capability 10.0.
+# --no-deps so this install cannot replace onnxruntime-gpu 1.30.0 or the image cv2.
+: "${SAGEATTENTION_URL:=https://github.com/deepbeepmeep/SageAttention/releases/download/v2.2.0-linux.cg1/sageattention-2.2.0+cu130torch2.10.0.cg1-cp312-cp312-linux_x86_64.whl}"
+: "${SAGEATTENTION_SHA256:=28e527a22203af9f858fa5facfa6dd2b89dcc562467ec1d360b78f68e4754a56}"
+sage_wheel=/tmp/sageattention-2.2.0-cu130-cp312.whl
+SAGEATTENTION_URL="$SAGEATTENTION_URL" SAGEATTENTION_SHA256="$SAGEATTENTION_SHA256" \
+  SAGE_WHEEL="$sage_wheel" "$PYTHON" - << 'PY'
+import hashlib, os, urllib.request
+from pathlib import Path
+dest = Path(os.environ["SAGE_WHEEL"])
+urllib.request.urlretrieve(os.environ["SAGEATTENTION_URL"], dest)
+got = hashlib.sha256(dest.read_bytes()).hexdigest()
+expect = os.environ["SAGEATTENTION_SHA256"]
+if got != expect:
+    raise SystemExit("sageattention wheel sha256 " + got + " != " + expect)
+print("sageattention wheel", dest.stat().st_size, got)
+PY
+"${PIP[@]}" install --no-cache-dir --disable-pip-version-check --break-system-packages \
+  --no-deps "$sage_wheel"
+rm -f "$sage_wheel"
+"$PYTHON" - << 'PY'
+import importlib.metadata as m
+import inspect
+from pathlib import Path
+import onnxruntime
+import sageattention.core as core
+from sageattention import sageattn_qk_int8_pv_fp8_cuda
+version = m.version("sageattention")
+if not version.startswith("2.2.0"):
+    raise SystemExit("sageattention version is " + version)
+if not core.SM89_ENABLED:
+    raise SystemExit("sageattention fp8 CUDA extension failed to load")
+params = inspect.signature(sageattn_qk_int8_pv_fp8_cuda).parameters
+if "pv_accum_dtype" not in params or params["pv_accum_dtype"].default != "fp32+fp16":
+    raise SystemExit("sageattn_qk_int8_pv_fp8_cuda is missing the ++ fp32+fp16 path")
+extension = next(Path(core.__file__).resolve().parent.glob("_qattn_sm89*.so"))
+blob = extension.read_bytes()
+for arch in (b"sm_89", b"sm_90a", b"sm_120a"):
+    if arch not in blob:
+        raise SystemExit("fp8 extension is missing cubin arch " + arch.decode())
+dists = {dist.metadata["Name"].lower() for dist in m.distributions()}
+if "onnxruntime" in dists:
+    raise SystemExit("CPU onnxruntime is installed and would shadow onnxruntime-gpu")
+if "onnxruntime-gpu" not in dists or m.version("onnxruntime-gpu") != "1.30.0":
+    raise SystemExit("onnxruntime-gpu changed during the SageAttention install")
+if "CUDAExecutionProvider" not in onnxruntime.get_available_providers():
+    raise SystemExit("CUDAExecutionProvider missing after the SageAttention install")
+for banned in ("opencv-contrib-python", "opencv-contrib-python-headless"):
+    if banned in dists:
+        raise SystemExit(banned + " was installed; it would add another cv2")
+print("sageattention", version, sageattn_qk_int8_pv_fp8_cuda.__name__, "fp32+fp16")
+PY
+torch_sage="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
+if [ "$torch_sage" != "$torch_after" ]; then
+  echo "torch changed during the SageAttention install: $torch_after -> $torch_sage" >&2
+  exit 1
+fi
+log "sageattention baked (torch still $torch_sage)"
+
+# 10. Clean up build leftovers so the layer only holds the real changes.
 rm -rf /tmp/bake-* /root/.cache /root/.gitconfig
 find "$BAKED" -name __pycache__ -prune -exec rm -rf -- {} + 2>/dev/null || true
 log "done: $(du -sh "$BAKED" | cut -f1) baked at $BAKED"

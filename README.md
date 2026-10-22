@@ -4,6 +4,8 @@ Build koristi gotov `10sorllabs/comfyui-workflow-launcher:2.0`, zakljucan na lin
 
 Image sada ugradjuje PyTorch **cu130** (`torch==2.10.0+cu130` i odgovarajuci torchvision/torchaudio) u bake koraku, da bi `comfy_kitchen` CUDA backend radio sa ComfyUI v0.38.1. Ime venv foldera `.venv-cu128` moze ostati istorijsko — sadrzaj je cu130. Host GPU drajver i dalje mora da podrzava CUDA 13.
 
+Isti bake instalira SageAttention **2.2.0+cu130torch2.10.0.cg1** (`--no-deps`, wheel sha256 `28e527a22203af9f858fa5facfa6dd2b89dcc562467ec1d360b78f68e4754a56`). Izvor je thu-ml/SageAttention `d1a57a5` plus CUDA-graph patch `5afde5e`. KJNodes opcija `sageattn_qk_int8_pv_fp8_cuda++` uvozi `sageattn_qk_int8_pv_fp8_cuda` i prosleđuje `pv_accum_dtype="fp32+fp16"`. fp8 ekstenzija ima cubin-e za sm_89, sm_90a i sm_120a (i sm_80, sm_86). sm_100 (B200) nije u ovom wheel-u. Runtime profil `sageattention-cu128-hopper-blackwell` samo proverava taj paket: ne kompajlira i ne instalira `onnxruntime-gpu==1.22.0` niti `opencv-contrib-python`.
+
 Pripremljen iz korisnikovog 10sorLabs dashboard arhiva. Originalni Workflows, Custom models, Custom nodes i RapidCache interfejs ostaju prisutni. Dodat je Selfora / Selfism panel sa instalacijama Simple, AIO, dodatnih modela i Qwen/CUDA popravkom, uz prikaz izlaza instalacije.
 
 ## Trenutni status
