@@ -61,6 +61,20 @@ case "$cuda_meta" in
   *) echo "expected torch.version.cuda starting with 13 after upgrade, got: $cuda_meta" >&2; exit 1 ;;
 esac
 log "cu130 torch ready: $torch_before (cuda $cuda_meta)"
+# onnxruntime's CUDA provider dlopens libcudart/libcudnn by soname. Torch's cu130
+# wheels ship those under site-packages/nvidia/*/lib, which the dynamic linker does
+# not search until they are registered. Do it once in the image so cards that never
+# run the pod repair (Wan Animate) still load CUDAExecutionProvider.
+"$PYTHON" - << 'PY'
+from pathlib import Path
+import sys
+folders = sorted({str(p.resolve()) for s in sys.path if s for p in Path(s).glob("nvidia/*/lib") if p.is_dir()})
+if not folders:
+    raise SystemExit("torch cu130 did not ship nvidia/*/lib; CUDAExecutionProvider cannot load")
+Path("/etc/ld.so.conf.d/comfyui-nvidia.conf").write_text("\n".join(folders) + "\n")
+print("ldconfig nvidia libs: " + ", ".join(folders))
+PY
+ldconfig
 "${PIP[@]}" freeze --disable-pip-version-check > /tmp/bake-freeze-before.txt
 
 # 2. ComfyUI source: a real git checkout of the tag, remote = upstream.
@@ -204,7 +218,9 @@ missing = [name for name in names if name not in nodes]
 if missing:
     raise SystemExit("baked pack list is not in the catalog: " + ", ".join(missing))
 cache = Path(os.environ["NODE_CACHE"])
-skip_names = {"torch", "torchvision", "torchaudio", "sam2", "opencv-contrib-python"}
+# sam2 is installed later from a pinned commit. opencv-contrib would be a third cv2.
+# The CPU distribution `onnxruntime` shares the import name with onnxruntime-gpu.
+skip_names = {"torch", "torchvision", "torchaudio", "sam2", "opencv-contrib-python", "opencv-python", "onnxruntime"}
 wanted = []
 
 def requirement_names(node, extracted: Path):
@@ -272,6 +288,21 @@ for name in names:
         raise SystemExit(f"{name} bake still has a .git directory")
     shutil.rmtree(work, ignore_errors=True)
 
+aux = cache / "comfyui_controlnet_aux"
+if aux.is_dir():
+    # mediapipe 1.x tasks API (what the pinned aux face node selects) needs this file.
+    # The node does not download it; a missing file raises and the preprocessor returns nothing.
+    face = aux / "ckpts" / "mediapipe" / "face_landmarker.task"
+    face.parent.mkdir(parents=True, exist_ok=True)
+    face_url = (
+        "https://storage.googleapis.com/mediapipe-models/face_landmarker/"
+        "face_landmarker/float16/latest/face_landmarker.task"
+    )
+    print("[bake-nodes] face_landmarker.task", flush=True)
+    urllib.request.urlretrieve(face_url, face)
+    if face.stat().st_size < 1_000_000:
+        raise SystemExit("face landmarker model is truncated")
+
 # Extra small deps the pinned requirements do not always name, but the packs import.
 for package in ("deepdiff", "pynvml", "py-cpuinfo", "pilgram", "soundfile", "pyyaml", "tiktoken", "mpmath"):
     if package not in wanted:
@@ -282,10 +313,68 @@ if blocked:
 print("[bake-nodes] pip " + " ".join(wanted), flush=True)
 Path("/tmp/bake-node-requirements.txt").write_text("\n".join(wanted) + "\n", encoding="utf-8")
 PY
+# The CPU distribution and onnxruntime-gpu both install the `onnxruntime` import.
+# Remove the CPU one before the requirements file installs onnxruntime-gpu==1.30.0
+# (CUDA 13.0 / cuDNN 9, the build that matches torch 2.10.0+cu130).
+"$PYTHON" - << 'PY'
+import importlib.metadata as m
+import subprocess
+import sys
+names = {dist.metadata["Name"].lower() for dist in m.distributions()}
+if "onnxruntime" in names:
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "uninstall", "-y",
+        "--break-system-packages", "--disable-pip-version-check", "onnxruntime",
+    ])
+PY
 if [ -s /tmp/bake-node-requirements.txt ]; then
   PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir --disable-pip-version-check \
     --break-system-packages -c "$constraints" -r /tmp/bake-node-requirements.txt
 fi
+# mediapipe>=0.8.0 resolves to 1.1.1 (py3 wheel, cp312). Its metadata requires
+# opencv-contrib-python, which would be a third cv2 beside the image's opencv-python
+# and opencv-python-headless. controlnet_aux does not call cv2 contrib modules, so
+# mediapipe is installed with --no-deps and only its non-OpenCV dependencies.
+# albumentationsx is pinned to 2.3.0 in the requirements list: 2.4+ asks for
+# numpy>=2.2.6 and torch>=2.13, which would fight the cu130 pin. 2.3.0 still
+# imports as albumentations and does not require an OpenCV package.
+PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir --disable-pip-version-check \
+  --break-system-packages -c "$constraints" --no-deps 'mediapipe==1.1.1'
+PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir --disable-pip-version-check \
+  --break-system-packages -c "$constraints" 'absl-py~=2.3' 'certifi' 'sounddevice~=0.5' 'flatbuffers~=25.9'
+# Impact-Pack's requirements.txt is an unpinned git+ HEAD. Bake the commit that
+# `git+https://github.com/facebookresearch/sam2` resolves to (repo default branch,
+# 2024-12-16) so the SAM2 nodes import. SAM2_BUILD_CUDA=0 skips the optional nvcc
+# extension; upstream allows that and inference still runs on torch CUDA. Pod boot
+# does not pip this: requirements_baked skips the pack's requirements.txt.
+SAM2_BUILD_CUDA=0 PIP_CONSTRAINT="$constraints" "${PIP[@]}" install --no-cache-dir \
+  --disable-pip-version-check --break-system-packages --no-build-isolation -c "$constraints" \
+  'git+https://github.com/facebookresearch/sam2.git@2b90b9f5ceec907a1c18123530e92e794ad901a4'
+# get_available_providers lists compiled-in providers and does not need a GPU.
+"$PYTHON" - << 'PY'
+import importlib.metadata as m
+import onnxruntime
+dists = {dist.metadata["Name"].lower() for dist in m.distributions()}
+if "onnxruntime" in dists:
+    raise SystemExit("CPU onnxruntime is installed and would shadow onnxruntime-gpu")
+if "onnxruntime-gpu" not in dists:
+    raise SystemExit("onnxruntime-gpu is not installed")
+if m.version("onnxruntime-gpu") != "1.30.0":
+    raise SystemExit("onnxruntime-gpu version is " + m.version("onnxruntime-gpu"))
+providers = onnxruntime.get_available_providers()
+if "CUDAExecutionProvider" not in providers:
+    raise SystemExit("CUDAExecutionProvider missing from " + repr(providers))
+for banned in ("opencv-contrib-python", "opencv-contrib-python-headless"):
+    if banned in dists:
+        raise SystemExit(banned + " was installed; it would add another cv2")
+import mediapipe
+import sam2
+from sam2.build_sam import build_sam2, build_sam2_video_predictor
+from sam2.sam2_image_predictor import SAM2ImagePredictor
+print("onnxruntime", m.version("onnxruntime-gpu"), providers)
+print("mediapipe", mediapipe.__version__)
+print("sam2", sam2.__file__)
+PY
 # The cu130 stack must still be the one the ComfyUI bake just verified.
 torch_nodes="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
 if [ "$torch_nodes" != "$torch_after" ]; then

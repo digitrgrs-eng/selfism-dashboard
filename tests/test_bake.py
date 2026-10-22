@@ -114,6 +114,36 @@ def test_node_packs_are_baked_in_the_same_comfyui_run():
     assert DOCKERFILE.index('selfism-catalog.json') < DOCKERFILE.index('COPY --link launcher/')
 
 
+def test_gpu_onnxruntime_mediapipe_and_sam2_are_baked_without_a_second_cv2():
+    text = SCRIPT.read_text()
+    # CUDA 13 wheel. 1.27+ publishes CUDA 13.0 / cuDNN 9 builds, which match torch 2.10.0+cu130.
+    assert 'onnxruntime-gpu==1.30.0' in text
+    assert "m.version(\"onnxruntime-gpu\") != \"1.30.0\"" in text
+    assert 'CUDAExecutionProvider' in text
+    assert 'get_available_providers' in text
+    # The CPU distribution is uninstalled, never named as something to install.
+    assert 'pip", "uninstall"' in text and '"onnxruntime"' in text
+    assert 'CPU onnxruntime is installed and would shadow' in text
+    install_lines = [
+        line.strip() for line in text.splitlines()
+        if 'pip' in line and 'install' in line and 'onnxruntime-gpu==' not in line
+        and 'onnxruntime' in line and not line.strip().startswith('#')
+    ]
+    assert install_lines == []
+    # mediapipe's own metadata depends on opencv-contrib. --no-deps keeps the image cv2.
+    assert 'mediapipe==1.1.1' in text and '--no-deps' in text
+    assert 'opencv-contrib-python' in text and 'would add another cv2' in text
+    assert 'albumentationsx==2.3.0' in (ROOT / 'catalog/selfism.json').read_text()
+    # Impact-Pack sam2, pinned to the commit unpinned git+ HEAD currently resolves to.
+    assert '2b90b9f5ceec907a1c18123530e92e794ad901a4' in text
+    assert 'SAM2_BUILD_CUDA=0' in text and '--no-build-isolation' in text
+    assert 'from sam2.sam2_image_predictor import SAM2ImagePredictor' in text
+    assert 'face_landmarker.task' in text
+    assert 'AUX_ORT_PROVIDERS=CUDAExecutionProvider,CPUExecutionProvider' in DOCKERFILE
+    assert 'libportaudio2' in DOCKERFILE
+    assert 'nvidia/*/lib' in text and 'ldconfig' in text
+
+
 def test_workflow_frees_enough_disk_for_unpacking_the_base():
     # The hosted runner has ~86 GiB free before and ~114 GiB after this cleanup; unpacking
     # the base rootfs (~11 GiB) plus the bake needs well under that.

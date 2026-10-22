@@ -6,8 +6,11 @@
 #
 # Format: name  # reason
 
-sam2   # VCS requirement of ComfyUI-Impact-Pack. Handled at runtime by --no-build-isolation:
-       # 264 kB and seconds, instead of a 3 GB torch re-download. Measured on a pod 2026-08.
+sam2   # VCS requirement of ComfyUI-Impact-Pack. The image bake installs commit
+       # 2b90b9f5ceec907a1c18123530e92e794ad901a4 with SAM2_BUILD_CUDA=0 and
+       # --no-build-isolation, under the cu130 constraints. The catalog list omits the
+       # git line, and requirements_baked skips the pack requirements.txt at pod boot.
+       # A GitHub fallback does not reinstall sam2; the image copy is what imports.
 
 dlib   # sdist only; PyPI has no wheel for any Python. Built into the image by its own
        # pinned Dockerfile layer so no pod ever compiles it.

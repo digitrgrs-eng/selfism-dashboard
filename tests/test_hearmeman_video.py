@@ -93,6 +93,10 @@ def test_new_packs_are_pinned_and_baked_with_the_krast_set():
     assert router['repo'] == 'https://github.com/gabe-init/ComfyUI-Openrouter_node.git'
     assert router['ref'] == 'df18925e8d19f98987fe865fc0ed7b66015eeb05'
     assert router['requirements_packages'] == ['requests', 'tiktoken', 'Pillow']
+    # The preprocess pack's requirements.txt also names opencv-python. Leaving that
+    # for pod pip can change the image cv2. onnxruntime-gpu is the CUDA 13 pin.
+    preprocess = nodes['ComfyUI-WanAnimatePreprocess']['requirements_packages']
+    assert preprocess == ['onnx', 'onnxruntime-gpu==1.30.0']
     bake = (ROOT / 'docker/bake_comfyui.sh').read_text(encoding='utf-8')
     assert 'hearmemanai-upscale' in bake and 'openrouter_node' in bake
 
