@@ -24,7 +24,7 @@ def all_nodes():
 
 
 def test_workflow_is_shipped_unmodified():
-    assert hashlib.sha256(PATH.read_bytes()).hexdigest()=='e3194094627f90c80a72523f14d6d8d852de6a46433a52aef0cc359cdbfa28ac'
+    assert hashlib.sha256(PATH.read_bytes()).hexdigest()=='fb13b2962b8c9ccce2df59fbf6bd0108056db9819e569ee4f039481640a1583c'
 
 
 def test_every_node_and_model_is_covered():
@@ -46,6 +46,10 @@ def test_install_and_download(monkeypatch):
     assert {f['id'] for f in captured['files']}==set(CATALOG['hearmeman_i2i_files'])
     assert {n['name'] for n in captured['custom_nodes']}==set(CATALOG['hearmeman_i2i_nodes'])
     assert '<h2>Hearmeman ImageToImage</h2>' in html and 'data-sf-action="hearmeman_i2i"' in html
+    card=html.split('sf-card-hearmeman-i2i')[1].split('</article>')[0]
+    assert '6 rečenica' in card and 'Detail Daemon' in card and '5 paketa' not in card
+    scripts=(ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')
+    assert '6 rečenica' in scripts.split('sf-card-hearmeman-i2i')[1].split('</article>')[0]
     with TestClient(m.app) as client:
         resp=client.get('/api/selfism/workflow/hearmeman_i2i')
         assert resp.content==PATH.read_bytes()

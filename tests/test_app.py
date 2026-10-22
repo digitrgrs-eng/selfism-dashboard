@@ -4268,8 +4268,9 @@ def test_every_subprocess_the_workflow_installer_starts_is_bounded(
             return 0, "https://github.com/kijai/ComfyUI-KJNodes\n"
         if "cat-file" in command:
             return 1, "missing"
-        if "clone" in command:
+        if "clone" in command or "init" in command:
             # Give the pip step something to install, so its bound is recorded too.
+            # Fresh packs are a shallow checkout (git init), not git clone.
             destination = Path(command[-1])
             destination.mkdir(parents=True, exist_ok=True)
             (destination / "requirements.txt").write_text("# none\n", encoding="utf-8")
@@ -4437,7 +4438,7 @@ def custom_node_pip_argv(tmp_path, monkeypatch, outputs, node_overrides=None):
             return answers.pop(0)
         if "remote" in normalized and "get-url" in normalized:
             return 0, "https://github.com/ltdrdata/ComfyUI-Impact-Pack\n"
-        if "clone" in normalized:
+        if "clone" in normalized or "init" in normalized:
             destination = Path(normalized[-1])
             destination.mkdir(parents=True, exist_ok=True)
             (destination / "requirements.txt").write_text(
@@ -4730,7 +4731,7 @@ def test_each_node_prints_where_its_time_went(tmp_path, monkeypatch, capsys) -> 
 
     async def fake_process(*command, **_bounds) -> tuple[int, str]:
         normalized = tuple(str(part) for part in command)
-        if "clone" in normalized:
+        if "clone" in normalized or "init" in normalized:
             destination = Path(normalized[-1])
             destination.mkdir(parents=True, exist_ok=True)
             (destination / "requirements.txt").write_text("pyyaml\n", encoding="utf-8")
@@ -4984,7 +4985,7 @@ def test_a_node_that_retried_with_isolation_says_so(tmp_path, monkeypatch) -> No
             if attempts["pip"] == 1:
                 return 1, "ModuleNotFoundError: No module named 'setuptools'"
             return 0, ""
-        if "clone" in normalized:
+        if "clone" in normalized or "init" in normalized:
             destination = Path(normalized[-1])
             destination.mkdir(parents=True, exist_ok=True)
             (destination / "requirements.txt").write_text("dlib\n", encoding="utf-8")
@@ -5799,11 +5800,12 @@ def test_runtime_profiles_are_an_allowlist() -> None:
         asyncio.run(controller._install_runtime_profile("run-something-from-the-catalog"))
 
 
-def node_clone_harness(tmp_path, monkeypatch, failure, on_word="clone"):
+def node_clone_harness(tmp_path, monkeypatch, failure, on_word="init"):
     """Drive _install_custom_node with a git that dies part way through one command.
 
     Returns (controller, node, destination). The stub creates the directory before it
-    raises, which is what git leaves behind when it is signalled mid-clone.
+    raises, which is what git leaves behind when it is signalled mid-command. A fresh
+    pack starts with `git init` (shallow one-commit fetch), not `git clone`.
     """
     custom_nodes = tmp_path / "custom_nodes"
     monkeypatch.setattr(launcher_app, "CUSTOM_NODES_DIR", custom_nodes)
@@ -6788,3 +6790,122 @@ def test_empty_requirement_packages_skip_pip(tmp_path, monkeypatch) -> None:
 def test_requirement_packages_never_touch_torch_or_pass_options(bad) -> None:
     with pytest.raises(RuntimeError):
         launcher_app.validated_requirement_packages("X", [bad])
+
+
+def test_node_installs_overlap_model_downloads_and_links_wait(tmp_path, monkeypatch) -> None:
+    """Git/pip (or a baked copy) runs beside aria2c. Links need both to be finished."""
+    monkeypatch.setattr(launcher_app, "COMFYUI_DIR", tmp_path / "ComfyUI")
+    controller = launcher_app.JobController()
+    order: list[str] = []
+
+    async def ready() -> None:
+        return None
+
+    async def download(*_args, **_kwargs) -> int:
+        order.append("download-start")
+        await asyncio.sleep(0.2)
+        order.append("download-end")
+        return 1
+
+    async def install_nodes(_nodes) -> None:
+        order.append("nodes-start")
+        for _ in range(50):
+            if "download-start" in order:
+                break
+            await asyncio.sleep(0.01)
+        order.append("nodes-during-download")
+        await asyncio.sleep(0.05)
+        order.append("nodes-end")
+
+    async def link(_links) -> None:
+        order.append("links")
+
+    monkeypatch.setattr(controller, "_wait_for_comfyui", ready)
+    monkeypatch.setattr(controller, "_download_file", download)
+    monkeypatch.setattr(controller, "_install_custom_nodes", install_nodes)
+    monkeypatch.setattr(controller, "_apply_model_links", link)
+
+    asyncio.run(
+        controller._install_workflow(
+            {
+                "id": "w",
+                "files": [
+                    {
+                        "name": "depth.safetensors",
+                        "url": "https://example.invalid/depth.safetensors",
+                        "destination": "models/checkpoints/depth.safetensors",
+                        "size_bytes": 1,
+                    }
+                ],
+                "custom_nodes": [
+                    {
+                        "name": "ComfyUI-KJNodes",
+                        "repo": "https://github.com/kijai/ComfyUI-KJNodes",
+                        "ref": "a" * 40,
+                    }
+                ],
+                "model_links": [
+                    {
+                        "source": "models/checkpoints/depth.safetensors",
+                        "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth.safetensors",
+                    }
+                ],
+            }
+        )
+    )
+
+    assert order.index("nodes-during-download") < order.index("download-end")
+    assert order.index("links") > order.index("download-end")
+    assert order.index("links") > order.index("nodes-end")
+
+
+def test_a_cancelled_download_cancels_the_node_install_task(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(launcher_app, "COMFYUI_DIR", tmp_path / "ComfyUI")
+    controller = launcher_app.JobController()
+    order: list[str] = []
+
+    async def ready() -> None:
+        return None
+
+    async def download(*_args, **_kwargs) -> int:
+        order.append("download")
+        await asyncio.sleep(0)
+        raise launcher_app.InstallCancelled()
+
+    async def install_nodes(_nodes) -> None:
+        order.append("nodes-start")
+        try:
+            await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            order.append("nodes-cancelled")
+            raise
+
+    monkeypatch.setattr(controller, "_wait_for_comfyui", ready)
+    monkeypatch.setattr(controller, "_download_file", download)
+    monkeypatch.setattr(controller, "_install_custom_nodes", install_nodes)
+
+    with pytest.raises(launcher_app.InstallCancelled):
+        asyncio.run(
+            controller._install_workflow(
+                {
+                    "id": "w",
+                    "files": [
+                        {
+                            "name": "a.safetensors",
+                            "url": "https://example.invalid/a.safetensors",
+                            "destination": "models/checkpoints/a.safetensors",
+                            "size_bytes": 1,
+                        }
+                    ],
+                    "custom_nodes": [
+                        {
+                            "name": "ComfyUI-KJNodes",
+                            "repo": "https://github.com/kijai/ComfyUI-KJNodes",
+                            "ref": "a" * 40,
+                        }
+                    ],
+                }
+            )
+        )
+
+    assert order == ["download", "nodes-start", "nodes-cancelled"]

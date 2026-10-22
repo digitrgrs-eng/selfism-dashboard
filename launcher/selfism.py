@@ -25,7 +25,7 @@ INT8_PROFILES = ('simple','aio','full','full_refine','repair')
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -271,8 +271,17 @@ def register(host):
                 if workflow.get('selfism_profile') == 'krast':
                     await self._install_krast_nodes()
                 if workflow.get('selfism_repair'):
-                    self.update(stage='installing',message='Repairing Qwen / CUDA environment…',percent=96)
-                    rc,output=await self._run_process(python,'-u',root/'launcher/selfism_runtime.py',timeout=2100)
+                    # Krast ORG graphs have no llama.cpp / GGUF node. Keep the CUDA library
+                    # path fix and skip the 313 MB llama-cpp wheel and its GPU probe.
+                    repair_args=[python,'-u',root/'launcher/selfism_runtime.py']
+                    repair_timeout=2100
+                    repair_message='Repairing Qwen / CUDA environment…'
+                    if workflow.get('selfism_repair_paths_only'):
+                        repair_args.append('--paths-only')
+                        repair_timeout=180
+                        repair_message='Configuring CUDA library paths…'
+                    self.update(stage='installing',message=repair_message,percent=96)
+                    rc,output=await self._run_process(*repair_args,timeout=repair_timeout)
                     if rc: raise RuntimeError('Environment repair failed: '+output[-1500:])
                 profile=workflow.get('selfism_profile')
                 if profile=='recreate_hybrid':
@@ -341,7 +350,21 @@ def register(host):
                     dest=folder/'Hearmeman_ImageToImage.json'
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_i2i.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
-                    logs.append('Hearmeman ImageToImage: load the character image and the image to recreate. Krea 2 Turbo BF16, Qwen 3.5 9B prompt writer, Detail Daemon and SeedVR2 7B upscale are installed. Add your Millie LoRA in the Power Lora Loader.')
+                    logs.append('Hearmeman ImageToImage: load the character image and the image to recreate. Krea 2 Turbo BF16, Qwen 3.5 9B prompt writer (6 sentences) and SeedVR2 7B upscale are installed. Detail Daemon is in the graph and bypassed. Add your Millie LoRA in the Power Lora Loader.')
+                if profile=='hearmeman_wan_v5':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/'Hearmeman_WanAnimate_V5_SAM3.json'
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_wan_v5.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Hearmeman Wan Animate V5 (SAM3): load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. DWPose uses the image CPU onnxruntime. About 48 GB+ VRAM, not GPU-validated.')
+                if profile=='hearmeman_scail2_v2':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/'Hearmeman_SCAIL2_GodMode_V2.json'
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/hearmeman_scail2_v2.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Hearmeman SCAIL 2 God Mode V2: load a character image and a driving video. OpenRouter auto-prompt needs an API key (node field, LLM_KEY, or openrouter_api_key.json next to the node). SageAttention fp8 needs Hopper/Blackwell; otherwise set DiffusionModelLoaderKJ to sdpa. About 48 GB+ VRAM, not GPU-validated.')
                 if profile=='6gsc':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -434,9 +457,9 @@ def register(host):
         elif profile=='6gsc':
             file_keys=catalog['6gsc_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['6gsc_nodes']]
-        elif profile=='hearmeman_i2i':
-            file_keys=catalog['hearmeman_i2i_files']
-            nodes=[n for n in catalog['nodes'] if n['name'] in catalog['hearmeman_i2i_nodes']]
+        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2'):
+            file_keys=catalog[profile+'_files']
+            nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='recreate_hybrid':
             file_keys=catalog['recreate_hybrid_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['recreate_hybrid_nodes']]
@@ -492,7 +515,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -510,12 +533,23 @@ def register(host):
         if busy(): raise HTTPException(409,'Another installation started; retry later.')
         logs.clear()
         if lut_note: logs.append(lut_note)
+        # Depth Anything V2 is downloaded under models/controlnet_aux, but the preprocessor
+        # only looks in custom_nodes/comfyui_controlnet_aux/ckpts (or AUX_ANNOTATOR_CKPTS_PATH).
+        # full/full_refine/reference/carousel already carry that link; the other depth cards did not.
+        model_links=[]
+        if profile in ('full','full_refine','6gsc','god_mode','hearmeman_wan_v5'):
+            model_links=copy.deepcopy(catalog[profile+'_links'])
+        elif profile in ('reference','carousel'):
+            model_links=copy.deepcopy(catalog['reference_links'])
+        if profile in ('krast','recreate_hybrid','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org_depth','rawgirl'):
+            model_links=model_links+copy.deepcopy(catalog['depth_anything_links'])
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
+                  'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth'),
                   'pip_packages':(list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
-                  'model_links':(copy.deepcopy(catalog[profile+'_links']) if profile in ('full','full_refine','6gsc','god_mode') else copy.deepcopy(catalog['reference_links']) if profile in ('reference','carousel') else [])+lut_links}
+                  'model_links':model_links+lut_links}
         return await controller.start(workflow)
 
     @host.app.post('/api/selfism/cancel')
@@ -549,6 +583,10 @@ def register(host):
             return FileResponse(root/'selfism_workflows/recreate_hybrid.json',filename='Selfism_Recreate_Hybrid.json')
         if profile=='hearmeman_i2i':
             return FileResponse(root/'selfism_workflows/hearmeman_i2i.json',filename='Hearmeman_ImageToImage.json')
+        if profile=='hearmeman_wan_v5':
+            return FileResponse(root/'selfism_workflows/hearmeman_wan_v5.json',filename='Hearmeman_WanAnimate_V5_SAM3.json')
+        if profile=='hearmeman_scail2_v2':
+            return FileResponse(root/'selfism_workflows/hearmeman_scail2_v2.json',filename='Hearmeman_SCAIL2_GodMode_V2.json')
         if profile=='6gsc':
             return FileResponse(root/'selfism_workflows/6gsc.json',filename='6gsc_dashboard_v1.json')
         if profile=='full_refine':

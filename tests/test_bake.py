@@ -95,6 +95,25 @@ def test_dockerfile_bakes_and_keeps_the_template_contract():
     assert DOCKERFILE.index('bake_comfyui.sh') < DOCKERFILE.index('COPY --link launcher/')
 
 
+def test_node_packs_are_baked_in_the_same_comfyui_run():
+    import json
+    text = SCRIPT.read_text()
+    catalog = json.loads((ROOT / 'catalog/selfism.json').read_text(encoding='utf-8'))
+    block = text.split('BAKED_NODE_PACKS=(', 1)[1].split(')', 1)[0]
+    names = re.findall(r'^\s*([A-Za-z0-9._-]+)\s*$', block, re.M)
+    assert names == catalog['krast_org_depth_nodes'] + ['hearmemanai-upscale', 'openrouter_node']
+    assert 'example_workflows' in text and 'requirements_baked' in text
+    assert 'NODE_CACHE=/opt/10sorlabs/node_cache' in text
+    assert 'bake still has a .git directory' in text
+    for package in ('deepdiff', 'pynvml', 'py-cpuinfo', 'pilgram', 'soundfile', 'pyyaml', 'tiktoken', 'mpmath'):
+        assert package in text
+    assert '"sam2"' in text and '"opencv-contrib-python"' in text
+    assert 'torch changed during the node-pack bake' in text
+    assert 'source=catalog/selfism.json,target=/tmp/selfism-catalog.json' in DOCKERFILE
+    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 2
+    assert DOCKERFILE.index('selfism-catalog.json') < DOCKERFILE.index('COPY --link launcher/')
+
+
 def test_workflow_frees_enough_disk_for_unpacking_the_base():
     # The hosted runner has ~86 GiB free before and ~114 GiB after this cleanup; unpacking
     # the base rootfs (~11 GiB) plus the bake needs well under that.

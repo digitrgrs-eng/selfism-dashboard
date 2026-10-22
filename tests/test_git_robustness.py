@@ -57,30 +57,33 @@ def test_every_git_call_cannot_prompt(tmp_path, monkeypatch) -> None:
         assert "--filter=blob:none" not in command
 
 
-def test_failed_clone_retries_full_clone_then_succeeds(tmp_path, monkeypatch) -> None:
-    controller, destination = setup(tmp_path, monkeypatch)
-    clones = []
+def test_failed_shallow_fetch_retries_then_succeeds(tmp_path, monkeypatch) -> None:
+    """A refused one-commit fetch is retried, still without a partial clone."""
+    monkeypatch.setattr(launcher_app, "GIT_RETRY_DELAYS", (0.0,))
+    controller, _destination = setup(tmp_path, monkeypatch)
+    fetches = []
 
     async def run(*command, **_bounds):
         command = tuple(str(part) for part in command)
-        if "clone" in command:
-            clones.append(command)
-            destination.mkdir(exist_ok=True)
-            if len(clones) == 1:
-                return 128, REFUSED  # partial dir left behind
+        if "fetch" in command:
+            fetches.append(command)
+            if len(fetches) == 1:
+                return 128, REFUSED
             return 0, ""
         return 0, ""
 
     monkeypatch.setattr(controller, "_run_process", run)
     asyncio.run(controller._install_custom_node(NODE))
 
-    assert len(clones) == 2
-    assert all("--filter=blob:none" not in c for c in clones)
+    assert len(fetches) == 2
+    assert all("--depth" in command and "1" in command for command in fetches)
+    assert all("--filter=blob:none" not in command for command in fetches)
     assert controller.state.restart_required is True
 
 
 def test_checkout_failure_after_clone_falls_back_to_archive(tmp_path, monkeypatch) -> None:
-    controller, destination = setup(tmp_path, monkeypatch)
+    monkeypatch.setattr(launcher_app, "GIT_RETRY_DELAYS", (0.0,))
+    controller, _destination = setup(tmp_path, monkeypatch)
     archives = []
     monkeypatch.setattr(launcher_app, "download_github_tarball", fake_archive(archives))
 
@@ -147,3 +150,80 @@ def test_tarball_url_is_the_pinned_commit() -> None:
     assert launcher_app.github_tarball_url(REPO + ".git", REF) == (
         f"https://codeload.github.com/kijai/ComfyUI-KJNodes/tar.gz/{REF}"
     )
+
+
+def _cache_pack(tmp_path, monkeypatch, *, ref=REF, requirements_baked=True):
+    controller, destination = setup(tmp_path, monkeypatch)
+    cache = tmp_path / "node_cache" / "ComfyUI-KJNodes"
+    cache.mkdir(parents=True)
+    (cache / "FROM_CACHE").write_text("baked", encoding="utf-8")
+    (cache / ".git").mkdir()
+    (cache / "requirements.txt").write_text("not-a-real-package\n", encoding="utf-8")
+    (cache / launcher_app.SOURCE_MARKER).write_text(
+        json.dumps(
+            {
+                "repo": REPO + ".git",
+                "ref": ref,
+                "source": "image-cache",
+                "requirements_baked": requirements_baked,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(launcher_app, "NODE_CACHE_DIR", tmp_path / "node_cache")
+    return controller, destination
+
+
+def test_a_matching_baked_pack_is_copied_and_skips_git_and_pip(tmp_path, monkeypatch, capsys) -> None:
+    controller, destination = _cache_pack(tmp_path, monkeypatch)
+    calls = []
+
+    async def run(*command, **_bounds):
+        calls.append(tuple(str(part) for part in command))
+        return 0, ""
+
+    monkeypatch.setattr(controller, "_run_process", run)
+    asyncio.run(controller._install_custom_node({**NODE, "install_requirements": True}))
+
+    assert (destination / "FROM_CACHE").read_text() == "baked"
+    assert not (destination / ".git").exists()
+    assert calls == []
+    assert "copied in " in capsys.readouterr().out
+
+
+def test_a_baked_pack_without_the_dep_marker_still_installs_requirements(
+    tmp_path, monkeypatch
+) -> None:
+    controller, destination = _cache_pack(tmp_path, monkeypatch, requirements_baked=False)
+    pip = []
+
+    async def run(*command, **_bounds):
+        command = tuple(str(part) for part in command)
+        if "pip" in command:
+            pip.append(command)
+        return 0, ""
+
+    monkeypatch.setattr(controller, "_run_process", run)
+    asyncio.run(controller._install_custom_node({**NODE, "install_requirements": True}))
+
+    assert (destination / "FROM_CACHE").is_file()
+    assert pip and "-r" in pip[0]
+    assert any(part.endswith("requirements.txt") for part in pip[0])
+
+
+def test_a_ref_mismatch_falls_through_to_a_shallow_fetch(tmp_path, monkeypatch) -> None:
+    controller, destination = _cache_pack(tmp_path, monkeypatch, ref="b" * 40)
+    fetches = []
+
+    async def run(*command, **_bounds):
+        command = tuple(str(part) for part in command)
+        if "fetch" in command:
+            fetches.append(command)
+        return 0, ""
+
+    monkeypatch.setattr(controller, "_run_process", run)
+    asyncio.run(controller._install_custom_node(NODE))
+
+    assert fetches and "--depth" in fetches[0] and REF in fetches[0]
+    assert "--filter=blob:none" not in fetches[0]
+    assert not (destination / "FROM_CACHE").exists()

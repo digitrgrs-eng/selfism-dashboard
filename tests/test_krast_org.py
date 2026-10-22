@@ -119,3 +119,98 @@ def test_krast_org_depth_and_rawgirl_cards():
     assert enc['destination']=='models/text_encoders/qwen3vl_4b_fp8_scaled.safetensors' and enc['size_bytes']==6020316384
     assert len(list((ROOT/'selfism_workflows/krast_org_depth').glob('*.json')))==8
     assert len(list((ROOT/'selfism_workflows/rawgirl').glob('*.json')))==4
+    depth_users=[p for p in ROOT.joinpath('selfism_workflows/krast_org_depth').glob('*.json') if 'DepthAnythingV2Preprocessor' in p.read_text()]
+    assert depth_users
+
+
+AUX=['einops','huggingface-hub','pyyaml','scipy','scikit-image','matplotlib']
+IMPACT=['segment-anything','scikit-image','piexif','opencv-python-headless','scipy','dill','matplotlib']
+DEPTH_PROFILES=('krast','recreate_hybrid','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org_depth','rawgirl')
+
+
+def test_shared_packs_install_only_the_preprocessors_the_cards_use():
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    nodes={n['name']:n for n in c['nodes']}
+    assert nodes['comfyui_controlnet_aux']['requirements_packages']==AUX
+    assert nodes['ComfyUI-Impact-Pack']['requirements_packages']==IMPACT
+    for name in ('comfyui_controlnet_aux','ComfyUI-Impact-Pack'):
+        blob=' '.join(nodes[name]['requirements_packages']).lower()
+        assert 'opencv-contrib' not in blob and 'sam2' not in blob and 'onnxruntime' not in blob
+    users=[key[:-6] for key,value in c.items() if key.endswith('_nodes') and 'comfyui_controlnet_aux' in value]
+    assert 'krast_org_depth' in users and len(users)>=11
+    assert 'ComfyUI-Impact-Pack' in c['krast_org_nodes'] and 'sam2' not in IMPACT
+
+
+def test_depth_anything_is_linked_for_every_card_that_downloads_it(monkeypatch):
+    from test_full import start_install
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    link=c['depth_anything_links'][0]
+    assert link==c['reference_links'][0]==c['full_links'][0]==c['full_refine_links'][0]
+    assert link['destination']=='custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth'
+    for prof in DEPTH_PROFILES:
+        r,captured,_=start_install(monkeypatch,{'profile':prof})
+        assert r.status_code==200, prof
+        assert captured['model_links'].count(link)==1, prof
+        assert any(f['destination']==link['source'] for f in captured['files']), prof
+    for prof in ('full','full_refine','reference','carousel'):
+        r,captured,_=start_install(monkeypatch,{'profile':prof})
+        assert r.status_code==200, prof
+        assert captured['model_links'].count(link)==1, prof
+        assert captured['selfism_repair_paths_only'] is False
+    r,captured,_=start_install(monkeypatch,{'profile':'krast_org'})
+    assert captured['selfism_repair'] is True and captured['selfism_repair_paths_only'] is True
+    assert link not in captured['model_links']
+    r,captured,html=start_install(monkeypatch,{'profile':'krast_org_depth'})
+    assert captured['selfism_repair'] is True and captured['selfism_repair_paths_only'] is True
+    assert captured['model_links']==[link]
+    for page in (html,(ROOT/'scripts/selfism-section.html').read_text(encoding='utf-8')):
+        card=page.split('sf-card-krast-org-depth')[1].split('</article>')[0]
+        assert '15 paketa custom nodova sa privatnog R2' not in card
+        assert 'već u image-u' in card and 'controlnet_aux/ckpts' in card
+
+
+def test_depth_anything_file_lands_in_the_preprocessor_ckpt_dir(tmp_path,monkeypatch):
+    import asyncio
+    from launcher import app as launcher_app
+    c=json.loads((ROOT/'catalog/selfism.json').read_text())
+    comfy=tmp_path/'ComfyUI'
+    source=comfy/'models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth'
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b'depth-bytes')
+    monkeypatch.setattr(launcher_app,'COMFYUI_DIR',comfy)
+    asyncio.run(launcher_app.JobController()._apply_model_links(c['depth_anything_links']))
+    dest=comfy/'custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth'
+    assert dest.read_bytes()==b'depth-bytes'
+    assert dest.stat().st_ino==source.stat().st_ino
+
+
+def test_krast_org_repair_only_configures_cuda_paths(monkeypatch,tmp_path):
+    import asyncio
+    import importlib
+    m=importlib.import_module('launcher.app')
+    s=importlib.import_module('launcher.selfism')
+    monkeypatch.setattr(m,'COMFYUI_DIR',tmp_path)
+    monkeypatch.setattr(m,'COMFYUI_VENV',tmp_path/'.venv')
+    python=m.COMFYUI_VENV/'bin/python'
+    python.parent.mkdir(parents=True)
+    python.touch()
+    ctrl=type(m.selfism_controller)()
+    calls=[]
+    async def ready(*_a,**_k): pass
+    async def run(*args,**_kwargs):
+        calls.append(tuple(str(part) for part in args))
+        return 0,'torch==2.10.0\ntorchvision==0\ntorchaudio==0\nnumpy==0\ntransformers==0\n'
+    async def sources(_host,files): return files,[]
+    monkeypatch.setattr(ctrl,'_wait_for_comfyui',ready)
+    monkeypatch.setattr(ctrl,'_run_process',run)
+    monkeypatch.setattr(m.JobController,'_install_workflow',ready)
+    monkeypatch.setattr(s,'resolve_sources',sources)
+    for prof in ('krast_org','krast_org_depth'):
+        calls.clear()
+        asyncio.run(ctrl._install_workflow({'selfism_profile':prof,'precision':'fp8','files':[{'id':'x'}],'custom_nodes':[{'name':'x'}],'selfism_repair':True,'selfism_repair_paths_only':True}))
+        repair=[c for c in calls if any(part.endswith('selfism_runtime.py') for part in c)]
+        assert repair and repair[0][-1]=='--paths-only', prof
+    calls.clear()
+    asyncio.run(ctrl._install_workflow({'selfism_profile':'6gsc','precision':'fp8','files':[{'id':'x'}],'selfism_repair':True,'selfism_repair_paths_only':False}))
+    repair=[c for c in calls if any(part.endswith('selfism_runtime.py') for part in c)]
+    assert repair and '--paths-only' not in repair[0]
