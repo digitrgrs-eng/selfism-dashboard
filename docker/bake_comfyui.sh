@@ -395,7 +395,8 @@ log "baked node packs: $(du -sh "$NODE_CACHE" | cut -f1) at $NODE_CACHE"
 # --no-deps so this install cannot replace onnxruntime-gpu 1.30.0 or the image cv2.
 : "${SAGEATTENTION_URL:=https://github.com/deepbeepmeep/SageAttention/releases/download/v2.2.0-linux.cg1/sageattention-2.2.0+cu130torch2.10.0.cg1-cp312-cp312-linux_x86_64.whl}"
 : "${SAGEATTENTION_SHA256:=28e527a22203af9f858fa5facfa6dd2b89dcc562467ec1d360b78f68e4754a56}"
-sage_wheel=/tmp/sageattention-2.2.0-cu130-cp312.whl
+sage_wheel_dir="$(mktemp -d)"
+sage_wheel="$sage_wheel_dir/${SAGEATTENTION_URL##*/}"
 SAGEATTENTION_URL="$SAGEATTENTION_URL" SAGEATTENTION_SHA256="$SAGEATTENTION_SHA256" \
   SAGE_WHEEL="$sage_wheel" "$PYTHON" - << 'PY'
 import hashlib, os, urllib.request
@@ -410,7 +411,7 @@ print("sageattention wheel", dest.stat().st_size, got)
 PY
 "${PIP[@]}" install --no-cache-dir --disable-pip-version-check --break-system-packages \
   --no-deps "$sage_wheel"
-rm -f "$sage_wheel"
+rm -rf "$sage_wheel_dir"
 "$PYTHON" - << 'PY'
 import importlib.metadata as m
 import inspect
