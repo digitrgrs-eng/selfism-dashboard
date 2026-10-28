@@ -42,6 +42,7 @@ jobs:
             docker image inspect "$image" --format '{{json .Config}}' > "out/$which-config.json"
             docker run --rm --entrypoint python3.12 -v "$PWD/scripts:/inv:ro" -v "$PWD/out:/out" "$image" \
               /inv/image_inventory.py "/out/$which.json"
+            sudo chown -R "$(id -u):$(id -g)" out   # written by root inside the container
             python3 - "$which" <<'PY'
           import json, sys
           which = sys.argv[1]

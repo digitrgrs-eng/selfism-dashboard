@@ -47,6 +47,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check the pinned base image exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=$(awk '/^FROM / {print $2; exit}' Dockerfile)
+          echo "Base: $base"
+          docker buildx imagetools inspect "$base" > /dev/null
+          echo "Base image: $base" >> "$GITHUB_STEP_SUMMARY"
       - name: Build and publish
         uses: docker/build-push-action@v6
         with:

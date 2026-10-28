@@ -14,13 +14,15 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCKERFILE = (ROOT / 'Dockerfile').read_text()
+# The bake moved to the base image; the app Dockerfile only copies our files on top.
+BASE_DOCKERFILE = (ROOT / 'docker/base.Dockerfile').read_text()
 SCRIPT = ROOT / 'docker/bake_comfyui.sh'
 WORKFLOW = (ROOT / '.github/workflows/build-image.yml').read_text()
 int8 = importlib.import_module('launcher.selfism_int8')
 
 
 def dockerfile_arg(name):
-    return re.search(r'^ARG %s=(\S+)$' % name, DOCKERFILE, re.M).group(1)
+    return re.search(r'^ARG %s=(\S+)$' % name, BASE_DOCKERFILE, re.M).group(1)
 
 
 def test_baked_tag_and_sha_match_the_boot_hook_target():
@@ -84,15 +86,20 @@ def test_script_keeps_git_checkout_with_upstream_remote():
 
 
 def test_dockerfile_bakes_and_keeps_the_template_contract():
-    assert 'bake_comfyui.sh' in DOCKERFILE
-    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 2     # r2deps stage + the bake
+    assert 'bake_comfyui.sh' in BASE_DOCKERFILE
+    # The app image has no RUN at all (only COPY --link on top of the pinned base);
+    # the base has the r2deps pip step, the bake and the llama-cpp wheel step.
+    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 0
+    assert len(re.findall(r'^RUN ', BASE_DOCKERFILE, re.M)) == 3
+    assert re.search(r'^FROM ghcr\.io/digitrgrs-eng/selfism-dashboard:base-[0-9a-f]{16}@sha256:[0-9a-f]{64}$', DOCKERFILE, re.M)
+    assert len(re.findall(r'^FROM ', DOCKERFILE, re.M)) == 1
     for line in ('COPY --link launcher/ /opt/10sorlabs/launcher/',
                  'COPY --link --chmod=755 docker/entrypoint.sh /start.sh'):
         assert line in DOCKERFILE
     assert 'ENTRYPOINT' not in DOCKERFILE and 'EXPOSE' not in DOCKERFILE and 'USER ' not in DOCKERFILE
     assert 'SELFISM_AUTO_COMFY_UPDATE=1' in DOCKERFILE
-    # the bake must come before the COPYs of our own files so those stay cheap layers
-    assert DOCKERFILE.index('bake_comfyui.sh') < DOCKERFILE.index('COPY --link launcher/')
+    # the bake comes before the copy that flattens it, our own files stay cheap app layers
+    assert BASE_DOCKERFILE.index('bake_comfyui.sh') < BASE_DOCKERFILE.index('FROM scratch')
 
 
 def test_node_packs_are_baked_in_the_same_comfyui_run():
@@ -109,9 +116,9 @@ def test_node_packs_are_baked_in_the_same_comfyui_run():
         assert package in text
     assert '"sam2"' in text and '"opencv-contrib-python"' in text
     assert 'torch changed during the node-pack bake' in text
-    assert 'source=catalog/selfism.json,target=/tmp/selfism-catalog.json' in DOCKERFILE
-    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 2
-    assert DOCKERFILE.index('selfism-catalog.json') < DOCKERFILE.index('COPY --link launcher/')
+    # The base mounts only the baked packs' catalog entries (docker/base-nodes.json).
+    assert 'source=docker/base-nodes.json,target=/tmp/selfism-catalog.json' in BASE_DOCKERFILE
+    assert BASE_DOCKERFILE.index('selfism-catalog.json') < BASE_DOCKERFILE.index('FROM scratch')
 
 
 def test_gpu_onnxruntime_mediapipe_and_sam2_are_baked_without_a_second_cv2():
@@ -140,7 +147,7 @@ def test_gpu_onnxruntime_mediapipe_and_sam2_are_baked_without_a_second_cv2():
     assert 'from sam2.sam2_image_predictor import SAM2ImagePredictor' in text
     assert 'face_landmarker.task' in text
     assert 'AUX_ORT_PROVIDERS=CUDAExecutionProvider,CPUExecutionProvider' in DOCKERFILE
-    assert 'libportaudio2' in DOCKERFILE
+    assert 'libportaudio2' in BASE_DOCKERFILE
     assert 'nvidia/*/lib' in text and 'ldconfig' in text
 
 
@@ -159,8 +166,9 @@ def test_sageattention_wheel_is_baked_without_replacing_onnxruntime():
     assert '!= "1.30.0"' in block
     assert "CUDAExecutionProvider missing after the SageAttention install" in block
     assert "torch changed during the SageAttention install" in block
-    # The wheel install stays in the same RUN as the ComfyUI bake.
-    assert len(re.findall(r'^RUN ', DOCKERFILE, re.M)) == 2
+    # The wheel install stays in the same script/RUN as the ComfyUI bake.
+    bake_run = BASE_DOCKERFILE.split('bake_comfyui.sh,target', 1)[1].split('\nRUN ', 1)[0]
+    assert 'bash /tmp/bake_comfyui.sh' in bake_run
 
 
 def test_workflow_frees_enough_disk_for_unpacking_the_base():

@@ -50,8 +50,11 @@ def main():
     problems += ['pip missing ' + n for n in missing] + ['pip changed ' + n for n in changed]
     problems += ['pip unexpected new ' + n for n in added if n not in EXPECTED_NEW_PACKAGES]
 
-    fo = {l for l in old['pip_freeze'] if not l.lower().startswith(('llama', 'diskcache'))}
-    fn = {l for l in new['pip_freeze'] if not l.lower().startswith(('llama', 'diskcache'))}
+    def freeze(inv):
+        # A local wheel's freeze line names the random mktemp dir it was installed from.
+        return {re.sub(r'file:///tmp/tmp\.[^/]+/', 'file:///tmp/<tmp>/', l) for l in inv['pip_freeze']
+                if not l.lower().startswith(('llama', 'diskcache'))}
+    fo, fn = freeze(old), freeze(new)
     say('- pip freeze --all lines: old %d, new %d, only-old %s, only-new %s'
         % (len(old['pip_freeze']), len(new['pip_freeze']), sorted(fo - fn) or 'none', sorted(fn - fo) or 'none'))
     problems += ['freeze line ' + l for l in sorted(fo ^ fn)]

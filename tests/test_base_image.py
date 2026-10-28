@@ -124,3 +124,14 @@ def test_compare_script_flags_lost_or_changed_packages(tmp_path):
     assert 'RESULT: OK' in ok.stdout
     ko = subprocess.run([sys.executable, script, paths['old'], paths['bad']], capture_output=True, text=True)
     assert ko.returncode == 1 and 'pip changed torch' in ko.stdout and 'file missing /a' in ko.stdout
+
+
+def test_app_dockerfile_is_from_the_current_base_pinned_by_digest():
+    app = (ROOT / 'Dockerfile').read_text()
+    match = re.search(r'^FROM ghcr\.io/digitrgrs-eng/selfism-dashboard:(base-[0-9a-f]{16})@(sha256:[0-9a-f]{64})$', app, re.M)
+    assert match, 'Dockerfile must be FROM ghcr.io/digitrgrs-eng/selfism-dashboard:base-<hash>@sha256:<digest>'
+    assert match.group(1) == base_image.base_tag(), (
+        'a base input changed: run "Build base image", then pin its tag and digest in Dockerfile')
+    assert '^RUN ' not in app and not re.search(r'^RUN ', app, re.M)
+    workflow = (ROOT / '.github/workflows/build-image.yml').read_text()
+    assert 'docker buildx imagetools inspect' in workflow   # the pinned base must exist before building
