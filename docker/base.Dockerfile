@@ -58,11 +58,10 @@ RUN --mount=type=bind,source=docker/install_llama_cpp.sh,target=/tmp/install_lla
 # parallel. Order and content do not matter for the result; together they are fat's /.
 FROM scratch
 COPY --from=fat --exclude=usr/local/lib/python3.12 / /
-# --exclude paths are matched from the root of the source stage, not from the copied
-# directory (a bare "nvidia" matched nothing and left torch/triton/nvidia in this layer).
-COPY --from=fat --exclude=usr/local/lib/python3.12/dist-packages/nvidia \
-     --exclude=usr/local/lib/python3.12/dist-packages/torch \
-     --exclude=usr/local/lib/python3.12/dist-packages/triton \
+# --exclude paths are relative to the copied source directory (here python3.12/).
+COPY --from=fat --exclude=dist-packages/nvidia \
+     --exclude=dist-packages/torch \
+     --exclude=dist-packages/triton \
      /usr/local/lib/python3.12/ /usr/local/lib/python3.12/
 COPY --from=fat /usr/local/lib/python3.12/dist-packages/torch/ /usr/local/lib/python3.12/dist-packages/torch/
 COPY --from=fat /usr/local/lib/python3.12/dist-packages/triton/ /usr/local/lib/python3.12/dist-packages/triton/
