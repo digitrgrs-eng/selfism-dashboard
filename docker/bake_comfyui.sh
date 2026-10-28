@@ -32,8 +32,17 @@ log "python: $("$PYTHON" --version); site-packages: $site"
 torch_base="$("$PYTHON" -c 'import torch; print(torch.__version__)')"
 [ -n "$torch_base" ] || { echo "no torch found"; exit 1; }
 log "base torch: $torch_base — upgrading to 2.10.0+cu130"
+# Reproducible rebuilds: docker/base.Dockerfile passes docker/base-constraints.txt (the
+# exact versions of the last single-stage image) so every pip step below resolves to
+# the same versions it did then. Unset = the old behaviour (newest matching versions).
+base_pins=()
+if [ -n "${SELFISM_BASE_CONSTRAINTS:-}" ]; then
+  [ -s "$SELFISM_BASE_CONSTRAINTS" ] || { echo "SELFISM_BASE_CONSTRAINTS=$SELFISM_BASE_CONSTRAINTS is missing or empty" >&2; exit 1; }
+  base_pins=(-c "$SELFISM_BASE_CONSTRAINTS")
+  log "pinning every pip step to $(grep -cE '^[A-Za-z]' "$SELFISM_BASE_CONSTRAINTS") versions from $SELFISM_BASE_CONSTRAINTS"
+fi
 "${PIP[@]}" install --no-cache-dir --disable-pip-version-check --break-system-packages \
-  --upgrade \
+  --upgrade "${base_pins[@]}" \
   torch==2.10.0+cu130 torchvision==0.25.0+cu130 torchaudio==2.10.0+cu130 \
   --index-url https://download.pytorch.org/whl/cu130
 
@@ -47,6 +56,10 @@ constraints=/tmp/bake-constraints.txt
 if [ -f /opt/comfyui-runtime-constraints.txt ]; then
   grep -E '^[A-Za-z]' /opt/comfyui-runtime-constraints.txt \
     | grep -viE '^(torch|torchvision|torchaudio)==' >> "$constraints" || true
+fi
+if [ -n "${SELFISM_BASE_CONSTRAINTS:-}" ]; then
+  grep -E '^[A-Za-z]' "$SELFISM_BASE_CONSTRAINTS" \
+    | grep -viE '^(torch|torchvision|torchaudio|numpy|transformers|pillow|opencv-[a-z-]+)==' >> "$constraints" || true
 fi
 sort -u "$constraints" -o "$constraints"
 log "holding:"; sed 's/^/  /' "$constraints"
