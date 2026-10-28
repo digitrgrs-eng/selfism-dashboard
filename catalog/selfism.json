@@ -1568,6 +1568,60 @@
       "sha256": "b106522036f64e50f5f8ae3b808973515ff442cc2fac27b65d875eafb95b89e2",
       "auth": "none",
       "id": "scail2-dpo-lora"
+    },
+    "qwen21-int8": {
+      "name": "Qwen Image 2.1 INT8 ConvRot",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/0217efd1d9c9452e84f6448903d6e21bfa171ffd/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+      "destination": "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors",
+      "size_bytes": 7256783064,
+      "sha256": "cb74113cb03faecd79611b01fd7fd642f0aa60d6f0b95086abee214d75eaa57d",
+      "auth": "none",
+      "id": "qwen21-int8"
+    },
+    "qwen3vl-8b-int8": {
+      "name": "Qwen3-VL 8B INT8 ConvRot text encoder (Qwen Image 2.1)",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/0217efd1d9c9452e84f6448903d6e21bfa171ffd/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+      "destination": "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors",
+      "size_bytes": 9350798360,
+      "sha256": "8bfd0f6e12abf2d2d697ecc888e5e90b0d6741d6708f05799f53afa560452e8f",
+      "auth": "none",
+      "id": "qwen3vl-8b-int8"
+    },
+    "qwen21-vae": {
+      "name": "Qwen Image 2.1 VAE bf16",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/0217efd1d9c9452e84f6448903d6e21bfa171ffd/vae/qwen_image_2.1_vae_bf16.safetensors",
+      "destination": "models/vae/qwen_image_2.1_vae_bf16.safetensors",
+      "size_bytes": 675509688,
+      "sha256": "bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9",
+      "auth": "none",
+      "id": "qwen21-vae"
+    },
+    "qwen21-consistency-lora": {
+      "name": "AusBoss Qwen Image 2.1 Consistency LoRA",
+      "url": "https://huggingface.co/ausboss/Qwen-Image-2.1-Consistency-LoRA/resolve/1b58c4406925d6ec5fa9abd2d080531030f7cc0d/qwen-image-2.1-consistency.safetensors",
+      "destination": "models/loras/qwen-image-2.1-consistency.safetensors",
+      "size_bytes": 159436496,
+      "sha256": "4f44ada1be2189cc23b3d010f9603543403f48454e2f76842a3d30109b20bd63",
+      "auth": "none",
+      "id": "qwen21-consistency-lora"
+    },
+    "qwen21-restore-lora": {
+      "name": "AusBoss Qwen Image 2.1 Restore LoRA",
+      "url": "https://huggingface.co/ausboss/Qwen-Image-2.1-Restore-LoRA/resolve/30cb947f5b9c6682a85f8d31017be4807c459682/qwen-image-2.1-restore.safetensors",
+      "destination": "models/loras/qwen-image-2.1-restore.safetensors",
+      "size_bytes": 159436584,
+      "sha256": "65de4f6c2468071d5aa6ffbd82c76bfee7cc8ac28fe960e91bbca4a58f43c08c",
+      "auth": "none",
+      "id": "qwen21-restore-lora"
+    },
+    "qwen21-viggle-turbo-lora": {
+      "name": "Viggle Qwen Image 2.1 Turbo v0.3 6-step LoRA r128",
+      "url": "https://huggingface.co/Viggle/Qwen-Image-2.1-viggle-turbo/resolve/009a44a895ef85f7e643c80fdca9543795248867/Qwen-Image-2.1-viggle-turbo-v0.3-6step-lora-r128.safetensors",
+      "destination": "models/loras/Qwen-Image-2.1-viggle-turbo-v0.3-6step-lora-r128.safetensors",
+      "size_bytes": 679604800,
+      "sha256": "0c98591700346f9777051d4e6fa29aa94519abec0d85b1f1f672a2a3db8c94b3",
+      "auth": "none",
+      "id": "qwen21-viggle-turbo-lora"
     }
   },
   "nodes": [
@@ -1893,6 +1947,12 @@
         "tiktoken",
         "Pillow"
       ]
+    },
+    {
+      "name": "ComfyUI-AusBoss",
+      "repo": "https://github.com/ausboss/ComfyUI-AusBoss.git",
+      "ref": "714b638ee8324c76bbd0604fae9f2fbab8d96e50",
+      "install_requirements": false
     }
   ],
   "simple_files": [
@@ -2827,5 +2887,16 @@
     "rgthree-comfy",
     "hearmemanai-upscale",
     "openrouter_node"
+  ],
+  "qwen21_edit_full_files": [
+    "qwen21-int8",
+    "qwen3vl-8b-int8",
+    "qwen21-vae",
+    "qwen21-consistency-lora",
+    "qwen21-restore-lora",
+    "qwen21-viggle-turbo-lora"
+  ],
+  "qwen21_edit_full_nodes": [
+    "ComfyUI-AusBoss"
   ]
 }

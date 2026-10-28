@@ -179,7 +179,8 @@ EOF
 # so a copied pack does no pip work.
 : "${SELFISM_CATALOG_JSON:=/tmp/selfism-catalog.json}"
 NODE_CACHE=/opt/10sorlabs/node_cache
-# Keep this list equal to krast_org_depth_nodes plus the two Hearmeman packs.
+# Keep this list equal to krast_org_depth_nodes plus the two Hearmeman packs
+# and the AusBoss pack (Qwen Image 2.1 Edit card).
 # tests/test_bake.py checks that.
 BAKED_NODE_PACKS=(
   rgthree-comfy
@@ -199,6 +200,7 @@ BAKED_NODE_PACKS=(
   ComfyUI-AutoGrid
   hearmemanai-upscale
   openrouter_node
+  ComfyUI-AusBoss
 )
 if [ ! -f "$SELFISM_CATALOG_JSON" ]; then
   echo "catalog JSON missing at $SELFISM_CATALOG_JSON; refusing to bake nodes" >&2

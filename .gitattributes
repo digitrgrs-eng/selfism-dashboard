@@ -19,3 +19,4 @@ selfism_workflows/krast_carousel.json -text
 bundled_nodes/ComfyUI-KRASTv3-Carousel/** -text
 selfism_workflows/krast_org_depth/*.json -text
 selfism_workflows/rawgirl/*.json -text
+selfism_workflows/qwen21_edit_full.json -text
