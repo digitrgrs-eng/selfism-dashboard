@@ -101,7 +101,7 @@ def test_node_packs_are_baked_in_the_same_comfyui_run():
     catalog = json.loads((ROOT / 'catalog/selfism.json').read_text(encoding='utf-8'))
     block = text.split('BAKED_NODE_PACKS=(', 1)[1].split(')', 1)[0]
     names = re.findall(r'^\s*([A-Za-z0-9._-]+)\s*$', block, re.M)
-    assert names == catalog['krast_org_depth_nodes'] + ['hearmemanai-upscale', 'openrouter_node']
+    assert names == catalog['krast_org_depth_nodes'] + ['hearmemanai-upscale', 'openrouter_node', 'ComfyUI-AusBoss']
     assert 'example_workflows' in text and 'requirements_baked' in text
     assert 'NODE_CACHE=/opt/10sorlabs/node_cache' in text
     assert 'bake still has a .git directory' in text
