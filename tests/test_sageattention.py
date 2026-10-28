@@ -21,6 +21,11 @@ SAGE_CARDS = {
     "hearmeman_wan_v5": "sageattn_qk_int8_pv_fp8_cuda++",
     "hearmeman_scail2_v2": "sageattn_qk_int8_pv_fp8_cuda++",
 }
+# SeedVR2 loaders set to sageattn_2 (from sageattention import sageattn_varlen, in the
+# baked SageAttention 2.2.0 wheel). Workflow file -> Selfism profile.
+SEEDVR2_SAGE_CARDS = {
+    "qwen21_auto_carousel_10sor": "qwen21_auto_carousel",
+}
 
 
 def _nodes(data):
@@ -74,6 +79,10 @@ def test_every_sage_workflow_is_a_card_the_image_bake_covers():
             continue
         discovered[path.relative_to(ROOT).as_posix()] = values
 
+    for stem, profile in SEEDVR2_SAGE_CARDS.items():
+        values = discovered.pop(f"selfism_workflows/{stem}.json")
+        assert {(item[1], item[3]) for item in values} == {("SeedVR2LoadDiTModel", "sageattn_2")}
+        assert "ComfyUI-SeedVR2_VideoUpscaler" in catalog[profile + "_nodes"]
     assert set(discovered) == {f"selfism_workflows/{name}.json" for name in SAGE_CARDS}
     for name, expected in SAGE_CARDS.items():
         values = discovered[f"selfism_workflows/{name}.json"]
