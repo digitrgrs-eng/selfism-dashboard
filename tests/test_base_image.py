@@ -47,7 +47,7 @@ def test_base_is_flattened_into_one_copy_of_the_filesystem():
     final = BASE.split('FROM scratch', 1)[1]
     assert 'COPY --from=fat --exclude=usr/local/lib/python3.12 / /' in final
     for package in ('torch', 'triton', 'nvidia'):
-        assert '--exclude=usr/local/lib/python3.12/dist-packages/%s ' % package in final
+        assert '--exclude=dist-packages/%s ' % package in final     # relative to the source dir
         assert 'COPY --from=fat /usr/local/lib/python3.12/dist-packages/%s/ /usr/local/lib/python3.12/dist-packages/%s/' % (package, package) in final
     assert 'COPY --from=r2deps /r2deps/ /opt/r2deps/' in final
     assert BASE.startswith('# syntax=docker/dockerfile:1.7-labs')    # COPY --exclude
