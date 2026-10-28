@@ -25,7 +25,7 @@ INT8_PROFILES = ('simple','aio','full','full_refine','repair')
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -380,6 +380,13 @@ def register(host):
                         if not dest.exists(): dest.write_bytes((root/'selfism_workflows'/src).read_bytes())
                         logs.append('Workflow saved: '+str(dest))
                     logs.append('Qwen Image 2.1 Swap (Person + Outfit): AusBoss Person Swap v1.0 (BFS body swap v1.0 / head swap v1.1 LoRAs, optional Pruna 8-step row OFF, 25 steps) and Outfit Swap v1.1 (Outfit Swap LoRA ON, optional Viggle Turbo row OFF, 25 steps, outfit describer ON) as published. Qwen Image 2.1 INT8 ConvRot, Qwen3-VL 8B INT8 ConvRot encoder, Qwen Image 2.1 VAE and AusBoss nodes 2.20.0 are installed. About 20-27 GB VRAM, not GPU-validated. Qwen Image 2.1 weights are under the Qwen research licence (non-commercial).')
+                if profile=='qwen21_auto_carousel':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/'Qwen21_Auto_Carousel_10SOR.json'
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/qwen21_auto_carousel_10sor.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Qwen 2.1 Auto Carousel (10SOR): 4-slot carousel as published. Qwen3-VL 8B BF16 (TextGenerate) analyses the reference and writes 4 edit prompts; each slot runs REDQW21 UNLOCKED v2 FP8 + NSFW Qwen by TheseAlpacas V2 LoRA 1.0 (8 steps, er_sde/beta, CFG 1, AuraFlow shift 1.31), a Krea 2 Turbo realism pass (denoise 0.09) and SeedVR2 7B FP16 upscale; 10SOR Regeneration Gate re-runs only the selected slots. Not GPU-validated. Qwen Image 2.1 weights are under the Qwen research licence (non-commercial).')
                 if profile=='6gsc':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -472,7 +479,7 @@ def register(host):
         elif profile=='6gsc':
             file_keys=catalog['6gsc_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['6gsc_nodes']]
-        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap'):
+        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel'):
             file_keys=catalog[profile+'_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='recreate_hybrid':
@@ -530,7 +537,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -560,7 +567,7 @@ def register(host):
             model_links=model_links+copy.deepcopy(catalog['depth_anything_links'])
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
                   'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
                   'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth'),
                   'pip_packages':(list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
@@ -608,6 +615,8 @@ def register(host):
             return FileResponse(root/'selfism_workflows/qwen21_person_swap.json',filename='AusBoss_Qwen21_PersonSwap_v1.0.json')
         if profile=='qwen21_outfit_swap':
             return FileResponse(root/'selfism_workflows/qwen21_outfit_swap.json',filename='AusBoss_Qwen21_OutfitSwap_v1.1.json')
+        if profile=='qwen21_auto_carousel':
+            return FileResponse(root/'selfism_workflows/qwen21_auto_carousel_10sor.json',filename='Qwen21_Auto_Carousel_10SOR.json')
         if profile=='6gsc':
             return FileResponse(root/'selfism_workflows/6gsc.json',filename='6gsc_dashboard_v1.json')
         if profile=='full_refine':
