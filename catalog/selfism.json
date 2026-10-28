@@ -1622,6 +1622,42 @@
       "sha256": "0c98591700346f9777051d4e6fa29aa94519abec0d85b1f1f672a2a3db8c94b3",
       "auth": "none",
       "id": "qwen21-viggle-turbo-lora"
+    },
+    "qwen21-outfit-swap-lora": {
+      "name": "AusBoss Qwen Image 2.1 Outfit Swap LoRA",
+      "url": "https://huggingface.co/ausboss/Qwen-Image-2.1-Outfit-Swap-Consistency-LoRA/resolve/3ae2a126eff7c3eb4e3721d89a6f9f06a1f61704/qwen-image-2.1-outfit-swap.safetensors",
+      "destination": "models/loras/qwen-image-2.1-outfit-swap.safetensors",
+      "size_bytes": 159436488,
+      "sha256": "4ddfeac5695adaed1f0f78b23fda40919fd2ed6a4af790ced6c1e043dc4ae1f0",
+      "auth": "none",
+      "id": "qwen21-outfit-swap-lora"
+    },
+    "bfs-body-swap-qwen21": {
+      "name": "BFS Body Swap v1.0 LoRA (Qwen Image 2.1)",
+      "url": "https://huggingface.co/Alissonerdx/BFS-Best-Face-Swap/resolve/0ca3913ade4b4ada458d60c232354e8586c4c181/bfs_body_swap_v1.0_qwen_2.1.safetensors",
+      "destination": "models/loras/bfs_body_swap_v1.0_qwen_2.1.safetensors",
+      "size_bytes": 209753576,
+      "sha256": "7dc0a53aba4dbc70c204f498936a619d226559da11011f748c389189af46b664",
+      "auth": "none",
+      "id": "bfs-body-swap-qwen21"
+    },
+    "bfs-head-qwen21": {
+      "name": "BFS Head Swap v1.1 LoRA (Qwen Image 2.1)",
+      "url": "https://huggingface.co/Alissonerdx/BFS-Best-Face-Swap/resolve/0ca3913ade4b4ada458d60c232354e8586c4c181/bfs_head_v1.1_qwen_2.1.safetensors",
+      "destination": "models/loras/bfs_head_v1.1_qwen_2.1.safetensors",
+      "size_bytes": 260096144,
+      "sha256": "d1d748d5601077f3b6d05766f6823510e901970d916afa404a97e85dc92fa88e",
+      "auth": "none",
+      "id": "bfs-head-qwen21"
+    },
+    "pruna-qwen21-8step-t8": {
+      "name": "Pruna Qwen Image 2.1 8-step LoRA (T8 ComfyUI)",
+      "url": "https://huggingface.co/t8star/Pruna-Qwen-Image-2.1-Comfy/resolve/1d19f7b4334a949a480fe49b1a2bf899766aefa4/p_qwen_image_2.1_8step_v0.1-comfyui-T8.safetensors",
+      "destination": "models/loras/p_qwen_image_2.1_8step_v0.1-comfyui-T8.safetensors",
+      "size_bytes": 335633936,
+      "sha256": "38a963b33ebd16d5eb9edfdf0254a3e7f55e3bda2d46bca55e5990e31ec43c83",
+      "auth": "none",
+      "id": "pruna-qwen21-8step-t8"
     }
   },
   "nodes": [
@@ -2897,6 +2933,19 @@
     "qwen21-viggle-turbo-lora"
   ],
   "qwen21_edit_full_nodes": [
+    "ComfyUI-AusBoss"
+  ],
+  "qwen21_swap_files": [
+    "qwen21-int8",
+    "qwen3vl-8b-int8",
+    "qwen21-vae",
+    "qwen21-viggle-turbo-lora",
+    "qwen21-outfit-swap-lora",
+    "bfs-body-swap-qwen21",
+    "bfs-head-qwen21",
+    "pruna-qwen21-8step-t8"
+  ],
+  "qwen21_swap_nodes": [
     "ComfyUI-AusBoss"
   ]
 }
