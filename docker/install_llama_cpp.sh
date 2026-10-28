@@ -3,14 +3,14 @@
 # Qwen / CUDA environment repair (launcher/selfism_runtime.py) otherwise downloads on
 # every new volume. Same wheel (same URL, pinned by sha256), same --no-deps install, same
 # runtime deps the repair adds. The repair is unchanged: on the pod it sees
-# llama-cpp-python 0.4.1+cu128 through the venv's --system-site-packages, runs its GPU
+# llama-cpp-python 0.4.1 (the +cu128 wheel) through the venv's --system-site-packages, runs its GPU
 # probe, and only downloads the wheel again if that probe fails.
 set -Eeuo pipefail
 
 : "${PYTHON:=python3.12}"
 : "${LLAMA_CPP_URL:=https://github.com/JamePeng/llama-cpp-python/releases/download/v0.4.1-cu128-linux-20260926/llama_cpp_python-0.4.1%2Bcu128-cp312-cp312-linux_x86_64.whl}"
 : "${LLAMA_CPP_SHA256:=cae7e9082e12ddf377ccbd2d19a9d3c14b86fafb9b9d702d0bd846563c0d1ca9}"
-: "${LLAMA_CPP_VERSION:=0.4.1+cu128}"
+: "${LLAMA_CPP_VERSION:=0.4.1}"  # the wheel metadata (its filename says +cu128)
 # What selfism_runtime.RUNTIME_DEPS resolves to; numpy, jinja2 and typing-extensions
 # are already in the image and are not touched.
 : "${DISKCACHE_VERSION:=5.6.3}"

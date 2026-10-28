@@ -18,6 +18,10 @@ WHEEL = ('https://github.com/JamePeng/llama-cpp-python/releases/download/'
 # (numpy, jinja2, typing-extensions shipped with ComfyUI) is left exactly as it is.
 RUNTIME_DEPS = ('diskcache', 'numpy', 'jinja2', 'typing-extensions')
 
+# What importlib.metadata reports once WHEEL is installed (the image bakes it:
+# docker/install_llama_cpp.sh), plus the local-version form the check used before.
+INSTALLED_VERSIONS = ('0.4.1', '0.4.1+cu128')
+
 VERIFY = '''
 import ctypes
 from pathlib import Path
@@ -71,7 +75,11 @@ def main():
     env = dict(os.environ)
     env.pop('LD_LIBRARY_PATH', None)
     probe = subprocess.run([sys.executable, '-c', VERIFY], env=env, timeout=120)
-    if version != '0.4.1+cu128' or probe.returncode:
+    # The wheel above is named +cu128 but its metadata says 0.4.1, so the old check
+    # ('0.4.1+cu128' only) never matched and the 313 MB wheel was reinstalled on every
+    # repair. The GPU probe is what proves it is this CUDA build (Qwen35ChatHandler +
+    # GPU offload); a CPU llama-cpp-python fails it and is replaced as before.
+    if version not in INSTALLED_VERSIONS or probe.returncode:
         run([sys.executable, '-m', 'pip', 'install', '--disable-pip-version-check',
              '--force-reinstall', '--no-deps', '--timeout', '30', '--retries', '3', WHEEL], timeout=1800)
     run([sys.executable, '-m', 'pip', 'install', '--disable-pip-version-check',

@@ -84,8 +84,9 @@ def test_llama_wheel_is_the_one_the_repair_downloads():
     text = LLAMA.read_text()
     assert runtime.WHEEL in text
     assert 'cae7e9082e12ddf377ccbd2d19a9d3c14b86fafb9b9d702d0bd846563c0d1ca9' in text
-    assert 'LLAMA_CPP_VERSION:=0.4.1+cu128' in text
-    assert "version != '0.4.1+cu128'" in (ROOT / 'launcher/selfism_runtime.py').read_text()
+    assert 'LLAMA_CPP_VERSION:=0.4.1}' in text
+    assert '0.4.1' in runtime.INSTALLED_VERSIONS          # what the baked wheel reports
+    assert 'version not in INSTALLED_VERSIONS or probe.returncode' in (ROOT / 'launcher/selfism_runtime.py').read_text()
     assert '--no-deps "$wheel"' in text
     assert 'diskcache' in runtime.RUNTIME_DEPS and 'diskcache==$DISKCACHE_VERSION' in text
     assert 'Qwen35ChatHandler' in text and 'libcublas.so.12' in text
