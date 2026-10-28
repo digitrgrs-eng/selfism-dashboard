@@ -7,7 +7,7 @@
 # input changes, build the base, then put its tag and digest below.
 # This file has no RUN step, so a card-only change rebuilds only the COPY layers below
 # and RunPod pulls only those (a few MB) when it already has the base.
-FROM ghcr.io/digitrgrs-eng/selfism-dashboard:BASE_TAG@BASE_DIGEST
+FROM ghcr.io/digitrgrs-eng/selfism-dashboard:base-bd7c9452991c7906@sha256:868223587cc50248c3c159a914bbafac38789901abc783ef01b6ac1c992382db
 
 ARG IMAGE_VERSION=dev
 LABEL org.opencontainers.image.title="Selfora / Selfism dashboard" \
