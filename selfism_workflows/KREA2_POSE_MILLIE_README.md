@@ -35,3 +35,28 @@ Everything else (links, samplers, denoise 0.85 / 0.2, 2× 4 MP pass, pose LoRA 0
 Steps (8), CFG (1), denoise (0.85 / 0.2), seeds, LoRAs, prompts, Ostris patch, pose LoRA, detailers (euler/normal) and upscale are unchanged. Both finetunes are step-distilled like Turbo: the existing RawGirl Millie cards run 8 steps, CFG 1, euler/beta (ClownsharKSampler), and the KRAST cards run 6–8 steps, CFG 1, er_sde or res_2s with beta. Only the scheduler/sampler was aligned with those cards.
 
 Risk: the Ostris edit patch and `krea2_turbo_openpose_controlnet` were trained on Krea 2 (Turbo). The finetunes share the architecture (same Qwen3-VL 4B encoder, Qwen VAE and Millie LoRA as on their own cards), so they load, but pose adherence and multi-reference editing may be weaker or different. Not GPU-validated.
+
+## Krast ORG Pose Recreate (card `krast_org_pose_millie`)
+
+`krast_org_pose_recreate_millie.json` (saved in ComfyUI as `Selfism/Krast_ORG_PoseRecreate_Millie_v1.json`) is a copy of `krast_org.json` with the Bella pose technique added to stage 1. `krast_org.json` and every other card are unchanged.
+
+Kept from Krast ORG: the `Model loader` subgraph (KRAST-V2 INT8 `krast_v20`, Qwen3-VL-4B Heretic INT8 ConvRot, `krea2RealVae_v10`), Pixaroma LoRA loader with Millie 1.0, stage 1 KSampler er_sde/simple 8 steps CFG 1 seed from `Seed (rgthree)`, stage 2 (1.5× latent upscale, DPM++ SDE + Beta 6 steps, sigma rescale, Adaptive Projected Guidance, text-only conditioning), FaceDetailer subgraph, MoP Mix Lustify SDXL detailers and the three PixaromaSaveImage nodes (now `output/KRAST_ORG_POSE/`).
+
+Removed: the img2img `LATENT` subgraph and its `Load Image` (the reference chain replaces them).
+
+Added (values from the Bella original workflow):
+
+- `REFERENCE IMAGE (image1)` → `DWPose - skeleton` (hand/body/face on, 1024, yolox_l + dw-ll_ucoco_384_bs5) → `Skeleton resize (image2)`.
+- Reference → `Reference denoise blur` (2, 1) → `Reference resize (image1)` → `VAEEncode` with krea2RealVae → stage 1 latent, denoise 0.85.
+- `OPTIONAL image3` LoadImage → resize → image3 of both encode nodes. Not needed: delete its two links into `PROMPT STAGE 1` and `NEGATIVE STAGE 1`.
+- Stage 1 model: Pixaroma LoRA (Millie 1.0 + `krea-smartphone-photo-slider` 1.0) → `Krea2OstrisEditModelPatch` (kv_cache on) → `POSE CONTROLNET LORA` 0.75. Stage 2 and the detailers keep the plain LoRA model.
+- `PROMPT STAGE 1` / `NEGATIVE STAGE 1 (leave empty!)`: `TextEncodeKrea2OstrisEdit` with the Heretic CLIP and krea2RealVae, followed by `FluxKontextMultiReferenceLatentMethod` index_timestep_zero.
+- `WRITE YOUR JSON PROMPT HERE` feeds stage 1 and the stage 2 `CLIPTextEncode` (`PROMPT STAGE 2`). Put `image_roles` first.
+
+Compatibility (checked in source, not on a GPU):
+
+- Ostris text encode calls `clip.tokenize(..., images=...)` and needs the Qwen3-VL vision tower. ComfyUI v0.38.1 loads the Heretic file as the core `krea2` CLIP (`Qwen3VL` with `visual`). By size accounting the Heretic INT8 file (5,246,908,680 bytes) = Comfy FP8 file minus `lm_head` (embeddings 0.778 GB + 3.634 GB INT8 linears + 0.831 GB F16 vision tower), so the vision weights are present. The header itself could not be read (Civitai needs a token here).
+- `Krea2OstrisEditModelPatch` only calls the DiT submodules (`wq/wk/wv/gate/wo`, `mlp`, `first`, `tmlp`, ...), so the INT8 `comfy_quant` layers of `krast_v20` run through the normal quantized ops; the same file is already patched on the `krea2_pose_millie_krast` card.
+- `krea2RealVae_v10` has the same 194 tensors/shapes as `qwen_image_vae` (F32), encoder included; Krast ORG already uses it for VAEEncode.
+
+No fallback encoder/VAE was needed. About 48 GB VRAM (as Krast ORG; three 1 MP reference latents add ~12k tokens, cached once per run with kv_cache). Not GPU-validated.

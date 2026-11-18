@@ -3109,5 +3109,49 @@
       "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
+  ],
+  "krast_org_pose_millie_files": [
+    "krast-v20",
+    "krast-org-heretic-te",
+    "edit-vae",
+    "krast-org-lustify",
+    "millie",
+    "face",
+    "sam",
+    "krast-org-hands-seg",
+    "krast-org-nipples-seg",
+    "krast-org-pussy-bbox",
+    "krast-org-eyeful",
+    "krast-org-cockandball",
+    "dwpose-det",
+    "dwpose-pose",
+    "pose-lora",
+    "6gsc-smartphone"
+  ],
+  "krast_org_pose_millie_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Pixaroma",
+    "ComfyUI-Adaptive-Guidance",
+    "ComfyUI-Crystools",
+    "ComfyUI-1hewNodes",
+    "CRT-Nodes",
+    "ComfyUI_Eclipse",
+    "sd-perturbed-attention",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit"
+  ],
+  "krast_org_pose_millie_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
   ]
 }
