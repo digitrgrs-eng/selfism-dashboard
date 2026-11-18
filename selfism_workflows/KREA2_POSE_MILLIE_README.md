@@ -22,3 +22,16 @@ Everything else (links, samplers, denoise 0.85 / 0.2, 2× 4 MP pass, pose LoRA 0
 ## Installation
 
 14 models (~23.2 GB, mostly shared with 6gsc/Krea cards) and 5 pinned node packs (rgthree, Impact Pack, Impact Subpack, controlnet_aux, Ostris Edit `7756566`). Models come from private R2 when size + SHA256 metadata match, otherwise from the pinned public source. DWPose weights are linked into `custom_nodes/comfyui_controlnet_aux/ckpts`. New catalog asset: `person-seg-m` (`ultralytics/segm/person_yolov8m-seg.pt`, Bingsu/adetailer, 54,827,683 bytes). GPU execution has not been tested.
+
+## RawGirl and KRAST v2 variants
+
+`krea2_pose_recreate_millie_rawgirl.json` (card `krea2_pose_millie_rawgirl`) and `krea2_pose_recreate_millie_krast.json` (card `krea2_pose_millie_krast`) are the same graph with only these changes:
+
+| | Turbo card | RawGirl | KRAST v2 |
+|---|---|---|---|
+| UNETLoader | `krea2_turbo_fp8_scaled` | `rawgirlKrea2_v20Fp8` (default dtype) | `krast_v20` (default dtype) |
+| Pass 1 + pass 2 KSampler | euler / simple | euler / beta | er_sde / beta |
+
+Steps (8), CFG (1), denoise (0.85 / 0.2), seeds, LoRAs, prompts, Ostris patch, pose LoRA, detailers (euler/normal) and upscale are unchanged. Both finetunes are step-distilled like Turbo: the existing RawGirl Millie cards run 8 steps, CFG 1, euler/beta (ClownsharKSampler), and the KRAST cards run 6–8 steps, CFG 1, er_sde or res_2s with beta. Only the scheduler/sampler was aligned with those cards.
+
+Risk: the Ostris edit patch and `krea2_turbo_openpose_controlnet` were trained on Krea 2 (Turbo). The finetunes share the architecture (same Qwen3-VL 4B encoder, Qwen VAE and Millie LoRA as on their own cards), so they load, but pose adherence and multi-reference editing may be weaker or different. Not GPU-validated.
