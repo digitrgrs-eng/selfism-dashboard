@@ -25,7 +25,7 @@ INT8_PROFILES = ('simple','aio','full','full_refine','repair')
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','krea2_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -387,6 +387,13 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/qwen21_auto_carousel_10sor.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Qwen 2.1 Auto Carousel (10SOR): 4-slot carousel as published. Qwen3-VL 8B BF16 (TextGenerate) analyses the reference and writes 4 edit prompts; each slot runs REDQW21 UNLOCKED v2 FP8 + NSFW Qwen by TheseAlpacas V2 LoRA 1.0 (8 steps, er_sde/beta, CFG 1, AuraFlow shift 1.31), a Krea 2 Turbo realism pass (denoise 0.09) and SeedVR2 7B FP16 upscale; 10SOR Regeneration Gate re-runs only the selected slots. Not GPU-validated. Qwen Image 2.1 weights are under the Qwen research licence (non-commercial).')
+                if profile=='krea2_pose_millie':
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    dest=folder/'Krea2_PoseRecreate_Millie_v1.json'
+                    if not dest.exists(): dest.write_bytes((root/'selfism_workflows/krea2_pose_recreate_millie.json').read_bytes())
+                    logs.append('Workflow saved: '+str(dest))
+                    logs.append('Millie Pose Recreate (Krea2 Ostris Edit + DWPose): load the REFERENCE IMAGE (photo or first video frame) and a MILLIE REFERENCE photo (image3, chest/body), then edit the prompt. Krea2 Turbo FP8, Qwen3-VL 4B FP8, Millie LoRA 1.0 (trigger m1lli3), smartphone slider 1.0, OpenPose control LoRA 0.75, Ostris edit patch, 1 MP pass (denoise 0.85), 2x 4 MP pass (denoise 0.2), FaceDetailer and BodyDetailer. Mystic v3, famegrid and bloomgirls rows stay OFF. No LLM prompter. Not GPU-validated.')
                 if profile=='6gsc':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -479,7 +486,7 @@ def register(host):
         elif profile=='6gsc':
             file_keys=catalog['6gsc_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['6gsc_nodes']]
-        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel'):
+        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','krea2_pose_millie'):
             file_keys=catalog[profile+'_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='recreate_hybrid':
@@ -537,7 +544,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','krea2_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -559,7 +566,7 @@ def register(host):
         # only looks in custom_nodes/comfyui_controlnet_aux/ckpts (or AUX_ANNOTATOR_CKPTS_PATH).
         # full/full_refine/reference/carousel already carry that link; the other depth cards did not.
         model_links=[]
-        if profile in ('full','full_refine','6gsc','god_mode','hearmeman_wan_v5'):
+        if profile in ('full','full_refine','6gsc','god_mode','hearmeman_wan_v5','krea2_pose_millie'):
             model_links=copy.deepcopy(catalog[profile+'_links'])
         elif profile in ('reference','carousel'):
             model_links=copy.deepcopy(catalog['reference_links'])
@@ -567,9 +574,9 @@ def register(host):
             model_links=model_links+copy.deepcopy(catalog['depth_anything_links'])
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','6gsc','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
-                  'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth'),
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','krea2_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','6gsc','krea2_pose_millie','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
+                  'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth','krea2_pose_millie'),
                   'pip_packages':(list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':model_links+lut_links}
         return await controller.start(workflow)
@@ -617,6 +624,8 @@ def register(host):
             return FileResponse(root/'selfism_workflows/qwen21_outfit_swap.json',filename='AusBoss_Qwen21_OutfitSwap_v1.1.json')
         if profile=='qwen21_auto_carousel':
             return FileResponse(root/'selfism_workflows/qwen21_auto_carousel_10sor.json',filename='Qwen21_Auto_Carousel_10SOR.json')
+        if profile=='krea2_pose_millie':
+            return FileResponse(root/'selfism_workflows/krea2_pose_recreate_millie.json',filename='Krea2_PoseRecreate_Millie_v1.json')
         if profile=='6gsc':
             return FileResponse(root/'selfism_workflows/6gsc.json',filename='6gsc_dashboard_v1.json')
         if profile=='full_refine':
