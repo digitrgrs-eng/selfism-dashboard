@@ -28,3 +28,5 @@ selfism_workflows/sources/krea2_pose_recreate_original.json -text
 selfism_workflows/krea2_pose_recreate_millie_rawgirl.json -text
 selfism_workflows/krea2_pose_recreate_millie_krast.json -text
 selfism_workflows/krast_org_pose_recreate_millie.json -text
+selfism_workflows/qwen21_dataset_generator.json -text
+selfism_workflows/sources/qwen21_dataset_generator_original.json -text

@@ -1696,6 +1696,15 @@
       "sha256": "c8ab26f517173b1fe8342d336a09f443eb61cb08dcbfc78d53fff4c2547ae81e",
       "auth": "none",
       "id": "person-seg-m"
+    },
+    "lenovo-qwen21": {
+      "name": "Lenovo UltraReal LoRA (Qwen Image 2.1, Danrisi)",
+      "url": "https://huggingface.co/Danrisi/lenovo_qwen2.1/resolve/1b75c2bc71a335d981bdc0060ffab0931ba24b50/lenovo_qwen21.safetensors",
+      "destination": "models/loras/lenovo_qwen21.safetensors",
+      "size_bytes": 79743896,
+      "sha256": "7f1e95c3ec1e9c7cea197f7b6f80f601af8e6b479f6ead78ab16df542f447c0e",
+      "auth": "none",
+      "id": "lenovo-qwen21"
     }
   },
   "nodes": [
@@ -3153,5 +3162,25 @@
       "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
+  ],
+  "qwen21_dataset_generator_files": [
+    "redqw21-unlocked-v2-fp8",
+    "qwen3vl-8b-bf16",
+    "qwen21-vae",
+    "nsfw-qwen-thesealpacas-v2",
+    "lenovo-qwen21",
+    "bfs-head-qwen21",
+    "krea-turbo",
+    "encoder",
+    "edit-vae",
+    "seedvr2-7b-fp16",
+    "seedvr2-vae-fp16"
+  ],
+  "qwen21_dataset_generator_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Easy-Use",
+    "ComfyUI-Custom-Scripts",
+    "ComfyUI-SeedVR2_VideoUpscaler"
   ]
 }
