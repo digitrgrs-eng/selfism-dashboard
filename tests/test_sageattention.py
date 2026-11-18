@@ -25,6 +25,8 @@ SAGE_CARDS = {
 # baked SageAttention 2.2.0 wheel). Workflow file -> Selfism profile.
 SEEDVR2_SAGE_CARDS = {
     "qwen21_auto_carousel_10sor": "qwen21_auto_carousel",
+    "qwen21_dataset_generator": "qwen21_dataset_generator",
+    "sources/qwen21_dataset_generator_original": "qwen21_dataset_generator",
 }
 
 
