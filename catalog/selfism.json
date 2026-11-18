@@ -3043,5 +3043,71 @@
       "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
       "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
     }
+  ],
+  "krea2_pose_millie_rawgirl_files": [
+    "rawgirl-krea2-v20-fp8",
+    "encoder",
+    "qwen-vae",
+    "face",
+    "person-seg-m",
+    "sam",
+    "dwpose-det",
+    "dwpose-pose",
+    "pose-lora",
+    "millie",
+    "6gsc-smartphone",
+    "famegrid",
+    "bloom",
+    "lora-mystic-xxx"
+  ],
+  "krea2_pose_millie_rawgirl_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit"
+  ],
+  "krea2_pose_millie_rawgirl_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
+  ],
+  "krea2_pose_millie_krast_files": [
+    "krast-v20",
+    "encoder",
+    "qwen-vae",
+    "face",
+    "person-seg-m",
+    "sam",
+    "dwpose-det",
+    "dwpose-pose",
+    "pose-lora",
+    "millie",
+    "6gsc-smartphone",
+    "famegrid",
+    "bloom",
+    "lora-mystic-xxx"
+  ],
+  "krea2_pose_millie_krast_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit"
+  ],
+  "krea2_pose_millie_krast_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
   ]
 }
