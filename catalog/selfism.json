@@ -1687,6 +1687,15 @@
       "sha256": "83aba822ad8ee10a1e836828f5088259d93bce7b5f3419b46dbc0258c2be46a9",
       "auth": "none",
       "id": "nsfw-qwen-thesealpacas-v2"
+    },
+    "person-seg-m": {
+      "name": "Person YOLOv8m segmentation (Impact Subpack BodyDetailer)",
+      "url": "https://huggingface.co/Bingsu/adetailer/resolve/53cc19de382014514d9d4038601d261a7faa9b7b/person_yolov8m-seg.pt",
+      "destination": "models/ultralytics/segm/person_yolov8m-seg.pt",
+      "size_bytes": 54827683,
+      "sha256": "c8ab26f517173b1fe8342d336a09f443eb61cb08dcbfc78d53fff4c2547ae81e",
+      "auth": "none",
+      "id": "person-seg-m"
     }
   },
   "nodes": [
@@ -3001,5 +3010,38 @@
     "ComfyUI-Custom-Scripts",
     "ComfyUI-SeedVR2_VideoUpscaler",
     "ComfyUI-10SOR-Regeneration-Gate"
+  ],
+  "krea2_pose_millie_files": [
+    "krea-turbo",
+    "encoder",
+    "qwen-vae",
+    "face",
+    "person-seg-m",
+    "sam",
+    "dwpose-det",
+    "dwpose-pose",
+    "pose-lora",
+    "millie",
+    "6gsc-smartphone",
+    "famegrid",
+    "bloom",
+    "lora-mystic-xxx"
+  ],
+  "krea2_pose_millie_nodes": [
+    "rgthree-comfy",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit"
+  ],
+  "krea2_pose_millie_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    }
   ]
 }
