@@ -2056,6 +2056,12 @@
       "ref": "23038f5050acdcbb8e938bfd7c87a18d2cc84aab",
       "install_requirements": true,
       "requirements_packages": []
+    },
+    {
+      "name": "ComfyUI-Inpaint-CropAndStitch",
+      "repo": "https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git",
+      "ref": "6005efc02f7745649118edd89cdd084c2b9bd3ae",
+      "install_requirements": false
     }
   ],
   "simple_files": [
@@ -3208,5 +3214,59 @@
     "rgthree-comfy",
     "MATRIX-LAB-Nodes",
     "ComfyUI-Fantastic-MiniMaxH3-PromptBuilder"
+  ],
+  "millie_recreate_pro_setup_files": [
+    "krea-turbo",
+    "rawgirl-krea2-v20-fp8",
+    "krast-v20",
+    "encoder",
+    "krast-org-heretic-te",
+    "qwen3vl-8b-bf16",
+    "qwen-vae",
+    "edit-vae",
+    "millie",
+    "6gsc-smartphone",
+    "pose-lora",
+    "depth",
+    "depth-anything",
+    "dwpose-det",
+    "dwpose-pose",
+    "face",
+    "eyes",
+    "hand",
+    "person-seg-m",
+    "sam"
+  ],
+  "millie_recreate_pro_setup_nodes": [
+    "rgthree-comfy",
+    "RES4LYF",
+    "ComfyUI-KJNodes",
+    "ComfyUI-Impact-Pack",
+    "ComfyUI-Impact-Subpack",
+    "ComfyUI-Pixaroma",
+    "ComfyUI-Adaptive-Guidance",
+    "ComfyUI-Crystools",
+    "ComfyUI-1hewNodes",
+    "CRT-Nodes",
+    "ComfyUI_Eclipse",
+    "sd-perturbed-attention",
+    "comfyui_controlnet_aux",
+    "comfyui-krea2-ostris-edit",
+    "comfyui-krea2-controlnet",
+    "ComfyUI-Inpaint-CropAndStitch"
+  ],
+  "millie_recreate_pro_setup_links": [
+    {
+      "source": "models/controlnet_aux/yzd-v/DWPose/yolox_l.onnx",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"
+    },
+    {
+      "source": "models/controlnet_aux/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"
+    },
+    {
+      "source": "models/controlnet_aux/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth",
+      "destination": "custom_nodes/comfyui_controlnet_aux/ckpts/depth-anything/Depth-Anything-V2-Large/depth_anything_v2_vitl.pth"
+    }
   ]
 }

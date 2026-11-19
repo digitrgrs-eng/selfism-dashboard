@@ -25,7 +25,7 @@ INT8_PROFILES = ('simple','aio','full','full_refine','repair')
 GOD_MODE_WORKFLOW_NAME = 'Wan22_Animate_GOD_Mode.json'
 
 class Selection(BaseModel):
-    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
+    profile: Literal['simple','aio','reference','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','god_mode','extras','repair','model','node'] = 'simple'
     precision: Literal['fp8','int8','bf16'] = 'fp8'
     item: str = ''
 
@@ -329,6 +329,15 @@ def register(host):
                     if not dest.exists(): dest.write_bytes((root/'selfism_workflows/krast_org_pose_recreate_millie.json').read_bytes())
                     logs.append('Workflow saved: '+str(dest))
                     logs.append('Krast ORG Pose Recreate (Millie): the Krast ORG graph (krast_v20 INT8, Qwen3-VL-4B Heretic INT8 ConvRot, krea2RealVae; 1.5x DPM++ SDE/Beta/APG stage 2; FaceDetailer + MoP Mix Lustify SDXL detailers) with the Bella pose technique in stage 1: REFERENCE IMAGE -> DWPose skeleton, blurred reference as start latent (denoise 0.85), Ostris Edit patch + TextEncodeKrea2OstrisEdit (image1 = reference, image2 = skeleton, optional image3), OpenPose control LoRA 0.75, Millie LoRA 1.0 + smartphone slider 1.0. One JSON prompt feeds both stages. Saves to output/KRAST_ORG_POSE. About 48 GB GPU. Not GPU-validated.')
+                if profile=='millie_recreate_pro_setup':
+                    # One folder for the A/B test workflows now and the final Millie Recreate Pro workflows later.
+                    folder=host.COMFYUI_DIR/'user/default/workflows/Selfism/MillieRecreatePro'
+                    folder.mkdir(parents=True,exist_ok=True)
+                    for src in sorted((root/'selfism_workflows/millie_recreate_pro').glob('*.json')):
+                        dest=folder/src.name
+                        if not dest.exists(): dest.write_bytes(src.read_bytes())
+                        logs.append('Workflow saved: '+str(dest))
+                    logs.append('Millie Recreate Pro Setup: models and nodes for the Recreate Pro workflows (Krea2 Turbo FP8, RawGirl Krea2 v2.0 FP8, KRAST v2 krast_v20; Qwen3-VL 4B FP8, Qwen3-VL-4B Heretic INT8 ConvRot, Qwen3-VL 8B BF16 for the optional auto prompter; qwen_image_vae, krea2RealVae; Millie LoRA, smartphone slider, OpenPose control LoRA, Krea2 depth-control LoRA + Depth Anything V2; DWPose; face/eyes/hand/person detectors + SAM; Krast ORG nodes; Inpaint Crop and Stitch). A/B test (Krea2 Turbo, PASS 1 only, refine/FaceDetailer/BodyDetailer bypassed): A = reference photo image1 + skeleton image2 + Millie image3 in the Ostris encoder; B = skeleton only as image1, reference photo still the img2img start latent. Same prompt, seed 1, denoise 0.85, pose LoRA 0.75. Results: output/MillieRecreatePro/AB_A and AB_B. Not GPU-validated.')
                 if profile=='rawgirl_millie':
                     folder=host.COMFYUI_DIR/'user/default/workflows/Selfism'
                     folder.mkdir(parents=True,exist_ok=True)
@@ -521,7 +530,7 @@ def register(host):
         elif profile=='6gsc':
             file_keys=catalog['6gsc_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog['6gsc_nodes']]
-        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie'):
+        elif profile in ('hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup'):
             file_keys=catalog[profile+'_files']
             nodes=[n for n in catalog['nodes'] if n['name'] in catalog[profile+'_nodes']]
         elif profile=='recreate_hybrid':
@@ -579,7 +588,7 @@ def register(host):
             for f in files:
                 # This profile ships pinned size + SHA256 for every model; downloads verify those bytes.
                 # Do not require Civitai access merely to install verified private-R2 copies.
-                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
+                if profile in ('full_refine','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') and re.fullmatch(r'[0-9a-f]{64}', f.get('sha256','')) and f.get('size_bytes',0)>0:
                     continue
                 if 'civitai_version' not in f: continue
                 token=(os.getenv('CIVITAI_TOKEN') or os.getenv('CIVITAI_API_TOKEN') or '').strip()
@@ -601,7 +610,7 @@ def register(host):
         # only looks in custom_nodes/comfyui_controlnet_aux/ckpts (or AUX_ANNOTATOR_CKPTS_PATH).
         # full/full_refine/reference/carousel already carry that link; the other depth cards did not.
         model_links=[]
-        if profile in ('full','full_refine','6gsc','god_mode','hearmeman_wan_v5','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie'):
+        if profile in ('full','full_refine','6gsc','god_mode','hearmeman_wan_v5','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup'):
             model_links=copy.deepcopy(catalog[profile+'_links'])
         elif profile in ('reference','carousel'):
             model_links=copy.deepcopy(catalog['reference_links'])
@@ -609,9 +618,9 @@ def register(host):
             model_links=model_links+copy.deepcopy(catalog['depth_anything_links'])
         workflow={'id':'selfism-'+profile,'title':'Selfora / Selfism — '+profile,
                   'files':files,'custom_nodes':nodes,'selfism_profile':profile,
-                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
-                  'selfism_repair':profile in ('simple','aio','reference','6gsc','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
-                  'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie'),
+                  'precision':'fp8' if profile in ('carousel','6gsc','hearmeman_i2i','hearmeman_wan_v5','hearmeman_scail2_v2','qwen21_edit_full','qwen21_swap','qwen21_auto_carousel','qwen21_dataset_generator','matrix_qwen21_dataset','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl') else request.precision,
+                  'selfism_repair':profile in ('simple','aio','reference','6gsc','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup','hearmeman_i2i','recreate_hybrid','krast','krea_klein','krea_fluxdepth','krast_fluxdepth','krast_faithful_klein_v5','krast_org','rawgirl_millie','krast_org_depth','rawgirl','carousel','full','full_refine','repair','node'),
+                  'selfism_repair_paths_only':profile in ('krast_org','krast_org_depth','krea2_pose_millie','krea2_pose_millie_rawgirl','krea2_pose_millie_krast','krast_org_pose_millie','millie_recreate_pro_setup'),
                   'pip_packages':(list(catalog.get('god_mode_pip',[])) if profile=='god_mode' else []),
                   'model_links':model_links+lut_links}
         return await controller.start(workflow)
@@ -635,6 +644,10 @@ def register(host):
             return FileResponse(root/'selfism_workflows/krast_org.json',filename='KRAST_ORG_Millie.json')
         if profile=='krast_org_pose_millie':
             return FileResponse(root/'selfism_workflows/krast_org_pose_recreate_millie.json',filename='Krast_ORG_PoseRecreate_Millie_v1.json')
+        if profile in ('millie_recreate_pro_setup','millie_recreate_pro_ab_a'):
+            return FileResponse(root/'selfism_workflows/millie_recreate_pro/MillieRecreatePro_AB_A_Turbo_ReferenceInEncoder.json',filename='MillieRecreatePro_AB_A_Turbo_ReferenceInEncoder.json')
+        if profile=='millie_recreate_pro_ab_b':
+            return FileResponse(root/'selfism_workflows/millie_recreate_pro/MillieRecreatePro_AB_B_Turbo_SkeletonOnly.json',filename='MillieRecreatePro_AB_B_Turbo_SkeletonOnly.json')
         if profile=='krast_faithful_klein_v5':
             return FileResponse(root/'selfism_workflows/krast_faithful_klein_v5.json',filename='KRAST_FaithfulPose_Millie_Klein_Amateur_v5.json')
         if profile=='krea_klein_artfat':
