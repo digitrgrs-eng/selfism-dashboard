@@ -2042,6 +2042,20 @@
       "repo": "https://github.com/10sorlabs/ComfyUI-10SOR-Regeneration-Gate.git",
       "ref": "7d891c3c1abb64cd51913816ecf3eeca343574bc",
       "install_requirements": false
+    },
+    {
+      "name": "MATRIX-LAB-Nodes",
+      "repo": "https://github.com/JsonMatrixLab/MATRIX-LAB-Nodes.git",
+      "ref": "f71fb38dea39f6052ff4e883c18fecc7ec07d199",
+      "install_requirements": true,
+      "requirements_packages": []
+    },
+    {
+      "name": "ComfyUI-Fantastic-MiniMaxH3-PromptBuilder",
+      "repo": "https://github.com/Adudeguyman/ComfyUI-Fantastic-MiniMaxH3-PromptBuilder.git",
+      "ref": "23038f5050acdcbb8e938bfd7c87a18d2cc84aab",
+      "install_requirements": true,
+      "requirements_packages": []
     }
   ],
   "simple_files": [
@@ -3182,5 +3196,17 @@
     "ComfyUI-Easy-Use",
     "ComfyUI-Custom-Scripts",
     "ComfyUI-SeedVR2_VideoUpscaler"
+  ],
+  "matrix_qwen21_dataset_files": [
+    "qwen21-int8",
+    "qwen3vl-8b-int8",
+    "qwen21-vae",
+    "bfs-head-qwen21",
+    "pruna-qwen21-8step-t8"
+  ],
+  "matrix_qwen21_dataset_nodes": [
+    "rgthree-comfy",
+    "MATRIX-LAB-Nodes",
+    "ComfyUI-Fantastic-MiniMaxH3-PromptBuilder"
   ]
 }
