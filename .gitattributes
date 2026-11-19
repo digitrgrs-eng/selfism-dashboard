@@ -32,3 +32,4 @@ selfism_workflows/qwen21_dataset_generator.json -text
 selfism_workflows/sources/qwen21_dataset_generator_original.json -text
 selfism_workflows/matrix_qwen21_dataset.json -text
 selfism_workflows/sources/matrix_qwen21_dataset_original.json -text
+selfism_workflows/millie_recreate_pro/*.json -text
